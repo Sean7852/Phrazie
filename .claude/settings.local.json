@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(export PATH=\"$PATH:/c/Program Files/dotnet\")",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet add:*)",
+      "Bash(find . -not -path '*/bin/*' -not -path '*/obj/*' -not -path '*/.git/*' -type f '\\(' -name '*.cs' -o -name '*.axaml' -o -name '*.csproj' -o -name '*.sln' -o -name '*.md' -o -name '*.manifest' '\\)' -exec sed -i s/Phraze/Phrazie/g '{}' +)",
+      "Bash(mv Phraze.Desktop/Phraze.Desktop.csproj Phraze.Desktop/Phrazie.Desktop.csproj)",
+      "Bash(mv Phraze.Core/Phraze.Core.csproj Phraze.Core/Phrazie.Core.csproj)",
+      "Bash(mv Phraze.Data/Phraze.Data.csproj Phraze.Data/Phrazie.Data.csproj)",
+      "Bash(mv Phraze.Desktop Phrazie.Desktop)",
+      "Bash(mv Phraze.Core Phrazie.Core)",
+      "Bash(mv:*)",
+      "Bash(dotnet build:*)"
+    ]
+  }
+}
