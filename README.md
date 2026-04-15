@@ -1,13 +1,23 @@
 # Phrazie
 
-A cross-platform VJ desktop application built with Avalonia UI and .NET 9. Phrazie reads your installed Rekordbox library, links tracks to local video clips, and plays them live to a club screen.
+A high-performance, cross-platform VJ desktop application built with Avalonia UI and .NET 9. Phrazie is designed for DJs who want professional-grade live visuals without a dedicated VJ, allowing for precise, timing-based visual orchestration with minimal live interaction.
 
-## Features
+## Core Philosophy: Live Visual Timing
 
-- Browse Rekordbox playlists and track metadata (BPM, key, cue points)
-- Link tracks to local video clip files
-- Live video playback synced to your DJ set
-- Dual-display output: control surface + club screen
+Phrazie moves away from traditional, manual VJing. Its core strength is **Timing-Based Automation**. You can pre-schedule visual state changes to occur exactly on musical transitions without interrupting your DJ performance.
+
+- **Musical Timing:** Trigger visuals based on bars or phrases (e.g., "Drop in 8 bars", "Break in 4 bars").
+- **State-Based Workflow:** Arrange clips into distinct states (Normal, Break, Drop) and switch between them seamlessly.
+- **Set Consistency:** Map specific video collections to your sets to maintain a consistent vibe while allowing for randomized, dynamic clip selection.
+
+## Key Features (MVP)
+
+- **Dynamic Trigger System:** Schedule visual transitions precisely by bars or seconds.
+- **Smart Collection Management:** Organize your visual assets into "Collections" and "States" (Normal/Break/Drop).
+- **Randomized Playback:** Keep visuals fresh by automatically cycling through a pool of clips assigned to the current state.
+- **Mobile Remote Control:** A web-based remote to trigger state changes and monitor countdowns from your phone or tablet.
+- **Dual-Display Output:** High-performance video output dedicated to the club screen/projector.
+- **Emergency Switch:** Instantly clear or black-out the visual output in one click.
 
 ## Solution Structure
 
