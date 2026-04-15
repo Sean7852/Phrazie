@@ -33,7 +33,8 @@ public partial class CollectionDetailViewModel : ViewModelBase
     private string? _pendingCoverPath;   // path chosen in modal but not yet committed
 
     // ── add state ──────────────────────────────────────────────────────────
-    [ObservableProperty] private string _newStateName = string.Empty;
+    [ObservableProperty] private string _newStateName  = string.Empty;
+    [ObservableProperty] private bool   _isAddingState = false;
 
     // ── clip import ────────────────────────────────────────────────────────
     [ObservableProperty]
@@ -177,6 +178,20 @@ public partial class CollectionDetailViewModel : ViewModelBase
     // ── state management ───────────────────────────────────────────────────
 
     [RelayCommand]
+    private void ShowAddStateInput()
+    {
+        NewStateName  = string.Empty;
+        IsAddingState = true;
+    }
+
+    [RelayCommand]
+    private void CancelAddState()
+    {
+        NewStateName  = string.Empty;
+        IsAddingState = false;
+    }
+
+    [RelayCommand]
     private async Task AddStateAsync()
     {
         if (string.IsNullOrWhiteSpace(NewStateName)) return;
@@ -185,7 +200,24 @@ public partial class CollectionDetailViewModel : ViewModelBase
         Model.States.Add(state);
         States.Add(MakeStateItem(state));
         await _repository.UpdateAsync(Model);
-        NewStateName = string.Empty;
+        NewStateName  = string.Empty;
+        IsAddingState = false;
+    }
+
+    /// <summary>Called by the view's drag-drop handler to reorder states.</summary>
+    public void MoveState(StateItemViewModel source, StateItemViewModel target)
+    {
+        int fromIdx = States.IndexOf(source);
+        int toIdx   = States.IndexOf(target);
+        if (fromIdx < 0 || toIdx < 0 || fromIdx == toIdx) return;
+
+        States.Move(fromIdx, toIdx);
+
+        var modelItem = Model.States[fromIdx];
+        Model.States.RemoveAt(fromIdx);
+        Model.States.Insert(toIdx, modelItem);
+
+        _ = _repository.UpdateAsync(Model);
     }
 
     private StateItemViewModel MakeStateItem(State state) =>

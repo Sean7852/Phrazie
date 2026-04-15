@@ -17,7 +17,8 @@
       "Bash(dotnet publish:*)",
       "Bash(start:*)",
       "Bash(taskkill /PID 37488 /F)",
-      "Bash(cmd *)"
+      "Bash(cmd *)",
+      "Bash(powershell -Command ' *)"
     ]
   }
 }

@@ -6,13 +6,12 @@
              x:DataType="vm:CollectionDetailViewModel"
              Background="Transparent">
 
-    <!-- Root Panel allows the modal overlay to sit on top of the page content -->
     <Panel>
 
         <!-- ══════════════════════════════════════════════════════════════════
              PAGE CONTENT
         ══════════════════════════════════════════════════════════════════ -->
-        <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Margin="32,24,32,32">
+        <Grid RowDefinitions="Auto,Auto,*" Margin="32,24,32,32">
 
             <!-- ── Back button ── -->
             <Button Grid.Row="0"
@@ -26,14 +25,12 @@
             <!-- ── Collection header (cover + name + description) ── -->
             <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="0,0,0,28">
 
-                <!-- Cover image -->
                 <Border Grid.Column="0"
                         Width="110" Height="110"
                         CornerRadius="10"
                         ClipToBounds="True"
                         Margin="0,0,24,0">
                     <Panel>
-                        <!-- Gradient background (always shown) -->
                         <Border>
                             <Border.Background>
                                 <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
@@ -42,221 +39,231 @@
                                 </LinearGradientBrush>
                             </Border.Background>
                         </Border>
-                        <!-- Fallback "P" glyph when no cover image -->
                         <TextBlock Text="P"
                                    IsVisible="{Binding CoverImage, Converter={x:Static ObjectConverters.IsNull}}"
-                                   Foreground="#252550"
-                                   FontSize="72"
-                                   FontWeight="Bold"
-                                   HorizontalAlignment="Center"
-                                   VerticalAlignment="Center" />
-                        <!-- Actual cover image -->
+                                   Foreground="#252550" FontSize="72" FontWeight="Bold"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
                         <Image Source="{Binding CoverImage}"
                                Stretch="UniformToFill"
                                IsVisible="{Binding CoverImage, Converter={x:Static ObjectConverters.IsNotNull}}" />
                     </Panel>
                 </Border>
 
-                <!-- Name, description, edit icon -->
                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="8">
-
                     <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                         <TextBlock Text="{Binding CollectionName}"
-                                   Foreground="White"
-                                   FontSize="30"
-                                   FontWeight="Light" />
+                                   Foreground="White" FontSize="30" FontWeight="Light" />
                         <Button Command="{Binding OpenEditModalCommand}"
                                 Background="Transparent" Foreground="#555577"
                                 BorderThickness="0" Padding="6,4" FontSize="15"
                                 VerticalAlignment="Center"
-                                ToolTip.Tip="Edit collection details">
-                            ✏
-                        </Button>
+                                ToolTip.Tip="Edit collection details">✏</Button>
                     </StackPanel>
-
                     <TextBlock Text="{Binding CollectionDescription}"
-                               Foreground="#555577"
-                               FontSize="13"
-                               FontStyle="Italic"
-                               TextWrapping="Wrap"
-                               MaxWidth="480"
+                               Foreground="#555577" FontSize="13" FontStyle="Italic"
+                               TextWrapping="Wrap" MaxWidth="480"
                                IsVisible="{Binding CollectionDescription, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-
                     <TextBlock Text="No description — click ✏ to add one"
-                               Foreground="#333344"
-                               FontSize="12"
-                               FontStyle="Italic"
+                               Foreground="#333344" FontSize="12" FontStyle="Italic"
                                IsVisible="{Binding CollectionDescription, Converter={x:Static StringConverters.IsNullOrEmpty}}" />
-
                 </StackPanel>
             </Grid>
 
-            <!-- ── Import Clips toolbar ── -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,0,0,16">
-                <Button Command="{Binding ImportClipsCommand}"
-                        Content="⬆ Import Clips"
-                        Background="#1A2A1A" Foreground="#66AA66"
-                        BorderBrush="#2A4A2A" BorderThickness="1"
-                        Padding="14,7" CornerRadius="4" FontSize="13"
-                        ToolTip.Tip="Import local video files into the clip library" />
-                <TextBlock IsVisible="{Binding HasImportedClips}"
-                           Text="{Binding ImportedClipCount, StringFormat='{}{0} clip(s) imported'}"
-                           Foreground="#448844" FontSize="12"
-                           VerticalAlignment="Center" />
-            </StackPanel>
+            <!-- ── States list + "+ State" at the bottom ── -->
+            <ScrollViewer Grid.Row="2" DragDrop.AllowDrop="True">
+                <StackPanel Spacing="0">
 
-            <!-- ── Add State ── -->
-            <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8" Margin="0,0,0,20">
-                <TextBox Text="{Binding NewStateName}"
-                         PlaceholderText="New state name…"
-                         Width="240"
-                         Background="#12121E" BorderBrush="#2A2A44" CornerRadius="4"
-                         ToolTip.Tip="Enter a name for the new state" />
-                <Button Command="{Binding AddStateCommand}"
-                        Content="Add State"
-                        Background="White" Foreground="#111111"
-                        BorderThickness="0" Padding="16,8" CornerRadius="4" FontWeight="Medium"
-                        ToolTip.Tip="Add a new state to this collection" />
-            </StackPanel>
+                    <!-- State cards (draggable) -->
+                    <ItemsControl ItemsSource="{Binding States}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:StateItemViewModel">
+                                <Border Background="#12121E"
+                                        BorderBrush="#1E1E30" BorderThickness="1"
+                                        CornerRadius="8" Margin="0,0,0,12" Padding="0,14,16,14"
+                                        DragDrop.AllowDrop="True">
+                                    <Grid ColumnDefinitions="Auto,*">
 
-            <!-- ── States list ── -->
-            <ScrollViewer Grid.Row="4">
-                <ItemsControl ItemsSource="{Binding States}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate x:DataType="vm:StateItemViewModel">
-                            <Border Background="#12121E"
-                                    BorderBrush="#1E1E30" BorderThickness="1"
-                                    CornerRadius="8" Margin="0,0,0,12" Padding="16,14">
-                                <StackPanel Spacing="12">
+                                        <!-- Drag handle -->
+                                        <Border Grid.Column="0"
+                                                Padding="12,0,10,0"
+                                                Cursor="SizeAll"
+                                                VerticalAlignment="Stretch"
+                                                PointerPressed="DragHandle_PointerPressed"
+                                                ToolTip.Tip="Drag to reorder">
+                                            <TextBlock Text="⠿"
+                                                       Foreground="#2A2A50"
+                                                       FontSize="15"
+                                                       VerticalAlignment="Center" />
+                                        </Border>
 
-                                    <!-- State header row -->
-                                    <Grid ColumnDefinitions="*,Auto,Auto">
+                                        <!-- State content -->
+                                        <StackPanel Grid.Column="1" Spacing="12">
 
-                                        <!-- Name — view mode -->
-                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
-                                                    IsVisible="{Binding !IsRenaming}"
-                                                    VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Name}"
-                                                       Foreground="White" FontSize="15" FontWeight="Medium" />
-                                            <Button Command="{Binding StartRenameCommand}"
-                                                    Content="✏️"
-                                                    Background="Transparent" Foreground="#666688"
-                                                    BorderThickness="0" Padding="4,2" FontSize="12"
-                                                    ToolTip.Tip="Rename this state" />
-                                        </StackPanel>
+                                            <!-- State header row -->
+                                            <Grid ColumnDefinitions="*,Auto,Auto">
 
-                                        <!-- Name — rename mode -->
-                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
-                                                    IsVisible="{Binding IsRenaming}"
-                                                    VerticalAlignment="Center">
-                                            <TextBox Text="{Binding RenameInput}"
-                                                     Width="200" FontSize="14"
-                                                     Background="#0E0E1E" BorderBrush="#3A3A5A" CornerRadius="4"
-                                                     ToolTip.Tip="Type the new state name" />
-                                            <Button Command="{Binding SaveRenameCommand}"
-                                                    Content="Save"
-                                                    Background="#1E3A5F" Foreground="White"
-                                                    BorderThickness="0" Padding="12,5" CornerRadius="4" FontSize="12"
-                                                    ToolTip.Tip="Save new state name" />
-                                            <Button Command="{Binding CancelRenameCommand}"
-                                                    Content="Cancel"
-                                                    Background="Transparent" Foreground="#555566"
-                                                    BorderThickness="0" Padding="8,5" FontSize="12"
-                                                    ToolTip.Tip="Discard rename" />
-                                        </StackPanel>
+                                                <!-- Name — view mode -->
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
+                                                            IsVisible="{Binding !IsRenaming}"
+                                                            VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Name}"
+                                                               Foreground="White" FontSize="15" FontWeight="Medium" />
+                                                    <Button Command="{Binding StartRenameCommand}"
+                                                            Content="✏️"
+                                                            Background="Transparent" Foreground="#666688"
+                                                            BorderThickness="0" Padding="4,2" FontSize="12"
+                                                            ToolTip.Tip="Rename this state" />
+                                                </StackPanel>
 
-                                        <!-- Playback mode selector -->
-                                        <ComboBox Grid.Column="1"
-                                                  ItemsSource="{x:Static vm:StateItemViewModel.AllPlaybackModes}"
-                                                  SelectedItem="{Binding PlaybackMode}"
-                                                  Margin="0,0,8,0"
-                                                  Background="#0E0E1E" BorderBrush="#2A2A44"
-                                                  Foreground="#AAAACC" FontSize="12"
-                                                  VerticalAlignment="Center"
-                                                  ToolTip.Tip="Clip playback mode for this state" />
+                                                <!-- Name — rename mode -->
+                                                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
+                                                            IsVisible="{Binding IsRenaming}"
+                                                            VerticalAlignment="Center">
+                                                    <TextBox Text="{Binding RenameInput}"
+                                                             Width="200" FontSize="14"
+                                                             Background="#0E0E1E" BorderBrush="#3A3A5A" CornerRadius="4"
+                                                             ToolTip.Tip="Type the new state name" />
+                                                    <Button Command="{Binding SaveRenameCommand}"
+                                                            Content="Save"
+                                                            Background="#1E3A5F" Foreground="White"
+                                                            BorderThickness="0" Padding="12,5" CornerRadius="4" FontSize="12"
+                                                            ToolTip.Tip="Save new state name" />
+                                                    <Button Command="{Binding CancelRenameCommand}"
+                                                            Content="Cancel"
+                                                            Background="Transparent" Foreground="#555566"
+                                                            BorderThickness="0" Padding="8,5" FontSize="12"
+                                                            ToolTip.Tip="Discard rename" />
+                                                </StackPanel>
 
-                                        <!-- Remove button -->
-                                        <Button Grid.Column="2"
-                                                Command="{Binding RemoveCommand}"
-                                                Content="Remove"
-                                                Background="Transparent" Foreground="#663333"
-                                                BorderBrush="#3A1A1A" BorderThickness="1"
-                                                Padding="10,5" CornerRadius="4" FontSize="12"
-                                                ToolTip.Tip="Remove this state from the collection" />
-                                    </Grid>
+                                                <!-- Playback mode -->
+                                                <ComboBox Grid.Column="1"
+                                                          ItemsSource="{x:Static vm:StateItemViewModel.AllPlaybackModes}"
+                                                          SelectedItem="{Binding PlaybackMode}"
+                                                          Margin="0,0,8,0"
+                                                          Background="#0E0E1E" BorderBrush="#2A2A44"
+                                                          Foreground="#AAAACC" FontSize="12"
+                                                          VerticalAlignment="Center"
+                                                          ToolTip.Tip="Clip playback mode for this state" />
 
-                                    <!-- Assigned clips -->
-                                    <StackPanel Spacing="6">
-                                        <TextBlock Text="CLIPS"
-                                                   Foreground="#444466" FontSize="10" LetterSpacing="2" />
+                                                <!-- Remove -->
+                                                <Button Grid.Column="2"
+                                                        Command="{Binding RemoveCommand}"
+                                                        Content="Remove"
+                                                        Background="Transparent" Foreground="#663333"
+                                                        BorderBrush="#3A1A1A" BorderThickness="1"
+                                                        Padding="10,5" CornerRadius="4" FontSize="12"
+                                                        ToolTip.Tip="Remove this state from the collection" />
+                                            </Grid>
 
-                                        <ItemsControl ItemsSource="{Binding AssignedClips}">
-                                            <ItemsControl.ItemTemplate>
-                                                <DataTemplate x:DataType="vm:ClipItemViewModel">
-                                                    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,4">
-                                                        <TextBlock Grid.Column="0"
-                                                                   Text="{Binding DisplayName}"
-                                                                   Foreground="#CCCCEE" FontSize="13"
-                                                                   VerticalAlignment="Center" />
-                                                        <TextBlock Grid.Column="1"
-                                                                   Text="{Binding Duration}"
-                                                                   Foreground="#666688" FontSize="12"
-                                                                   Margin="0,0,10,0"
-                                                                   VerticalAlignment="Center" />
-                                                        <Button Grid.Column="2"
-                                                                Command="{Binding UnassignCommand}"
-                                                                Content="✕"
-                                                                Background="Transparent" Foreground="#555566"
-                                                                BorderThickness="0" Padding="4,2" FontSize="12"
-                                                                ToolTip.Tip="Remove clip from this state" />
-                                                    </Grid>
-                                                </DataTemplate>
-                                            </ItemsControl.ItemTemplate>
-                                        </ItemsControl>
+                                            <!-- Assigned clips -->
+                                            <StackPanel Spacing="6">
+                                                <TextBlock Text="CLIPS"
+                                                           Foreground="#444466" FontSize="10" LetterSpacing="2" />
 
-                                        <!-- Assign clip button / picker -->
-                                        <Button Command="{Binding ToggleClipPickerCommand}"
-                                                IsVisible="{Binding !IsClipPickerOpen}"
-                                                Content="+ Assign Clip"
-                                                Background="#1A1A2E" Foreground="#8888AA"
-                                                BorderBrush="#2A2A44" BorderThickness="1"
-                                                Padding="10,6" CornerRadius="4" FontSize="12"
-                                                ToolTip.Tip="Assign a clip to this state" />
+                                                <ItemsControl ItemsSource="{Binding AssignedClips}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="vm:ClipItemViewModel">
+                                                            <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,4">
+                                                                <TextBlock Grid.Column="0"
+                                                                           Text="{Binding DisplayName}"
+                                                                           Foreground="#CCCCEE" FontSize="13"
+                                                                           VerticalAlignment="Center" />
+                                                                <TextBlock Grid.Column="1"
+                                                                           Text="{Binding Duration}"
+                                                                           Foreground="#666688" FontSize="12"
+                                                                           Margin="0,0,10,0"
+                                                                           VerticalAlignment="Center" />
+                                                                <Button Grid.Column="2"
+                                                                        Command="{Binding UnassignCommand}"
+                                                                        Content="✕"
+                                                                        Background="Transparent" Foreground="#555566"
+                                                                        BorderThickness="0" Padding="4,2" FontSize="12"
+                                                                        ToolTip.Tip="Remove clip from this state" />
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
 
-                                        <!-- Clip picker -->
-                                        <StackPanel IsVisible="{Binding IsClipPickerOpen}" Spacing="6">
-                                            <ComboBox ItemsSource="{Binding UnassignedClips}"
-                                                      SelectedItem="{Binding ClipToAssign}"
-                                                      PlaceholderText="Select a clip…"
-                                                      HorizontalAlignment="Stretch"
-                                                      Background="#0E0E1E" BorderBrush="#3A3A5A"
-                                                      ToolTip.Tip="Choose a clip to assign">
-                                                <ComboBox.ItemTemplate>
-                                                    <DataTemplate x:DataType="models:Clip">
-                                                        <TextBlock Text="{Binding DisplayName}" />
-                                                    </DataTemplate>
-                                                </ComboBox.ItemTemplate>
-                                            </ComboBox>
-                                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                                <Button Command="{Binding AssignClipCommand}"
-                                                        Content="Assign"
-                                                        Background="#1E3A5F" Foreground="White"
-                                                        BorderThickness="0" Padding="14,6" CornerRadius="4" FontSize="12"
-                                                        ToolTip.Tip="Assign selected clip to this state" />
+                                                <!-- Assign clip -->
                                                 <Button Command="{Binding ToggleClipPickerCommand}"
-                                                        Content="Cancel"
-                                                        Background="Transparent" Foreground="#555566"
-                                                        BorderThickness="0" Padding="10,6" FontSize="12"
-                                                        ToolTip.Tip="Close clip picker" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </StackPanel>
+                                                        IsVisible="{Binding !IsClipPickerOpen}"
+                                                        Content="+ Assign Clip"
+                                                        Background="#1A1A2E" Foreground="#8888AA"
+                                                        BorderBrush="#2A2A44" BorderThickness="1"
+                                                        Padding="10,6" CornerRadius="4" FontSize="12"
+                                                        ToolTip.Tip="Assign a clip to this state" />
 
-                                </StackPanel>
-                            </Border>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                                                <StackPanel IsVisible="{Binding IsClipPickerOpen}" Spacing="6">
+                                                    <ComboBox ItemsSource="{Binding UnassignedClips}"
+                                                              SelectedItem="{Binding ClipToAssign}"
+                                                              PlaceholderText="Select a clip…"
+                                                              HorizontalAlignment="Stretch"
+                                                              Background="#0E0E1E" BorderBrush="#3A3A5A"
+                                                              ToolTip.Tip="Choose a clip to assign">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:Clip">
+                                                                <TextBlock Text="{Binding DisplayName}" />
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <Button Command="{Binding AssignClipCommand}"
+                                                                Content="Assign"
+                                                                Background="#1E3A5F" Foreground="White"
+                                                                BorderThickness="0" Padding="14,6" CornerRadius="4" FontSize="12"
+                                                                ToolTip.Tip="Assign selected clip to this state" />
+                                                        <Button Command="{Binding ToggleClipPickerCommand}"
+                                                                Content="Cancel"
+                                                                Background="Transparent" Foreground="#555566"
+                                                                BorderThickness="0" Padding="10,6" FontSize="12"
+                                                                ToolTip.Tip="Close clip picker" />
+                                                    </StackPanel>
+                                                </StackPanel>
+                                            </StackPanel>
+
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- ── + State — always at the bottom ── -->
+                    <!-- Button mode -->
+                    <Button Command="{Binding ShowAddStateInputCommand}"
+                            IsVisible="{Binding !IsAddingState}"
+                            Content="+ State"
+                            Background="#1A1A2E" Foreground="#8888AA"
+                            BorderBrush="#2A2A44" BorderThickness="1"
+                            Padding="10,6" CornerRadius="4" FontSize="12"
+                            HorizontalAlignment="Left"
+                            Margin="0,4,0,0"
+                            ToolTip.Tip="Add a new state to this collection" />
+
+                    <!-- Inline input mode -->
+                    <StackPanel IsVisible="{Binding IsAddingState}"
+                                Spacing="8" Margin="0,4,0,0">
+                        <TextBox Text="{Binding NewStateName}"
+                                 PlaceholderText="State name…"
+                                 Width="220" HorizontalAlignment="Left"
+                                 Background="#12121E" BorderBrush="#3A3A5A"
+                                 CornerRadius="4" FontSize="13"
+                                 ToolTip.Tip="Enter a name for the new state" />
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Button Command="{Binding AddStateCommand}"
+                                    Content="Add"
+                                    Background="#1E3A5F" Foreground="White"
+                                    BorderThickness="0" Padding="14,6" CornerRadius="4" FontSize="12"
+                                    ToolTip.Tip="Confirm new state" />
+                            <Button Command="{Binding CancelAddStateCommand}"
+                                    Content="Cancel"
+                                    Background="Transparent" Foreground="#555566"
+                                    BorderThickness="0" Padding="10,6" FontSize="12"
+                                    ToolTip.Tip="Cancel adding a state" />
+                        </StackPanel>
+                    </StackPanel>
+
+                </StackPanel>
             </ScrollViewer>
 
         </Grid>
@@ -276,16 +283,11 @@
                     Padding="28,24">
                 <StackPanel Spacing="20">
 
-                    <!-- Modal title -->
                     <TextBlock Text="Edit Collection"
-                               Foreground="White"
-                               FontSize="18"
-                               FontWeight="Light" />
+                               Foreground="White" FontSize="18" FontWeight="Light" />
 
                     <!-- Cover image row -->
                     <StackPanel Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
-
-                        <!-- Preview thumbnail -->
                         <Border Width="72" Height="72" CornerRadius="8" ClipToBounds="True">
                             <Panel>
                                 <Border>
@@ -298,20 +300,15 @@
                                 </Border>
                                 <TextBlock Text="P"
                                            IsVisible="{Binding EditCoverPreview, Converter={x:Static ObjectConverters.IsNull}}"
-                                           Foreground="#252550"
-                                           FontSize="44"
-                                           FontWeight="Bold"
-                                           HorizontalAlignment="Center"
-                                           VerticalAlignment="Center" />
+                                           Foreground="#252550" FontSize="44" FontWeight="Bold"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
                                 <Image Source="{Binding EditCoverPreview}"
                                        Stretch="UniformToFill"
                                        IsVisible="{Binding EditCoverPreview, Converter={x:Static ObjectConverters.IsNotNull}}" />
                             </Panel>
                         </Border>
-
                         <StackPanel Spacing="6" VerticalAlignment="Center">
-                            <TextBlock Text="Cover Image"
-                                       Foreground="#888899" FontSize="12" />
+                            <TextBlock Text="Cover Image" Foreground="#888899" FontSize="12" />
                             <Button Command="{Binding PickEditCoverImageCommand}"
                                     Content="📷  Choose Image"
                                     Background="#1A1A30" Foreground="#AAAACC"
@@ -319,29 +316,24 @@
                                     Padding="12,7" CornerRadius="6" FontSize="13"
                                     ToolTip.Tip="Select a cover image for this collection" />
                         </StackPanel>
-
                     </StackPanel>
 
-                    <!-- Name field -->
+                    <!-- Name -->
                     <StackPanel Spacing="6">
-                        <TextBlock Text="Collection Name"
-                                   Foreground="#888899" FontSize="12" />
+                        <TextBlock Text="Collection Name" Foreground="#888899" FontSize="12" />
                         <TextBox Text="{Binding EditName}"
                                  Background="#12121E" BorderBrush="#3A3A5A"
                                  CornerRadius="6" FontSize="14" Padding="12,8"
                                  ToolTip.Tip="Collection name" />
                     </StackPanel>
 
-                    <!-- Description field -->
+                    <!-- Description -->
                     <StackPanel Spacing="6">
-                        <TextBlock Text="Description"
-                                   Foreground="#888899" FontSize="12" />
+                        <TextBlock Text="Description" Foreground="#888899" FontSize="12" />
                         <TextBox Text="{Binding EditDescription}"
                                  Background="#12121E" BorderBrush="#3A3A5A"
                                  CornerRadius="6" FontSize="13" Padding="12,8"
-                                 Height="80"
-                                 AcceptsReturn="True"
-                                 TextWrapping="Wrap"
+                                 Height="80" AcceptsReturn="True" TextWrapping="Wrap"
                                  PlaceholderText="Describe the visual vibe of this collection…"
                                  ToolTip.Tip="Collection description" />
                     </StackPanel>
@@ -352,7 +344,7 @@
                                 Content="Save"
                                 Background="#1E3A5F" Foreground="White"
                                 BorderThickness="0" Padding="20,9" CornerRadius="6" FontSize="13"
-                                ToolTip.Tip="Save changes to this collection" />
+                                ToolTip.Tip="Save changes" />
                         <Button Command="{Binding CancelEditCommand}"
                                 Content="Cancel"
                                 Background="Transparent" Foreground="#555566"
@@ -360,10 +352,8 @@
                                 ToolTip.Tip="Discard changes" />
                     </StackPanel>
 
-                    <!-- Divider -->
                     <Border Height="1" Background="#1E1E30" />
 
-                    <!-- Danger zone: delete -->
                     <Button Command="{Binding DeleteCollectionCommand}"
                             HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
                             Background="Transparent" Foreground="#663333"
