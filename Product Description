@@ -1,0 +1,262 @@
+Phrazie 项目计划书（MVP）
+1. 项目概述
+项目名称：Phrazie
+ 定位：面向 DJ 的视觉节奏助手（visual timing assistant）
+一句话定义：
+ Phrazie 帮助 DJ 在演出前预设视觉状态，并在 break / drop 等关键时刻按节拍自动触发视觉变化。
+
+2. 目标用户
+没有专职 VJ 的 DJ
+有基础视觉素材但不会使用复杂 VJ 软件的人
+需要让 visual 和音乐结构更同步的演出者
+
+3. 核心问题
+当前痛点：
+找到懂音乐结构的 VJ 很难
+DJ 同时控音乐 + visual 操作负担过高
+现有 VJ 软件（如 Resolume Arena）过于复杂
+visual 很难精准跟上 break / drop
+
+4. 产品目标（MVP）
+在第一版本中，实现：
+一个 DJ 可以在 10 分钟内完成素材准备，并在演出中通过简单操作，实现视觉按 bars/phrase 准时触发。
+
+5. MVP 范围
+包含功能（必须做）
+1. 素材管理（Collections/Playlist）
+创建/删除分类（如 Dark / Tech / Euphoric）
+每个分类包含多个 State
+2. State 系统
+默认：
+Normal
+Break
+Drop
+支持：
+改名 / 删除 / 新增
+自定义模版Template
+
+3. Clip 管理
+导入本地视频
+分配到 State
+支持：
+loop
+random / sequential
+
+4. Live Performance 页面
+核心界面，包含：
+当前状态显示
+下一状态选择
+Trigger 设置
+倒计时显示
+紧急切换按钮
+
+5. Trigger 系统（核心功能）
+支持：
+Immediate（立即）
+After X seconds
+After X bars
+展示方式：
+“Number on color blocks + dual color blocks”
+“Break in 4 bars”
+
+6. Playback（基础版）
+clip 播放
+state 切换
+外接屏幕全屏输出
+preview window
+
+7. 手机遥控（基础版）
+查看当前状态
+设置下一状态
+控制 trigger
+紧急切换
+（第一版可用 web remote 实现）
+
+8. 账号 & 试用
+trial（7–14天）
+subscription（后期可完善）
+
+9. 自定义参数
+持续多少个phraze
+偶尔要有全黑的break,频率
+
+不包含（MVP阶段不做）
+自动识别 drop / phrase
+AI 生成 visual
+高级视觉效果编辑器
+云素材库 / 社区
+多人协作
+深度 DJ 软件集成
+
+6. 核心概念定义（必须统一）
+Collection：视觉分类（Dark / Tech）
+State：视觉状态（Break / Drop）
+Clip：视频素材
+Trigger：预设切换动作
+Session：当前演出状态
+Remote：手机控制端
+
+7. 数据模型（简化版）
+Collection
+id
+name
+states[]
+State
+id
+name
+clips[]
+playback mode
+Clip
+id
+file path
+loop
+duration
+Trigger
+target state
+delay type（seconds / bars）
+delay value
+Session
+current collection
+current state
+next trigger
+bpm
+
+8. 信息架构
+Desktop App
+Onboarding
+Collections（首页）
+Collection Detail
+State Editor
+Live Performance（核心）
+Settings
+Billing
+
+Mobile Remote
+当前状态
+下一状态选择
+Trigger 控制
+Emergency switch
+
+9. UI / 品牌方向
+风格
+Dark UI
+Minimal
+Performance-first
+Futuristic（但克制）
+人格（Phrazie）
+冷静
+精准
+懂节奏
+不抢戏
+UI语言示例
+“Drop in 8 bars”
+“Locked”
+“Waiting”
+“Triggered”
+
+10. 技术架构（初步）
+桌面端
+.NET + Avalonia（跨平台）
+播放引擎
+本地视频播放
+GPU 加速（后续）
+通信
+本地 WebSocket（手机遥控）
+手机端
+Web-based remote（优先）
+
+11. 开发阶段（关键）
+
+Phase 1：项目骨架（1–2周）
+目标：
+App 能运行
+页面结构存在
+使用 mock data
+内容：
+项目初始化
+页面框架
+基础组件
+路由
+
+Phase 2：数据模型 + 假交互（2周）
+目标：
+可以完整模拟流程
+内容：
+Collection / State CRUD
+mock clip
+trigger 模拟
+倒计时 UI
+
+Phase 3：核心功能（3–4周）
+目标：
+可以“假演出”
+内容：
+clip 导入
+播放切换
+state 切换
+trigger 执行
+
+Phase 4：输出 + remote（2–3周）
+目标：
+可用于真实场景测试
+内容：
+外接屏幕输出
+mobile remote
+基础同步
+
+Phase 5：测试 + 打磨（2周）
+目标：
+稳定
+可 demo
+内容：
+bug 修复
+UI 优化
+性能优化
+
+12. Cloud Coding 工作方式
+原则
+不一次性生成全部代码
+每次只做一个模块
+先 mock → 再真实
+
+示例任务拆分
+
+
+建立基础 app 结构 + 页面占位
+
+
+添加 Collection / State 数据模型 + 本地存储
+
+
+实现 Live 页面（假数据）
+
+
+实现 trigger 倒计时系统
+
+
+接入视频播放
+
+13. Figma 工作方式
+第一步（必须）
+信息架构
+页面列表
+第二步
+low-fi wireframe（结构）
+第三步
+hi-fi UI（视觉）
+
+14. 成功标准（MVP）
+用户 10 分钟内完成素材准备
+演出中 3 秒内设置 trigger
+visual 按 timing 准确触发
+不需要 VJ 背景也能使用
+
+15. 风险与重点
+最大风险
+timing 不准
+播放卡顿
+操作过复杂
+核心优先级
+稳定
+简单
+timing 准确
