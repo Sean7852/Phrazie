@@ -51,125 +51,47 @@
                             BorderThickness="1"
                             CornerRadius="8"
                             Margin="0,0,14,14"
-                            ClipToBounds="True">
-                        <Grid>
+                            ClipToBounds="True"
+                            Cursor="Hand">
+                        <StackPanel>
 
-                            <!-- ── Normal view ── -->
-                            <StackPanel IsVisible="{Binding !IsSettingsOpen}">
-                                <Panel Height="115">
-                                    <Border>
-                                        <Border.Background>
-                                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                                                <GradientStop Color="#0F0F22" Offset="0" />
-                                                <GradientStop Color="#1A1A3A" Offset="1" />
-                                            </LinearGradientBrush>
-                                        </Border.Background>
-                                    </Border>
-                                    <Image Source="{Binding CoverImage}"
-                                           Stretch="UniformToFill"
-                                           IsVisible="{Binding CoverImage, Converter={x:Static ObjectConverters.IsNotNull}}" />
-                                    <Button Command="{Binding ToggleSettingsCommand}"
-                                            HorizontalAlignment="Right" VerticalAlignment="Top"
-                                            Margin="0,6,6,0"
-                                            Background="#22223A" Foreground="#AAAACC"
-                                            BorderThickness="0" Padding="6,4" CornerRadius="4"
-                                            FontSize="13" Content="⚙"
-                                            ToolTip.Tip="Collection settings" />
-                                </Panel>
+                            <!-- Thumbnail -->
+                            <Panel Height="115">
+                                <Border>
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                            <GradientStop Color="#0F0F22" Offset="0" />
+                                            <GradientStop Color="#1A1A3A" Offset="1" />
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <Image Source="{Binding CoverImage}"
+                                       Stretch="UniformToFill"
+                                       IsVisible="{Binding CoverImage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                            </Panel>
 
-                                <StackPanel Margin="14,12,14,14" Spacing="10">
-                                    <TextBlock Text="{Binding Name}"
-                                               Foreground="White" FontSize="14" FontWeight="Medium" />
+                            <!-- Name + buttons -->
+                            <StackPanel Margin="14,12,14,14" Spacing="10">
+                                <TextBlock Text="{Binding Name}"
+                                           Foreground="White" FontSize="14" FontWeight="Medium" />
 
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <Button Command="{Binding SelectCommand}"
-                                                Content="Select"
-                                                Background="#2A2A44" Foreground="White"
-                                                BorderThickness="0" Padding="12,5" CornerRadius="4"
-                                                FontSize="12"
-                                                ToolTip.Tip="Set as the active collection for live performance" />
-                                        <Button Command="{Binding ManageCommand}"
-                                                Content="Manage"
-                                                Background="Transparent" Foreground="#666688"
-                                                BorderThickness="0" Padding="8,5"
-                                                FontSize="12"
-                                                ToolTip.Tip="Edit states and clips for this collection" />
-                                    </StackPanel>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <Button Command="{Binding SelectCommand}"
+                                            Content="Select"
+                                            Background="#2A2A44" Foreground="White"
+                                            BorderThickness="0" Padding="12,5" CornerRadius="4"
+                                            FontSize="12"
+                                            ToolTip.Tip="Set as the active collection for live performance" />
+                                    <Button Command="{Binding ManageCommand}"
+                                            Content="Manage"
+                                            Background="Transparent" Foreground="#666688"
+                                            BorderThickness="0" Padding="8,5"
+                                            FontSize="12"
+                                            ToolTip.Tip="Open collection management" />
                                 </StackPanel>
                             </StackPanel>
 
-                            <!-- ── Settings overlay ── -->
-                            <Border IsVisible="{Binding IsSettingsOpen}"
-                                    Background="#0E0E1E" Padding="14,12">
-                                <StackPanel Spacing="10">
-
-                                    <!-- Header row -->
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <TextBlock Grid.Column="0" Text="SETTINGS"
-                                                   Foreground="#444466" FontSize="10" LetterSpacing="2"
-                                                   VerticalAlignment="Center" />
-                                        <Button Grid.Column="1"
-                                                Command="{Binding ToggleSettingsCommand}"
-                                                Content="✕"
-                                                Background="Transparent" Foreground="#666688"
-                                                BorderThickness="0" Padding="4,2" FontSize="13"
-                                                ToolTip.Tip="Close settings" />
-                                    </Grid>
-
-                                    <!-- Change cover image -->
-                                    <Button Command="{Binding UploadCoverImageCommand}"
-                                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                            Background="#1A1A30" Foreground="#CCCCEE"
-                                            BorderBrush="#2A2A44" BorderThickness="1"
-                                            Padding="12,9" CornerRadius="6" FontSize="13"
-                                            Content="📷  Change Cover Image"
-                                            ToolTip.Tip="Choose a cover image (PNG, JPG, WEBP, GIF)" />
-
-                                    <!-- Rename — normal state -->
-                                    <Button Command="{Binding StartRenameCommand}"
-                                            IsVisible="{Binding !IsRenaming}"
-                                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                            Background="#1A1A30" Foreground="#CCCCEE"
-                                            BorderBrush="#2A2A44" BorderThickness="1"
-                                            Padding="12,9" CornerRadius="6" FontSize="13"
-                                            Content="✏️  Rename Collection"
-                                            ToolTip.Tip="Give this collection a new name" />
-
-                                    <!-- Rename — editing state -->
-                                    <StackPanel IsVisible="{Binding IsRenaming}" Spacing="6">
-                                        <TextBox Text="{Binding RenameInput}"
-                                                 Background="#12121E" BorderBrush="#3A3A5A"
-                                                 CornerRadius="4" FontSize="13"
-                                                 ToolTip.Tip="Type the new collection name" />
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <Button Command="{Binding SaveRenameCommand}"
-                                                    Content="Save"
-                                                    Background="#1E3A5F" Foreground="White"
-                                                    BorderThickness="0" Padding="14,6" CornerRadius="4"
-                                                    FontSize="12"
-                                                    ToolTip.Tip="Save the new name" />
-                                            <Button Command="{Binding CancelRenameCommand}"
-                                                    Content="Cancel"
-                                                    Background="Transparent" Foreground="#555566"
-                                                    BorderThickness="0" Padding="10,6"
-                                                    FontSize="12"
-                                                    ToolTip.Tip="Discard the rename" />
-                                        </StackPanel>
-                                    </StackPanel>
-
-                                    <!-- Delete -->
-                                    <Button Command="{Binding DeleteCommand}"
-                                            HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
-                                            Background="Transparent" Foreground="#663333"
-                                            BorderBrush="#3A1A1A" BorderThickness="1"
-                                            Padding="12,9" CornerRadius="6" FontSize="13"
-                                            Content="🗑  Delete Collection"
-                                            ToolTip.Tip="Permanently delete this collection" />
-
-                                </StackPanel>
-                            </Border>
-
-                        </Grid>
+                        </StackPanel>
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

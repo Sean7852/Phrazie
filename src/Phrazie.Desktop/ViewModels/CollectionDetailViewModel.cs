@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,9 @@ public partial class CollectionDetailViewModel : ViewModelBase
     private readonly ICollectionRepository _repository;
     private readonly Action _goBack;
     private IReadOnlyList<Clip> _allClips = [];
+
+    // ── cover image ────────────────────────────────────────────────────────
+    [ObservableProperty] private Bitmap? _coverImage;
 
     public Collection Model { get; }
 
@@ -41,6 +45,9 @@ public partial class CollectionDetailViewModel : ViewModelBase
         Model       = model;
         _repository = repository;
         _goBack     = goBack;
+
+        if (!string.IsNullOrEmpty(model.CoverImagePath) && File.Exists(model.CoverImagePath))
+            _coverImage = new Bitmap(model.CoverImagePath);
 
         _ = LoadAsync();
     }
@@ -111,6 +118,30 @@ public partial class CollectionDetailViewModel : ViewModelBase
 
     [RelayCommand]
     private void CancelCollectionRename() => IsRenamingCollection = false;
+
+    // ── cover image ────────────────────────────────────────────────────────
+
+    [RelayCommand]
+    private async Task ChangeCoverImageAsync()
+    {
+        var filePicker = App.Services.GetRequiredService<IFilePickerService>();
+        var path = await filePicker.PickImageAsync();
+        if (path is null) return;
+
+        Model.CoverImagePath = path;
+        CoverImage?.Dispose();
+        CoverImage = new Bitmap(path);
+        await _repository.UpdateAsync(Model);
+    }
+
+    // ── delete collection ──────────────────────────────────────────────────
+
+    [RelayCommand]
+    private async Task DeleteCollectionAsync()
+    {
+        await _repository.DeleteAsync(Model.Id);
+        _goBack();
+    }
 
     // ── state management ───────────────────────────────────────────────────
 

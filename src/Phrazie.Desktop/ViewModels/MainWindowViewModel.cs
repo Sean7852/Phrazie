@@ -118,5 +118,5 @@ public partial class MainWindowViewModel : ViewModelBase
     // ── helpers ────────────────────────────────────────────────────────────
 
     private CollectionsViewModel BuildCollectionsPage() =>
-        new(_collections, _session, _filePicker, GoToCollectionDetail);
+        new(_collections, _session, GoToCollectionDetail);
 }

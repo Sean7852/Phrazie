@@ -3,16 +3,14 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
-using Phrazie.Desktop.Services;
 
 namespace Phrazie.Desktop.ViewModels;
 
 public partial class CollectionsViewModel : ViewModelBase
 {
     private readonly ICollectionRepository _repository;
-    private readonly ISessionService _session;
-    private readonly IFilePickerService _filePicker;
-    private readonly Action<Collection> _onManage;
+    private readonly ISessionService       _session;
+    private readonly Action<Collection>    _onManage;
 
     public ObservableCollection<CollectionCardViewModel> Collections { get; } = new();
 
@@ -21,13 +19,11 @@ public partial class CollectionsViewModel : ViewModelBase
 
     public CollectionsViewModel(
         ICollectionRepository repository,
-        ISessionService session,
-        IFilePickerService filePicker,
-        Action<Collection> onManage)
+        ISessionService       session,
+        Action<Collection>    onManage)
     {
         _repository = repository;
         _session    = session;
-        _filePicker = filePicker;
         _onManage   = onManage;
         _ = LoadAsync();
     }
@@ -50,7 +46,5 @@ public partial class CollectionsViewModel : ViewModelBase
     }
 
     private CollectionCardViewModel MakeCard(Collection c) =>
-        new(c, _filePicker, _repository, _session,
-            onDelete: card => Collections.Remove(card),
-            onManage: _onManage);
+        new(c, _session, _onManage);
 }
