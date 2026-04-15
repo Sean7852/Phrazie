@@ -6,6 +6,10 @@
 - [x] Create collections
 - [x] Rename collections
 - [x] Delete collections
+- [x] Collection description
+- [x] Collection cover image (with fallback "P" glyph)
+- [x] Collection detail header (cover + name + description)
+- [x] Edit collection modal (name, description, cover image, delete)
 
 ### 2. State System
 - [x] Default states: Normal, Break, Drop
