@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Phrazie.Core.Interfaces;
+using Phrazie.Desktop.Services;
 using Phrazie.Desktop.ViewModels;
 using Phrazie.Desktop.Views;
 using Phrazie.Engine.Mock;
@@ -37,13 +38,16 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
 
-        // ── Core interfaces → mock implementations (swap out in Phase 3) ──
+        // ── Core interfaces → mock implementations ──────────────────────────
         services.AddSingleton<ICollectionRepository, MockCollectionRepository>();
-        services.AddSingleton<IPlaybackService,      MockPlaybackService>();
-        services.AddSingleton<ITriggerService,        MockTriggerService>();
-        services.AddSingleton<ISessionService,        MockSessionService>();
+        services.AddSingleton<IPlaybackService,       MockPlaybackService>();
+        services.AddSingleton<ITriggerService,         MockTriggerService>();
+        services.AddSingleton<ISessionService,         MockSessionService>();
 
-        // ── ViewModels ──────────────────────────────────────────────────────
+        // ── Desktop services ─────────────────────────────────────────────────
+        services.AddSingleton<IFilePickerService, AvaloniaFilePickerService>();
+
+        // ── ViewModels ────────────────────────────────────────────────────────
         services.AddTransient<MainWindowViewModel>();
         services.AddTransient<CollectionsViewModel>();
         services.AddTransient<LivePerformanceViewModel>();
