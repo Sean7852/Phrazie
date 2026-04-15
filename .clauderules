@@ -1,0 +1,58 @@
+# Phrazie — Claude Rules
+
+## Project Identity
+- The project name is **Phrazie** (formerly VJStudio). Always refer to it as Phrazie.
+
+## Tech Stack
+- Runtime: **.NET 9**
+- UI framework: **Avalonia UI 12** with compiled bindings (`AvaloniaUseCompiledBindingsByDefault=true`)
+- MVVM: **CommunityToolkit.Mvvm** — use `[ObservableProperty]`, `[RelayCommand]`, `ObservableObject`
+- DI: **Microsoft.Extensions.DependencyInjection** — all services registered in `App.axaml.cs BuildServices()`
+
+## Project Structure
+Always keep concerns separated across three projects:
+
+| Project | Responsibility |
+|---|---|
+| `Phrazie.Core` | Models, interfaces, enums only. Zero external dependencies. |
+| `Phrazie.Engine` | Service implementations (mock now, real later). References Core only. |
+| `Phrazie.Desktop` | Avalonia UI, ViewModels, Views, DI root. References Core + Engine. |
+
+- Never put UI code in Core or Engine.
+- Never put business logic directly in Views — it belongs in ViewModels.
+- New interfaces go in `Phrazie.Core/Interfaces/`. Mock implementations go in `Phrazie.Engine/Mock/`.
+- To swap a real implementation for a mock, change only the registration in `App.axaml.cs`.
+
+## Terminology
+Always use these exact terms as defined in the project plan. Do not substitute synonyms.
+
+| Term | Meaning |
+|---|---|
+| **Collection** | A high-level visual grouping (e.g. "Dark", "Euphoric") |
+| **State** | A visual mode within a collection (e.g. Normal, Break, Drop) |
+| **Clip** | A video asset assigned to a State |
+| **Trigger** | A scheduled state transition (Immediate / After X seconds / After X bars) |
+| **Session** | The current live performance context (active collection, state, BPM, pending trigger) |
+
+Do not use "scene", "preset", "cue", "playlist", or "track" in place of these terms.
+
+## UI Style
+- Theme: **Dark, Minimal, Performance-focused**
+- Background palette: near-black (`#080810`) with a dark navy gradient (`#090912` → `#0D1535`)
+- Sidebar: `#0E0E18` with `#1E1E2E` border
+- Cards / panels: `#12121E` background, `#1E1E30` border, `8px` corner radius
+- Primary text: `White`
+- Secondary text / labels: `#888899` or `#666688`
+- Accent (buttons, highlights): `#2A2A44` (neutral), `#1E3A5F` (action/blue)
+- Danger / emergency: `#7A0000` background, `#5A0000` border
+- All input controls (`TextBox`, `NumericUpDown`) use `Foreground="Black"` via global style in `App.axaml`
+- Do not introduce light themes, colorful gradients, or decorative illustrations
+- Every interactive element must have a `ToolTip.Tip` describing its action
+
+## Coding Conventions
+- Use `async Task` for all repository and service methods
+- Use `partial class` with source generators for all ViewModels
+- Use file-scoped namespaces (`namespace Foo.Bar;`)
+- Prefer `IReadOnlyList<T>` for return types from repositories
+- Mock services use in-memory state; real services (Phase 3+) implement the same interface
+- Do not add error handling for impossible paths; validate only at system boundaries

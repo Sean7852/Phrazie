@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Phrazie.Core.Enums;
@@ -12,32 +13,43 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private readonly ITriggerService _trigger;
     private readonly IPlaybackService _playback;
 
-    // ── current performance state ──────────────────────────────────────────
+    // ── state options (the three buttons: Normal / Break / Drop) ──────────
 
-    [ObservableProperty] private string _currentStateName = "—";
-    [ObservableProperty] private string _nextStateName    = "—";
-    [ObservableProperty] private string _countdownDisplay = "—";
-    [ObservableProperty] private TriggerStatus _triggerStatus = TriggerStatus.Idle;
+    public ObservableCollection<StateOptionViewModel> StateOptions { get; } = new();
 
-    // ── trigger scheduling controls ────────────────────────────────────────
+    // ── current state display ─────────────────────────────────────────────
 
-    [ObservableProperty] private double _delayValue = 8;
-    [ObservableProperty] private TriggerDelayType _delayType = TriggerDelayType.Bars;
+    [ObservableProperty] private string _currentStateName  = "—";
+
+    /// <summary>Phrazie UI language: Waiting · Locked · Triggered</summary>
+    [ObservableProperty] private string _statusLabel       = "Waiting";
+
+    /// <summary>e.g. "Drop in 8 bars" or "Break in 4s"</summary>
+    [ObservableProperty] private string _triggerDescription = string.Empty;
+
+    [ObservableProperty] private string _countdownDisplay  = "—";
+
+    // ── next state ────────────────────────────────────────────────────────
+
+    public string NextStateName =>
+        StateOptions.FirstOrDefault(o => o.IsNext)?.Name ?? "—";
+
+    // ── trigger scheduling controls ───────────────────────────────────────
+
+    [ObservableProperty] private double           _delayValue = 8;
+    [ObservableProperty] private TriggerDelayType _delayType  = TriggerDelayType.Bars;
 
     public IReadOnlyList<TriggerDelayType> DelayTypes { get; } =
         Enum.GetValues<TriggerDelayType>();
 
-    // ── next-state candidates (populated from session's active collection) ─
+    // ── BPM ───────────────────────────────────────────────────────────────
 
-    private State? _selectedNextState;
-    public State? SelectedNextState
-    {
-        get => _selectedNextState;
-        set => SetProperty(ref _selectedNextState, value);
-    }
+    [ObservableProperty] private double _bpm = 128;
 
-    public IReadOnlyList<State> AvailableStates =>
-        _session.Current.ActiveCollection?.States ?? [];
+    partial void OnBpmChanged(double value) =>
+        _ = _session.SetBpmAsync(value);
+
+    // ── ctor ──────────────────────────────────────────────────────────────
 
     public LivePerformanceViewModel(
         ISessionService session,
@@ -48,33 +60,41 @@ public partial class LivePerformanceViewModel : ViewModelBase
         _trigger  = trigger;
         _playback = playback;
 
+        BuildStateOptions(_session.Current);
         SyncFromSession(_session.Current);
 
-        _session.SessionChanged += s => Avalonia.Threading.Dispatcher.UIThread.Post(() => SyncFromSession(s));
-        _trigger.TriggerFired   += OnTriggerFired;
-        _trigger.CountdownTick  += OnCountdownTick;
+        _session.SessionChanged += s =>
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                RebuildOptionsIfCollectionChanged(s);
+                SyncFromSession(s);
+            });
+
+        _trigger.TriggerFired  += OnTriggerFired;
+        _trigger.CountdownTick += OnCountdownTick;
     }
 
-    // ── commands ───────────────────────────────────────────────────────────
+    // ── commands ──────────────────────────────────────────────────────────
 
     [RelayCommand]
     private async Task ScheduleTriggerAsync()
     {
-        if (SelectedNextState is null) return;
+        var nextOpt = StateOptions.FirstOrDefault(o => o.IsNext);
+        if (nextOpt is null) return;
 
         var trigger = new Trigger
         {
-            TargetStateId = SelectedNextState.Id,
+            TargetStateId = nextOpt.Model.Id,
             DelayType     = DelayType,
             DelayValue    = DelayValue,
         };
 
-        _session.Current.NextState      = SelectedNextState;
+        _session.Current.NextState      = nextOpt.Model;
         _session.Current.PendingTrigger = trigger;
 
-        NextStateName = SelectedNextState.Name;
-        TriggerStatus = TriggerStatus.Scheduled;
-        CountdownDisplay = FormatDelay();
+        StatusLabel       = "Locked";
+        TriggerDescription = BuildTriggerDescription(nextOpt.Name);
+        CountdownDisplay  = TriggerDescription;
 
         await _trigger.ScheduleAsync(trigger, _session.Current.Bpm);
     }
@@ -83,38 +103,54 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private async Task CancelTriggerAsync()
     {
         await _trigger.CancelAsync();
-        TriggerStatus    = TriggerStatus.Idle;
-        CountdownDisplay = "—";
-        NextStateName    = "—";
+        StatusLabel        = "Waiting";
+        TriggerDescription = string.Empty;
+        CountdownDisplay   = "—";
     }
 
     [RelayCommand]
     private async Task EmergencySwitchAsync()
     {
         await _trigger.CancelAsync();
-        if (_session.Current.NextState is { } next)
+
+        var nextOpt = StateOptions.FirstOrDefault(o => o.IsNext);
+        if (nextOpt is not null)
         {
-            await _session.TransitionToStateAsync(next);
-            await _playback.TransitionToStateAsync(next);
+            await _session.TransitionToStateAsync(nextOpt.Model);
+            await _playback.TransitionToStateAsync(nextOpt.Model);
         }
-        TriggerStatus    = TriggerStatus.Idle;
-        CountdownDisplay = "—";
+
+        StatusLabel        = "Waiting";
+        TriggerDescription = string.Empty;
+        CountdownDisplay   = "—";
     }
 
-    // ── event handlers ─────────────────────────────────────────────────────
+    // ── called by StateOptionViewModel via callback ───────────────────────
+
+    internal void SelectNextState(StateOptionViewModel selected)
+    {
+        foreach (var opt in StateOptions)
+            opt.IsNext = opt == selected;
+
+        OnPropertyChanged(nameof(NextStateName));
+    }
+
+    // ── event handlers ────────────────────────────────────────────────────
 
     private void OnTriggerFired(Trigger trigger)
     {
         Avalonia.Threading.Dispatcher.UIThread.Post(async () =>
         {
-            var state = AvailableStates.FirstOrDefault(s => s.Id == trigger.TargetStateId);
-            if (state is not null)
+            var opt = StateOptions.FirstOrDefault(o => o.Model.Id == trigger.TargetStateId);
+            if (opt is not null)
             {
-                await _session.TransitionToStateAsync(state);
-                await _playback.TransitionToStateAsync(state);
+                await _session.TransitionToStateAsync(opt.Model);
+                await _playback.TransitionToStateAsync(opt.Model);
             }
-            TriggerStatus    = TriggerStatus.Fired;
-            CountdownDisplay = "Triggered";
+
+            StatusLabel        = "Triggered";
+            TriggerDescription = string.Empty;
+            CountdownDisplay   = "Triggered";
         });
     }
 
@@ -122,26 +158,48 @@ public partial class LivePerformanceViewModel : ViewModelBase
     {
         Avalonia.Threading.Dispatcher.UIThread.Post(() =>
         {
-            TriggerStatus    = TriggerStatus.Counting;
+            StatusLabel      = "Locked";
             CountdownDisplay = remaining.TotalSeconds < 60
-                ? $"{remaining.TotalSeconds:F0}s"
+                ? $"{(int)remaining.TotalSeconds}s"
                 : remaining.ToString(@"m\:ss");
         });
     }
 
-    // ── helpers ────────────────────────────────────────────────────────────
+    // ── helpers ───────────────────────────────────────────────────────────
+
+    private void BuildStateOptions(Session s)
+    {
+        StateOptions.Clear();
+        foreach (var state in s.ActiveCollection?.States ?? [])
+            StateOptions.Add(new StateOptionViewModel(state, SelectNextState));
+    }
 
     private void SyncFromSession(Session s)
     {
         CurrentStateName = s.CurrentState?.Name ?? "—";
-        OnPropertyChanged(nameof(AvailableStates));
+        Bpm              = s.Bpm;
+
+        foreach (var opt in StateOptions)
+            opt.IsActive = opt.Model.Id == s.CurrentState?.Id;
     }
 
-    private string FormatDelay() => DelayType switch
+    private void RebuildOptionsIfCollectionChanged(Session s)
     {
-        TriggerDelayType.Immediate => "Now",
-        TriggerDelayType.Seconds   => $"{DelayValue}s",
-        TriggerDelayType.Bars      => $"{DelayValue} bars",
-        _                          => "—"
+        var currentIds = StateOptions.Select(o => o.Model.Id).ToHashSet();
+        var newIds     = (s.ActiveCollection?.States ?? []).Select(st => st.Id).ToHashSet();
+
+        if (!currentIds.SetEquals(newIds))
+        {
+            BuildStateOptions(s);
+            OnPropertyChanged(nameof(NextStateName));
+        }
+    }
+
+    private string BuildTriggerDescription(string stateName) => DelayType switch
+    {
+        TriggerDelayType.Immediate => $"{stateName} — Now",
+        TriggerDelayType.Seconds   => $"{stateName} in {(int)DelayValue}s",
+        TriggerDelayType.Bars      => $"{stateName} in {(int)DelayValue} bars",
+        _                          => string.Empty
     };
 }

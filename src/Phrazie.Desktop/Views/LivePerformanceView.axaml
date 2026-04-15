@@ -1,53 +1,144 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Phrazie.Desktop.ViewModels"
-             xmlns:models="using:Phrazie.Core.Models"
              x:Class="Phrazie.Desktop.Views.LivePerformanceView"
              x:DataType="vm:LivePerformanceViewModel"
              Background="Transparent">
 
-    <Grid RowDefinitions="*,Auto" Margin="32">
+    <UserControl.Styles>
+        <!-- Base state button -->
+        <Style Selector="Button.state">
+            <Setter Property="Background"                 Value="#12121E" />
+            <Setter Property="Foreground"                 Value="#555566" />
+            <Setter Property="BorderBrush"                Value="#1E1E30" />
+            <Setter Property="BorderThickness"            Value="1" />
+            <Setter Property="CornerRadius"               Value="6" />
+            <Setter Property="Padding"                    Value="20,10" />
+            <Setter Property="MinWidth"                   Value="90" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="FontSize"                   Value="14" />
+            <Setter Property="FontWeight"                 Value="Medium" />
+        </Style>
+        <!-- Hover -->
+        <Style Selector="Button.state:pointerover /template/ ContentPresenter">
+            <Setter Property="Background"             Value="#1A1A2E" />
+            <Setter Property="TextElement.Foreground" Value="#AAAACC" />
+        </Style>
+        <!-- Active = currently playing -->
+        <Style Selector="Button.state.active /template/ ContentPresenter">
+            <Setter Property="Background"             Value="#0E1E0E" />
+            <Setter Property="TextElement.Foreground" Value="#66CC66" />
+        </Style>
+        <Style Selector="Button.state.active">
+            <Setter Property="BorderBrush" Value="#2A5A2A" />
+        </Style>
+        <!-- Next = selected for next transition -->
+        <Style Selector="Button.state.next /template/ ContentPresenter">
+            <Setter Property="Background"             Value="#1E3A5F" />
+            <Setter Property="TextElement.Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.state.next">
+            <Setter Property="BorderBrush" Value="#3A6A9F" />
+        </Style>
+    </UserControl.Styles>
 
-        <!-- Main performance area -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,1,*">
+    <Grid RowDefinitions="Auto,*,Auto">
 
-            <!-- LEFT: Current state + countdown -->
+        <!-- ── Header ─────────────────────────────────────────────────────── -->
+        <Grid Grid.Row="0"
+              ColumnDefinitions="*,Auto"
+              Margin="32,28,32,0">
+
+            <TextBlock Grid.Column="0"
+                       Text="Live"
+                       Foreground="White"
+                       FontSize="28"
+                       FontWeight="Light"
+                       VerticalAlignment="Center" />
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="10"
+                        VerticalAlignment="Center">
+                <TextBlock Text="BPM"
+                           Foreground="#444466"
+                           FontSize="11"
+                           LetterSpacing="2"
+                           VerticalAlignment="Center" />
+                <NumericUpDown Value="{Binding Bpm}"
+                               Minimum="60"
+                               Maximum="200"
+                               Increment="1"
+                               FormatString="0"
+                               Width="90"
+                               Background="#12121E"
+                               BorderBrush="#2A2A44"
+                               CornerRadius="4"
+                               ToolTip.Tip="Set the BPM — used to calculate bar-based trigger timing" />
+            </StackPanel>
+        </Grid>
+
+        <!-- ── Main area ─────────────────────────────────────────────────── -->
+        <Grid Grid.Row="1"
+              ColumnDefinitions="*,1,*"
+              Margin="32,24,32,24">
+
+            <!-- LEFT: Current state display -->
             <StackPanel Grid.Column="0"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Spacing="12">
+                        Spacing="16">
 
                 <TextBlock Text="NOW"
-                           Foreground="#555566"
-                           FontSize="11"
+                           Foreground="#444466"
+                           FontSize="10"
                            LetterSpacing="3"
                            HorizontalAlignment="Center"
-                           ToolTip.Tip="The visual state currently playing" />
+                           ToolTip.Tip="The visual state currently active" />
 
                 <TextBlock Text="{Binding CurrentStateName}"
                            Foreground="White"
-                           FontSize="48"
+                           FontSize="52"
                            FontWeight="Light"
                            HorizontalAlignment="Center" />
 
-                <Border Background="#1A1A2E"
+                <!-- Status badge -->
+                <Border HorizontalAlignment="Center"
+                        Background="#0E0E1E"
                         BorderBrush="#2A2A44"
                         BorderThickness="1"
-                        CornerRadius="4"
-                        Padding="16,8"
-                        HorizontalAlignment="Center"
-                        ToolTip.Tip="Time or bars remaining until the next state transition">
-                    <TextBlock Text="{Binding CountdownDisplay}"
-                               Foreground="#CCCCDD"
-                               FontSize="20"
+                        CornerRadius="20"
+                        Padding="18,7"
+                        ToolTip.Tip="Waiting = idle  ·  Locked = trigger scheduled  ·  Triggered = just fired">
+                    <TextBlock Text="{Binding StatusLabel}"
+                               Foreground="#888899"
+                               FontSize="12"
+                               LetterSpacing="1"
                                HorizontalAlignment="Center" />
                 </Border>
 
-                <TextBlock Text="{Binding TriggerStatus}"
+                <!-- Countdown -->
+                <Border HorizontalAlignment="Center"
+                        Background="#12121E"
+                        BorderBrush="#1E1E30"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="20,10"
+                        ToolTip.Tip="Time or bars remaining before the next transition">
+                    <TextBlock Text="{Binding CountdownDisplay}"
+                               Foreground="#CCCCDD"
+                               FontSize="22"
+                               HorizontalAlignment="Center" />
+                </Border>
+
+                <!-- Trigger description e.g. "Drop in 8 bars" -->
+                <TextBlock Text="{Binding TriggerDescription}"
                            Foreground="#555566"
                            FontSize="12"
+                           FontStyle="Italic"
                            HorizontalAlignment="Center"
-                           ToolTip.Tip="Current trigger state: Idle, Scheduled, Counting, Fired, or Cancelled" />
+                           IsVisible="{Binding TriggerDescription,
+                               Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
             </StackPanel>
 
             <!-- Divider -->
@@ -57,68 +148,101 @@
             <StackPanel Grid.Column="2"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center"
-                        Spacing="16"
-                        Width="280">
+                        Spacing="20"
+                        Width="300">
 
                 <TextBlock Text="NEXT"
-                           Foreground="#555566"
-                           FontSize="11"
+                           Foreground="#444466"
+                           FontSize="10"
                            LetterSpacing="3"
                            HorizontalAlignment="Center"
-                           ToolTip.Tip="The visual state that will play after the trigger fires" />
+                           ToolTip.Tip="The state that will play after the trigger fires" />
 
                 <TextBlock Text="{Binding NextStateName}"
                            Foreground="#AAAACC"
-                           FontSize="32"
+                           FontSize="34"
                            FontWeight="Light"
                            HorizontalAlignment="Center" />
 
-                <!-- State picker -->
-                <ComboBox ItemsSource="{Binding AvailableStates}"
-                          SelectedItem="{Binding SelectedNextState}"
-                          Background="#12121E"
-                          Foreground="White"
-                          BorderBrush="#2A2A44"
-                          HorizontalAlignment="Stretch"
-                          ToolTip.Tip="Choose which state to transition to next">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate DataType="models:State">
-                            <TextBlock Text="{Binding Name}" />
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
+                <!-- State selector buttons -->
+                <Border Background="#0E0E1A"
+                        BorderBrush="#1E1E30"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="14,12">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="SELECT NEXT STATE"
+                                   Foreground="#444466"
+                                   FontSize="10"
+                                   LetterSpacing="2"
+                                   Margin="0,0,0,4" />
+                        <ItemsControl ItemsSource="{Binding StateOptions}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="8" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:StateOptionViewModel">
+                                    <Button Command="{Binding SelectCommand}"
+                                            Classes="state"
+                                            Classes.active="{Binding IsActive}"
+                                            Classes.next="{Binding IsNext}"
+                                            ToolTip.Tip="Select as the next state to transition to">
+                                        <TextBlock Text="{Binding Name}" />
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Border>
 
-                <!-- Delay controls -->
-                <Grid ColumnDefinitions="*,8,Auto">
-                    <NumericUpDown Grid.Column="0"
-                                   Value="{Binding DelayValue}"
-                                   Minimum="0"
-                                   Maximum="256"
-                                   Increment="1"
-                                   FormatString="0"
-                                   Background="#12121E"
-                                   BorderBrush="#2A2A44"
-                                   ToolTip.Tip="Number of seconds or bars before the transition fires" />
+                <!-- Trigger delay controls -->
+                <Border Background="#0E0E1A"
+                        BorderBrush="#1E1E30"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Padding="14,12">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="TRIGGER IN"
+                                   Foreground="#444466"
+                                   FontSize="10"
+                                   LetterSpacing="2"
+                                   Margin="0,0,0,2" />
+                        <Grid ColumnDefinitions="*,8,Auto">
+                            <NumericUpDown Grid.Column="0"
+                                           Value="{Binding DelayValue}"
+                                           Minimum="0"
+                                           Maximum="256"
+                                           Increment="1"
+                                           FormatString="0"
+                                           Background="#12121E"
+                                           BorderBrush="#2A2A44"
+                                           CornerRadius="4"
+                                           ToolTip.Tip="Number of seconds or bars before the transition fires" />
+                            <ComboBox Grid.Column="2"
+                                      ItemsSource="{Binding DelayTypes}"
+                                      SelectedItem="{Binding DelayType}"
+                                      Background="#12121E"
+                                      Foreground="White"
+                                      BorderBrush="#2A2A44"
+                                      Width="120"
+                                      ToolTip.Tip="Delay unit — Bars requires BPM to be set" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
 
-                    <ComboBox Grid.Column="2"
-                              ItemsSource="{Binding DelayTypes}"
-                              SelectedItem="{Binding DelayType}"
-                              Background="#12121E"
-                              Foreground="White"
-                              BorderBrush="#2A2A44"
-                              Width="110"
-                              ToolTip.Tip="Delay unit: Immediate, Seconds, or Bars (bars require BPM)" />
-                </Grid>
-
-                <!-- Schedule button -->
+                <!-- Schedule -->
                 <Button Command="{Binding ScheduleTriggerCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Background="#1E3A5F"
                         Foreground="White"
                         BorderThickness="0"
-                        Padding="0,12"
+                        Padding="0,13"
+                        CornerRadius="6"
                         FontSize="14"
+                        FontWeight="Medium"
                         ToolTip.Tip="Schedule the transition — Phrazie will count down and switch at the right moment">
                     Schedule Trigger
                 </Button>
@@ -128,28 +252,35 @@
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Background="Transparent"
-                        Foreground="#666677"
-                        BorderBrush="#2A2A44"
+                        Foreground="#555566"
+                        BorderBrush="#1E1E30"
                         BorderThickness="1"
                         Padding="0,10"
+                        CornerRadius="6"
                         FontSize="13"
                         ToolTip.Tip="Cancel the pending trigger without changing the current state">
                     Cancel
                 </Button>
+
             </StackPanel>
         </Grid>
 
-        <!-- BOTTOM: Emergency switch bar -->
-        <Border Grid.Row="1"
+        <!-- ── Emergency switch bar ───────────────────────────────────────── -->
+        <Border Grid.Row="2"
                 Background="#1A0000"
                 BorderBrush="#5A0000"
                 BorderThickness="0,1,0,0"
-                Padding="32,16">
+                Padding="32,14">
             <Grid ColumnDefinitions="*,Auto">
-                <TextBlock Grid.Column="0"
-                           Text="Emergency switch — transitions immediately to next state"
-                           Foreground="#994444"
-                           VerticalAlignment="Center" />
+                <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock Text="Emergency switch"
+                               Foreground="#994444"
+                               FontSize="13"
+                               FontWeight="Medium" />
+                    <TextBlock Text="Transitions immediately to the selected next state"
+                               Foreground="#663333"
+                               FontSize="11" />
+                </StackPanel>
                 <Button Grid.Column="1"
                         Command="{Binding EmergencySwitchCommand}"
                         Content="SWITCH NOW"
@@ -157,8 +288,9 @@
                         Foreground="White"
                         BorderThickness="0"
                         Padding="24,10"
+                        CornerRadius="6"
                         FontWeight="SemiBold"
-                        ToolTip.Tip="Immediately jump to the next state — use when the crowd moment hits unexpectedly" />
+                        ToolTip.Tip="Immediately jump to the next state — no countdown" />
             </Grid>
         </Border>
 
