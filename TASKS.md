@@ -103,3 +103,14 @@
 - [ ] Bug fixes
 - [ ] UI refinement
 - [ ] Performance tuning
+
+---
+
+## UI / UX Improvements (Done)
+
+- [x] Remove gear icon from collection cards — settings moved to management page
+- [x] Single-click collection card opens management page
+- [x] Collection detail rich header — cover image, name, description, edit icon
+- [x] Edit collection modal — name, description, cover image picker, delete
+- [x] Settings page with master menu + detail panel
+- [x] Hotkey mapping — rebindable shortcuts, live key capture
