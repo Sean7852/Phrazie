@@ -3,12 +3,12 @@
 ## Included Features (Must Have)
 
 ### 1. Collections (Content Organization)
-- [ ] Create collections
+- [x] Create collections
 - [ ] Rename collections
-- [ ] Delete collections
+- [x] Delete collections
 
 ### 2. State System
-- [ ] Default states: Normal, Break, Drop
+- [x] Default states: Normal, Break, Drop
 - [ ] Rename states
 - [ ] Add custom states
 - [ ] Remove states
@@ -21,18 +21,18 @@
 - [ ] Playback mode: Sequential
 
 ### 4. Live Performance Screen
-- [ ] Current state display
-- [ ] Next state selection
-- [ ] Trigger scheduling
-- [ ] Countdown indicator
-- [ ] Emergency switch
+- [x] Current state display
+- [x] Next state selection
+- [x] Trigger scheduling
+- [x] Countdown indicator
+- [x] Emergency switch
 
 ### 5. Trigger System
-- [ ] Trigger type: Immediate
-- [ ] Trigger type: After X seconds
-- [ ] Trigger type: After X bars
-- [ ] UI label: "Drop in 8 bars"
-- [ ] UI label: "Break in 4 bars"
+- [x] Trigger type: Immediate
+- [x] Trigger type: After X seconds
+- [x] Trigger type: After X bars
+- [x] UI label: "Drop in 8 bars"
+- [x] UI label: "Break in 4 bars"
 
 ### 6. Playback (Basic)
 - [ ] Video playback
@@ -67,10 +67,10 @@
 ### Phase 2 — Data Model & Mock Interaction (2 weeks)
 > Goal: Fully simulated workflow
 
-- [ ] Collection / State CRUD
+- [x] Collection / State CRUD (create + delete done; rename pending)
 - [ ] Mock clip assignment
-- [ ] Trigger simulation
-- [ ] Countdown UI
+- [x] Trigger simulation
+- [x] Countdown UI
 
 ### Phase 3 — Core Functionality (3–4 weeks)
 > Goal: Functional prototype
