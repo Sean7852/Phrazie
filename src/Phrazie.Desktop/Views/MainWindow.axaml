@@ -11,35 +11,65 @@
 
     <Grid ColumnDefinitions="180,*">
 
-        <!-- Sidebar -->
+        <!-- ── Sidebar ── -->
         <Border Grid.Column="0"
                 Background="#0E0E18"
                 BorderBrush="#1E1E2E"
                 BorderThickness="0,0,1,0">
-            <StackPanel Margin="0,32,0,0" Spacing="2">
+            <Grid RowDefinitions="Auto,*,Auto">
 
-                <TextBlock Text="PHRAZIE"
-                           Foreground="#444466"
-                           FontSize="11"
-                           LetterSpacing="3"
-                           Margin="20,0,0,24" />
+                <!-- Brand + top nav -->
+                <StackPanel Grid.Row="0" Margin="0,32,0,0" Spacing="2">
+                    <TextBlock Text="PHRAZIE"
+                               Foreground="#444466"
+                               FontSize="11"
+                               LetterSpacing="3"
+                               Margin="20,0,0,24" />
 
-                <Button Command="{Binding GoToCollectionsCommand}"
+                    <Button Command="{Binding GoToCollectionsCommand}"
+                            Classes="nav"
+                            Classes.active="{Binding IsCollectionsActive}"
+                            ToolTip.Tip="Browse and manage your visual collections">
+                        Collections
+                    </Button>
+
+                    <Button Command="{Binding GoToLiveCommand}"
+                            Classes="nav"
+                            Classes.active="{Binding IsLiveActive}"
+                            ToolTip.Tip="Open the live performance screen">
+                        Live
+                    </Button>
+                </StackPanel>
+
+                <!-- Bottom: Help button -->
+                <Button Grid.Row="2"
+                        Command="{Binding GoToHelpCommand}"
                         Classes="nav"
-                        Classes.active="{Binding IsCollectionsActive}">
-                    Collections
+                        Classes.active="{Binding IsHelpActive}"
+                        Margin="0,0,0,16"
+                        ToolTip.Tip="Help, tips, and resources">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Border Width="20" Height="20"
+                                CornerRadius="10"
+                                BorderBrush="#444466"
+                                BorderThickness="1"
+                                VerticalAlignment="Center">
+                            <TextBlock Text="?"
+                                       Foreground="#888899"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="Help &amp; Resources"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
                 </Button>
 
-                <Button Command="{Binding GoToLiveCommand}"
-                        Classes="nav"
-                        Classes.active="{Binding IsLiveActive}">
-                    Live
-                </Button>
-
-            </StackPanel>
+            </Grid>
         </Border>
 
-        <!-- Content area with gradient background -->
+        <!-- ── Content area ── -->
         <Border Grid.Column="1">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
@@ -53,25 +83,22 @@
     </Grid>
 
     <Window.Styles>
-        <!-- Default nav button -->
         <Style Selector="Button.nav">
-            <Setter Property="Background"                  Value="Transparent" />
-            <Setter Property="Foreground"                  Value="#888899" />
-            <Setter Property="BorderThickness"             Value="0" />
-            <Setter Property="Padding"                     Value="20,10" />
-            <Setter Property="HorizontalAlignment"         Value="Stretch" />
-            <Setter Property="HorizontalContentAlignment"  Value="Left" />
-            <Setter Property="CornerRadius"                Value="0" />
+            <Setter Property="Background"                 Value="Transparent" />
+            <Setter Property="Foreground"                 Value="#888899" />
+            <Setter Property="BorderThickness"            Value="0" />
+            <Setter Property="Padding"                    Value="20,10" />
+            <Setter Property="HorizontalAlignment"        Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="CornerRadius"               Value="0" />
         </Style>
-        <!-- Hover -->
         <Style Selector="Button.nav:pointerover /template/ ContentPresenter">
-            <Setter Property="Background"              Value="#16162A" />
-            <Setter Property="TextElement.Foreground"  Value="White" />
+            <Setter Property="Background"             Value="#16162A" />
+            <Setter Property="TextElement.Foreground" Value="White" />
         </Style>
-        <!-- Active / selected page -->
         <Style Selector="Button.nav.active /template/ ContentPresenter">
-            <Setter Property="Background"              Value="#1C1C32" />
-            <Setter Property="TextElement.Foreground"  Value="White" />
+            <Setter Property="Background"             Value="#1C1C32" />
+            <Setter Property="TextElement.Foreground" Value="White" />
         </Style>
     </Window.Styles>
 

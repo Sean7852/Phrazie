@@ -1,0 +1,151 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Phrazie.Desktop.ViewModels"
+             x:Class="Phrazie.Desktop.Views.HelpView"
+             x:DataType="vm:HelpViewModel"
+             Background="Transparent">
+
+    <ScrollViewer Padding="32,28,32,32">
+        <StackPanel Spacing="24" MaxWidth="680">
+
+            <!-- Page title -->
+            <StackPanel Spacing="6">
+                <TextBlock Text="Help &amp; Resources"
+                           Foreground="White"
+                           FontSize="28"
+                           FontWeight="Light" />
+                <TextBlock Text="Everything you need to get up and running with Phrazie."
+                           Foreground="#666688"
+                           FontSize="13" />
+            </StackPanel>
+
+            <!-- ── Getting Started ── -->
+            <Border Background="#12121E" BorderBrush="#1E1E30" BorderThickness="1" CornerRadius="8" Padding="22,18">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="🚀  Getting Started"
+                               Foreground="White"
+                               FontSize="15"
+                               FontWeight="SemiBold" />
+                    <StackPanel Spacing="8">
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="1.  Go to Collections and click Create to add a new collection (e.g. Dark, Euphoric, Tech)." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="2.  Each collection comes with three default states: Normal, Break, and Drop. Rename or add more in a future update." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="3.  Click Select on a collection to make it active for the live session." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="4.  Go to Live, pick the Next state, set a delay, then hit Schedule Trigger." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="5.  Phrazie counts down and transitions visuals at precisely the right moment." />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ── Trigger Types ── -->
+            <Border Background="#12121E" BorderBrush="#1E1E30" BorderThickness="1" CornerRadius="8" Padding="22,18">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="⏱  Trigger Types"
+                               Foreground="White"
+                               FontSize="15"
+                               FontWeight="SemiBold" />
+                    <Grid ColumnDefinitions="130,*" RowDefinitions="Auto,Auto,Auto" >
+                        <Grid.Styles>
+                            <Style Selector="TextBlock.label">
+                                <Setter Property="Foreground" Value="White" />
+                                <Setter Property="FontSize" Value="13" />
+                                <Setter Property="FontWeight" Value="Medium" />
+                                <Setter Property="VerticalAlignment" Value="Top" />
+                                <Setter Property="Margin" Value="0,0,0,10" />
+                            </Style>
+                            <Style Selector="TextBlock.desc">
+                                <Setter Property="Foreground" Value="#888899" />
+                                <Setter Property="FontSize" Value="13" />
+                                <Setter Property="TextWrapping" Value="Wrap" />
+                                <Setter Property="VerticalAlignment" Value="Top" />
+                                <Setter Property="Margin" Value="0,0,0,10" />
+                            </Style>
+                        </Grid.Styles>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="label" Text="Immediate" />
+                        <TextBlock Grid.Row="0" Grid.Column="1" Classes="desc"  Text="Transitions right now. Good for emergency switches or instant cues." />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Classes="label" Text="After X Seconds" />
+                        <TextBlock Grid.Row="1" Grid.Column="1" Classes="desc"  Text="Transitions after a fixed number of seconds. Useful for timed intros or outros." />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Classes="label" Text="After X Bars" />
+                        <TextBlock Grid.Row="2" Grid.Column="1" Classes="desc"  Text="Transitions after a musical phrase (requires BPM to be set). 8 bars at 128 BPM ≈ 15 seconds. This is the most musical trigger mode." />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- ── Live Performance Tips ── -->
+            <Border Background="#12121E" BorderBrush="#1E1E30" BorderThickness="1" CornerRadius="8" Padding="22,18">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="🎛  Live Performance Tips"
+                               Foreground="White"
+                               FontSize="15"
+                               FontWeight="SemiBold" />
+                    <StackPanel Spacing="8">
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="• Set your BPM in the Live screen before using bar-based triggers for accurate timing." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="• The countdown indicator shows how much time remains before the next transition." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="• Use Cancel to abort a scheduled trigger without changing the current state." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="• Use the Emergency Switch bar at the bottom to jump to the next state instantly — great for unexpected drops or crowd moments." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="• Prepare your collections before the show — aim for under 10 minutes of setup." />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ── Collections & Cover Images ── -->
+            <Border Background="#12121E" BorderBrush="#1E1E30" BorderThickness="1" CornerRadius="8" Padding="22,18">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="🖼  Collections &amp; Cover Images"
+                               Foreground="White"
+                               FontSize="15"
+                               FontWeight="SemiBold" />
+                    <StackPanel Spacing="8">
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="• A Collection is a themed group of visual states (e.g. all clips for a dark techno set)." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="• Click the ⚙ gear icon on any collection card to open its settings." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="• Use Change Cover Image to assign a thumbnail — PNG, JPG, WEBP, and GIF are supported." />
+                        <TextBlock Foreground="#AAAACC" FontSize="13" TextWrapping="Wrap"
+                                   Text="• Only one collection can be active during a live session. Switch collections between sets, not mid-performance." />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- ── Keyboard Shortcuts ── -->
+            <Border Background="#12121E" BorderBrush="#1E1E30" BorderThickness="1" CornerRadius="8" Padding="22,18">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="⌨  Keyboard Shortcuts"
+                               Foreground="White"
+                               FontSize="15"
+                               FontWeight="SemiBold" />
+                    <TextBlock Foreground="#555566"
+                               FontSize="13"
+                               FontStyle="Italic"
+                               Text="Keyboard shortcuts are coming in a future update. MIDI mapping support is also planned." />
+                </StackPanel>
+            </Border>
+
+            <!-- ── About ── -->
+            <Border Background="#0E0E1A" BorderBrush="#1E1E30" BorderThickness="1" CornerRadius="8" Padding="22,18">
+                <StackPanel Spacing="6">
+                    <TextBlock Text="ℹ  About Phrazie"
+                               Foreground="White"
+                               FontSize="15"
+                               FontWeight="SemiBold" />
+                    <TextBlock Foreground="#555566" FontSize="12" Text="Version 0.1.0 — MVP Skeleton" />
+                    <TextBlock Foreground="#555566" FontSize="12" Text="Built with .NET 9 + Avalonia 12 + CommunityToolkit.Mvvm" />
+                    <TextBlock Foreground="#555566" FontSize="12" Margin="0,4,0,0" TextWrapping="Wrap"
+                               Text="Phrazie helps DJs pre-schedule and trigger visuals in sync with musical structure — phrases, breaks, and drops — with minimal live interaction." />
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

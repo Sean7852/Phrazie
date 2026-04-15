@@ -21,7 +21,8 @@
                          Width="280"
                          Background="#12121E"
                          BorderBrush="#2A2A44"
-                         CornerRadius="4" />
+                         CornerRadius="4"
+                         ToolTip.Tip="Enter a name for your new collection" />
                 <Button Command="{Binding CreateCollectionCommand}"
                         Content="Create"
                         Background="White"
@@ -29,7 +30,8 @@
                         BorderThickness="0"
                         Padding="18,8"
                         CornerRadius="4"
-                        FontWeight="Medium" />
+                        FontWeight="Medium"
+                        ToolTip.Tip="Create a new collection with Normal, Break, and Drop states" />
             </StackPanel>
         </StackPanel>
 
@@ -55,10 +57,8 @@
                             <!-- ── Normal view ── -->
                             <StackPanel IsVisible="{Binding !IsSettingsOpen}">
 
-                                <!-- Cover image / placeholder area -->
+                                <!-- Cover image / placeholder -->
                                 <Panel Height="115">
-
-                                    <!-- Placeholder gradient -->
                                     <Border>
                                         <Border.Background>
                                             <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
@@ -67,13 +67,10 @@
                                             </LinearGradientBrush>
                                         </Border.Background>
                                     </Border>
-
-                                    <!-- Actual cover image -->
                                     <Image Source="{Binding CoverImage}"
                                            Stretch="UniformToFill"
                                            IsVisible="{Binding CoverImage, Converter={x:Static ObjectConverters.IsNotNull}}" />
 
-                                    <!-- Gear button (top-right) -->
                                     <Button Command="{Binding ToggleSettingsCommand}"
                                             HorizontalAlignment="Right"
                                             VerticalAlignment="Top"
@@ -84,7 +81,8 @@
                                             Padding="6,4"
                                             CornerRadius="4"
                                             FontSize="13"
-                                            Content="⚙" />
+                                            Content="⚙"
+                                            ToolTip.Tip="Collection settings" />
                                 </Panel>
 
                                 <!-- Name + actions -->
@@ -102,14 +100,16 @@
                                                 BorderThickness="0"
                                                 Padding="12,5"
                                                 CornerRadius="4"
-                                                FontSize="12" />
+                                                FontSize="12"
+                                                ToolTip.Tip="Set as the active collection for live performance" />
                                         <Button Command="{Binding DeleteCommand}"
                                                 Content="Delete"
                                                 Background="Transparent"
                                                 Foreground="#555566"
                                                 BorderThickness="0"
                                                 Padding="8,5"
-                                                FontSize="12" />
+                                                FontSize="12"
+                                                ToolTip.Tip="Permanently delete this collection" />
                                     </StackPanel>
                                 </StackPanel>
                             </StackPanel>
@@ -119,8 +119,6 @@
                                     Background="#0E0E1E"
                                     Padding="14,12">
                                 <StackPanel Spacing="12">
-
-                                    <!-- Settings header row -->
                                     <Grid ColumnDefinitions="*,Auto">
                                         <TextBlock Grid.Column="0"
                                                    Text="SETTINGS"
@@ -135,10 +133,10 @@
                                                 Foreground="#666688"
                                                 BorderThickness="0"
                                                 Padding="4,2"
-                                                FontSize="13" />
+                                                FontSize="13"
+                                                ToolTip.Tip="Close settings" />
                                     </Grid>
 
-                                    <!-- Change Cover Image button -->
                                     <Button Command="{Binding UploadCoverImageCommand}"
                                             HorizontalAlignment="Stretch"
                                             HorizontalContentAlignment="Left"
@@ -149,8 +147,8 @@
                                             Padding="12,9"
                                             CornerRadius="6"
                                             FontSize="13"
-                                            Content="📷  Change Cover Image" />
-
+                                            Content="📷  Change Cover Image"
+                                            ToolTip.Tip="Choose a cover image from your computer (PNG, JPG, WEBP, GIF)" />
                                 </StackPanel>
                             </Border>
 

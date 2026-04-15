@@ -15,7 +15,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] private ViewModelBase _currentPage;
     [ObservableProperty] private bool _isCollectionsActive = true;
-    [ObservableProperty] private bool _isLiveActive = false;
+    [ObservableProperty] private bool _isLiveActive        = false;
+    [ObservableProperty] private bool _isHelpActive        = false;
 
     public MainWindowViewModel(
         ICollectionRepository collections,
@@ -39,6 +40,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = new CollectionsViewModel(_collections, _session, _filePicker);
         IsCollectionsActive = true;
         IsLiveActive        = false;
+        IsHelpActive        = false;
     }
 
     [RelayCommand]
@@ -47,5 +49,15 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = new LivePerformanceViewModel(_session, _trigger, _playback);
         IsCollectionsActive = false;
         IsLiveActive        = true;
+        IsHelpActive        = false;
+    }
+
+    [RelayCommand]
+    private void GoToHelp()
+    {
+        CurrentPage         = new HelpViewModel();
+        IsCollectionsActive = false;
+        IsLiveActive        = false;
+        IsHelpActive        = true;
     }
 }
