@@ -11,5 +11,11 @@
   
     <Application.Styles>
         <FluentTheme />
+        <Style Selector="TextBox">
+            <Setter Property="Foreground" Value="Black" />
+        </Style>
+        <Style Selector="NumericUpDown">
+            <Setter Property="Foreground" Value="Black" />
+        </Style>
     </Application.Styles>
 </Application>

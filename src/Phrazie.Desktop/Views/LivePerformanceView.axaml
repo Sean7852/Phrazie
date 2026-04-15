@@ -1,0 +1,159 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Phrazie.Desktop.ViewModels"
+             xmlns:enums="using:Phrazie.Core.Enums"
+             xmlns:models="using:Phrazie.Core.Models"
+             x:Class="Phrazie.Desktop.Views.LivePerformanceView"
+             x:DataType="vm:LivePerformanceViewModel"
+             Background="#0D0D0D">
+
+    <Grid RowDefinitions="*,Auto" Margin="32">
+
+        <!-- Main performance area -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,1,*">
+
+            <!-- LEFT: Current state + countdown -->
+            <StackPanel Grid.Column="0"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="12">
+
+                <TextBlock Text="NOW"
+                           Foreground="#555555"
+                           FontSize="11"
+                           LetterSpacing="3"
+                           HorizontalAlignment="Center" />
+
+                <TextBlock Text="{Binding CurrentStateName}"
+                           Foreground="White"
+                           FontSize="48"
+                           FontWeight="Light"
+                           HorizontalAlignment="Center" />
+
+                <!-- Countdown badge -->
+                <Border Background="#1A1A1A"
+                        BorderBrush="#2A2A2A"
+                        BorderThickness="1"
+                        CornerRadius="4"
+                        Padding="16,8"
+                        HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding CountdownDisplay}"
+                               Foreground="#CCCCCC"
+                               FontSize="20"
+                               HorizontalAlignment="Center" />
+                </Border>
+
+                <TextBlock Text="{Binding TriggerStatus}"
+                           Foreground="#555555"
+                           FontSize="12"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Divider -->
+            <Border Grid.Column="1" Background="#222222" />
+
+            <!-- RIGHT: Next state + trigger controls -->
+            <StackPanel Grid.Column="2"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Spacing="16"
+                        Width="280">
+
+                <TextBlock Text="NEXT"
+                           Foreground="#555555"
+                           FontSize="11"
+                           LetterSpacing="3"
+                           HorizontalAlignment="Center" />
+
+                <TextBlock Text="{Binding NextStateName}"
+                           Foreground="#AAAAAA"
+                           FontSize="32"
+                           FontWeight="Light"
+                           HorizontalAlignment="Center" />
+
+                <!-- State picker -->
+                <ComboBox ItemsSource="{Binding AvailableStates}"
+                          SelectedItem="{Binding SelectedNextState}"
+                          Background="#1A1A1A"
+                          Foreground="White"
+                          BorderBrush="#333333"
+                          HorizontalAlignment="Stretch">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate DataType="models:State">
+                            <TextBlock Text="{Binding Name}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+
+                <!-- Delay controls -->
+                <Grid ColumnDefinitions="*,8,Auto">
+                    <NumericUpDown Grid.Column="0"
+                                   Value="{Binding DelayValue}"
+                                   Minimum="0"
+                                   Maximum="256"
+                                   Increment="1"
+                                   FormatString="0"
+                                   Background="#1A1A1A"
+                                   BorderBrush="#333333" />
+
+                    <ComboBox Grid.Column="2"
+                              ItemsSource="{Binding DelayTypes}"
+                              SelectedItem="{Binding DelayType}"
+                              Background="#1A1A1A"
+                              Foreground="White"
+                              BorderBrush="#333333"
+                              Width="110" />
+                </Grid>
+
+                <!-- Schedule button -->
+                <Button Command="{Binding ScheduleTriggerCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Background="#1E3A5F"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Padding="0,12"
+                        FontSize="14">
+                    Schedule Trigger
+                </Button>
+
+                <!-- Cancel -->
+                <Button Command="{Binding CancelTriggerCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Background="Transparent"
+                        Foreground="#666666"
+                        BorderBrush="#333333"
+                        BorderThickness="1"
+                        Padding="0,10"
+                        FontSize="13">
+                    Cancel
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- BOTTOM: Emergency switch bar -->
+        <Border Grid.Row="1"
+                Background="#1A0000"
+                BorderBrush="#5A0000"
+                BorderThickness="0,1,0,0"
+                Padding="32,16">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="Emergency switch — transitions immediately to next state"
+                           Foreground="#994444"
+                           VerticalAlignment="Center" />
+                <Button Grid.Column="1"
+                        Command="{Binding EmergencySwitchCommand}"
+                        Content="SWITCH NOW"
+                        Background="#7A0000"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Padding="24,10"
+                        FontWeight="SemiBold" />
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</UserControl>

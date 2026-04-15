@@ -1,0 +1,88 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Phrazie.Desktop.ViewModels"
+             xmlns:models="using:Phrazie.Core.Models"
+             x:Class="Phrazie.Desktop.Views.CollectionsView"
+             x:DataType="vm:CollectionsViewModel"
+             Background="Transparent">
+
+    <Grid RowDefinitions="Auto,*" Margin="32">
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,28">
+            <TextBlock Text="Collections"
+                       Foreground="White"
+                       FontSize="28"
+                       FontWeight="Light"
+                       Margin="0,0,0,16" />
+
+            <!-- Create row -->
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBox Text="{Binding NewCollectionName}"
+                         PlaceholderText="New collection name…"
+                         Width="280"
+                         Background="#12121E"
+                         BorderBrush="#2A2A44"
+                         CornerRadius="4" />
+                <Button Command="{Binding CreateCollectionCommand}"
+                        Content="Create"
+                        Background="White"
+                        Foreground="#111111"
+                        BorderThickness="0"
+                        Padding="18,8"
+                        CornerRadius="4"
+                        FontWeight="Medium" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Collection cards -->
+        <ItemsControl Grid.Row="1" ItemsSource="{Binding Collections}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="models:Collection">
+                    <Border Background="#12121E"
+                            BorderBrush="#1E1E30"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Margin="0,0,14,14"
+                            Padding="20,18"
+                            Width="180">
+                        <StackPanel Spacing="14">
+                            <TextBlock Text="{Binding Name}"
+                                       Foreground="White"
+                                       FontSize="15"
+                                       FontWeight="Medium" />
+
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <Button Command="{Binding $parent[ItemsControl].((vm:CollectionsViewModel)DataContext).SelectCollectionCommand}"
+                                        CommandParameter="{Binding}"
+                                        Content="Select"
+                                        Background="#2A2A44"
+                                        Foreground="White"
+                                        BorderThickness="0"
+                                        Padding="12,5"
+                                        CornerRadius="4"
+                                        FontSize="12" />
+                                <Button Command="{Binding $parent[ItemsControl].((vm:CollectionsViewModel)DataContext).DeleteCollectionCommand}"
+                                        CommandParameter="{Binding}"
+                                        Content="Delete"
+                                        Background="Transparent"
+                                        Foreground="#555566"
+                                        BorderThickness="0"
+                                        Padding="8,5"
+                                        FontSize="12" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+    </Grid>
+
+</UserControl>

@@ -11,7 +11,11 @@
       "Bash(mv Phraze.Desktop Phrazie.Desktop)",
       "Bash(mv Phraze.Core Phrazie.Core)",
       "Bash(mv:*)",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build:*)",
+      "Bash(dotnet run:*)",
+      "Bash(taskkill /f /im Phrazie.Desktop.exe)",
+      "Bash(dotnet publish:*)",
+      "Bash(start:*)"
     ]
   }
 }
