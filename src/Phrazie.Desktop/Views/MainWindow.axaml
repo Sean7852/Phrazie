@@ -42,30 +42,46 @@
                     </Button>
                 </StackPanel>
 
-                <!-- Bottom: Help button -->
-                <Button Grid.Row="2"
-                        Command="{Binding GoToHelpCommand}"
-                        Classes="nav"
-                        Classes.active="{Binding IsHelpActive}"
-                        Margin="0,0,0,16"
-                        ToolTip.Tip="Help, tips, and resources">
-                    <StackPanel Orientation="Horizontal" Spacing="10">
-                        <Border Width="20" Height="20"
-                                CornerRadius="10"
-                                BorderBrush="#444466"
-                                BorderThickness="1"
-                                VerticalAlignment="Center">
-                            <TextBlock Text="?"
-                                       Foreground="#888899"
-                                       FontSize="12"
-                                       FontWeight="SemiBold"
-                                       HorizontalAlignment="Center"
+                <!-- Bottom: Settings + Help buttons -->
+                <StackPanel Grid.Row="2" Spacing="0" Margin="0,0,0,8">
+
+                    <Button Command="{Binding GoToSettingsCommand}"
+                            Classes="nav"
+                            Classes.active="{Binding IsSettingsActive}"
+                            ToolTip.Tip="App settings and preferences">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="⚙"
+                                       Foreground="#666688"
+                                       FontSize="14"
                                        VerticalAlignment="Center" />
-                        </Border>
-                        <TextBlock Text="Help &amp; Resources"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
+                            <TextBlock Text="Settings"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button Command="{Binding GoToHelpCommand}"
+                            Classes="nav"
+                            Classes.active="{Binding IsHelpActive}"
+                            ToolTip.Tip="Help, tips, and resources">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <Border Width="20" Height="20"
+                                    CornerRadius="10"
+                                    BorderBrush="#444466"
+                                    BorderThickness="1"
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="?"
+                                           Foreground="#888899"
+                                           FontSize="12"
+                                           FontWeight="SemiBold"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                            </Border>
+                            <TextBlock Text="Help &amp; Resources"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                </StackPanel>
 
             </Grid>
         </Border>

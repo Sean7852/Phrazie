@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Phrazie.Core.Enums;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
 using Phrazie.Desktop.Services;
@@ -9,28 +10,32 @@ namespace Phrazie.Desktop.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly ICollectionRepository _collections;
-    private readonly ISessionService _session;
-    private readonly ITriggerService _trigger;
-    private readonly IPlaybackService _playback;
-    private readonly IFilePickerService _filePicker;
+    private readonly ISessionService       _session;
+    private readonly ITriggerService       _trigger;
+    private readonly IPlaybackService      _playback;
+    private readonly IFilePickerService    _filePicker;
+    private readonly IHotkeyService        _hotkeys;
 
     [ObservableProperty] private ViewModelBase _currentPage;
     [ObservableProperty] private bool _isCollectionsActive = true;
     [ObservableProperty] private bool _isLiveActive        = false;
+    [ObservableProperty] private bool _isSettingsActive    = false;
     [ObservableProperty] private bool _isHelpActive        = false;
 
     public MainWindowViewModel(
         ICollectionRepository collections,
-        ISessionService session,
-        ITriggerService trigger,
-        IPlaybackService playback,
-        IFilePickerService filePicker)
+        ISessionService       session,
+        ITriggerService       trigger,
+        IPlaybackService      playback,
+        IFilePickerService    filePicker,
+        IHotkeyService        hotkeys)
     {
         _collections = collections;
         _session     = session;
         _trigger     = trigger;
         _playback    = playback;
         _filePicker  = filePicker;
+        _hotkeys     = hotkeys;
 
         _currentPage = BuildCollectionsPage();
     }
@@ -43,6 +48,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = BuildCollectionsPage();
         IsCollectionsActive = true;
         IsLiveActive        = false;
+        IsSettingsActive    = false;
         IsHelpActive        = false;
     }
 
@@ -52,6 +58,17 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = new LivePerformanceViewModel(_session, _trigger, _playback);
         IsCollectionsActive = false;
         IsLiveActive        = true;
+        IsSettingsActive    = false;
+        IsHelpActive        = false;
+    }
+
+    [RelayCommand]
+    private void GoToSettings()
+    {
+        CurrentPage         = new SettingsViewModel(_hotkeys);
+        IsCollectionsActive = false;
+        IsLiveActive        = false;
+        IsSettingsActive    = true;
         IsHelpActive        = false;
     }
 
@@ -61,7 +78,30 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = new HelpViewModel();
         IsCollectionsActive = false;
         IsLiveActive        = false;
+        IsSettingsActive    = false;
         IsHelpActive        = true;
+    }
+
+    // ── global hotkey routing ──────────────────────────────────────────────
+
+    /// <summary>Called by MainWindow.OnKeyDown with the Avalonia Key name.</summary>
+    public void HandleKeyDown(string keyName)
+    {
+        var action = _hotkeys.HandleKeyPress(keyName);
+        if (action is null) return;
+
+        switch (action.Value)
+        {
+            case HotkeyAction.GoToCollections: GoToCollections(); break;
+            case HotkeyAction.GoToLive:        GoToLive();        break;
+            // EmergencySwitch / ScheduleTrigger / CancelTrigger delegate to LivePerformanceViewModel
+            case HotkeyAction.EmergencySwitch or
+                 HotkeyAction.ScheduleTrigger  or
+                 HotkeyAction.CancelTrigger
+                when CurrentPage is LivePerformanceViewModel live:
+                live.HandleHotkeyAction(action.Value);
+                break;
+        }
     }
 
     // ── collection detail navigation ───────────────────────────────────────
@@ -71,6 +111,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = new CollectionDetailViewModel(collection, _collections, GoToCollections);
         IsCollectionsActive = false;
         IsLiveActive        = false;
+        IsSettingsActive    = false;
         IsHelpActive        = false;
     }
 

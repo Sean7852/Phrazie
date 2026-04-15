@@ -44,6 +44,7 @@ public partial class App : Application
         services.AddSingleton<IPlaybackService,       MockPlaybackService>();
         services.AddSingleton<ITriggerService,         MockTriggerService>();
         services.AddSingleton<ISessionService,         MockSessionService>();
+        services.AddSingleton<IHotkeyService,          MockHotkeyService>();
 
         // ── Desktop services ─────────────────────────────────────────────────
         services.AddSingleton<IFilePickerService, AvaloniaFilePickerService>();

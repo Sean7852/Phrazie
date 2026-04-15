@@ -125,6 +125,18 @@ public partial class LivePerformanceViewModel : ViewModelBase
         CountdownDisplay   = "—";
     }
 
+    // ── hotkey dispatch (called from MainWindowViewModel) ─────────────────
+
+    internal void HandleHotkeyAction(HotkeyAction action)
+    {
+        switch (action)
+        {
+            case HotkeyAction.EmergencySwitch: _ = EmergencySwitchAsync(); break;
+            case HotkeyAction.ScheduleTrigger: _ = ScheduleTriggerAsync(); break;
+            case HotkeyAction.CancelTrigger:   _ = CancelTriggerAsync();   break;
+        }
+    }
+
     // ── called by StateOptionViewModel via callback ───────────────────────
 
     internal void SelectNextState(StateOptionViewModel selected)
