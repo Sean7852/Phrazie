@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Phrazie.Core.Interfaces;
+using Phrazie.Core.Models;
 using Phrazie.Desktop.Services;
 
 namespace Phrazie.Desktop.ViewModels;
@@ -31,13 +32,15 @@ public partial class MainWindowViewModel : ViewModelBase
         _playback    = playback;
         _filePicker  = filePicker;
 
-        _currentPage = new CollectionsViewModel(_collections, _session, _filePicker);
+        _currentPage = BuildCollectionsPage();
     }
+
+    // ── nav commands ───────────────────────────────────────────────────────
 
     [RelayCommand]
     private void GoToCollections()
     {
-        CurrentPage         = new CollectionsViewModel(_collections, _session, _filePicker);
+        CurrentPage         = BuildCollectionsPage();
         IsCollectionsActive = true;
         IsLiveActive        = false;
         IsHelpActive        = false;
@@ -60,4 +63,19 @@ public partial class MainWindowViewModel : ViewModelBase
         IsLiveActive        = false;
         IsHelpActive        = true;
     }
+
+    // ── collection detail navigation ───────────────────────────────────────
+
+    private void GoToCollectionDetail(Collection collection)
+    {
+        CurrentPage         = new CollectionDetailViewModel(collection, _collections, GoToCollections);
+        IsCollectionsActive = false;
+        IsLiveActive        = false;
+        IsHelpActive        = false;
+    }
+
+    // ── helpers ────────────────────────────────────────────────────────────
+
+    private CollectionsViewModel BuildCollectionsPage() =>
+        new(_collections, _session, _filePicker, GoToCollectionDetail);
 }
