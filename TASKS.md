@@ -47,7 +47,13 @@
 - [ ] Emergency override
 - [ ] First version: web-based remote
 
-### 8. Account & Trial
+### 8. Settings
+- [x] Settings page (master menu + detail panel)
+- [x] Hotkey mapping (rebindable keyboard shortcuts for live controls)
+- [ ] Display settings
+- [ ] MIDI settings
+
+### 9. Account & Trial
 - [ ] Free trial (7–14 days)
 - [ ] Subscription (basic implementation)
 
