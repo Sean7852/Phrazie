@@ -90,7 +90,7 @@
                             <StackPanel Spacing="12">
 
                                 <!-- State header row -->
-                                <Grid ColumnDefinitions="*,Auto">
+                                <Grid ColumnDefinitions="*,Auto,Auto">
 
                                     <!-- Name — view mode -->
                                     <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8"
@@ -125,8 +125,18 @@
                                                 ToolTip.Tip="Discard rename" />
                                     </StackPanel>
 
+                                    <!-- Playback mode selector -->
+                                    <ComboBox Grid.Column="1"
+                                              ItemsSource="{x:Static vm:StateItemViewModel.AllPlaybackModes}"
+                                              SelectedItem="{Binding PlaybackMode}"
+                                              Margin="0,0,8,0"
+                                              Background="#0E0E1E" BorderBrush="#2A2A44"
+                                              Foreground="#AAAACC" FontSize="12"
+                                              VerticalAlignment="Center"
+                                              ToolTip.Tip="Clip playback mode for this state" />
+
                                     <!-- Remove button -->
-                                    <Button Grid.Column="1"
+                                    <Button Grid.Column="2"
                                             Command="{Binding RemoveCommand}"
                                             Content="Remove"
                                             Background="Transparent" Foreground="#663333"

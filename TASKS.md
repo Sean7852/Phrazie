@@ -16,9 +16,9 @@
 ### 3. Clip Management
 - [x] Import local video files
 - [x] Assign clips to states (mock)
-- [ ] Playback mode: Loop
-- [ ] Playback mode: Random
-- [ ] Playback mode: Sequential
+- [x] Playback mode: Loop
+- [x] Playback mode: Random
+- [x] Playback mode: Sequential
 
 ### 4. Live Performance Screen
 - [x] Current state display

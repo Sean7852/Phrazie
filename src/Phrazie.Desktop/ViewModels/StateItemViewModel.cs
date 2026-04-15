@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Phrazie.Core.Enums;
 using Phrazie.Core.Models;
 
 namespace Phrazie.Desktop.ViewModels;
@@ -14,9 +15,16 @@ public partial class StateItemViewModel : ObservableObject
     public State Model { get; }
     public string Name => Model.Name;
 
+    /// <summary>All available playback modes, for binding to a ComboBox.</summary>
+    public static IReadOnlyList<PlaybackMode> AllPlaybackModes { get; } =
+        Enum.GetValues<PlaybackMode>();
+
     // ── rename ─────────────────────────────────────────────────────────────
     [ObservableProperty] private bool   _isRenaming;
     [ObservableProperty] private string _renameInput = string.Empty;
+
+    // ── playback mode ───────────────────────────────────────────────────────
+    [ObservableProperty] private PlaybackMode _playbackMode;
 
     // ── clip assignment ────────────────────────────────────────────────────
     [ObservableProperty] private bool  _isClipPickerOpen;
@@ -37,12 +45,19 @@ public partial class StateItemViewModel : ObservableObject
         _allClips      = allClips;
         _onSaveRename  = onSaveRename;
         _onRemove      = onRemove;
+        _playbackMode  = model.PlaybackMode;
 
         foreach (var clip in model.Clips)
             AssignedClips.Add(new ClipItemViewModel(clip, Unassign));
 
         AssignedClips.CollectionChanged += (_, _) =>
             OnPropertyChanged(nameof(UnassignedClips));
+    }
+
+    partial void OnPlaybackModeChanged(PlaybackMode value)
+    {
+        Model.PlaybackMode = value;
+        _ = _onSaveRename(this);
     }
 
     // ── rename commands ────────────────────────────────────────────────────
