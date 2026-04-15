@@ -15,7 +15,9 @@
       "Bash(dotnet run:*)",
       "Bash(taskkill /f /im Phrazie.Desktop.exe)",
       "Bash(dotnet publish:*)",
-      "Bash(start:*)"
+      "Bash(start:*)",
+      "Bash(taskkill /PID 37488 /F)",
+      "Bash(cmd *)"
     ]
   }
 }
