@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Phrazie.Core.Enums;
@@ -11,47 +12,44 @@ public partial class StateItemViewModel : ObservableObject
     private readonly IReadOnlyList<Clip> _allClips;
     private readonly Func<StateItemViewModel, Task> _onSaveRename;
     private readonly Action<StateItemViewModel> _onRemove;
+    private readonly Action<StateItemViewModel> _onEdit;
 
     public State Model { get; }
+
     public string Name => Model.Name;
 
-    /// <summary>All available playback modes, for binding to a ComboBox.</summary>
+    /// <summary>Hex color string (e.g. "#FF3D3D") used for the state indicator swatch.</summary>
+    public string Color => Model.Color;
+
+    public ISolidColorBrush ColorBrush =>
+        new SolidColorBrush(Avalonia.Media.Color.Parse(Model.Color));
+
+    /// <summary>Five placeholder slots for the clip thumbnail row (MVP simulation).</summary>
+    public IEnumerable<int> PlaceholderSlots { get; } = Enumerable.Range(0, 5);
+
     public static IReadOnlyList<PlaybackMode> AllPlaybackModes { get; } =
         Enum.GetValues<PlaybackMode>();
 
-    // ── rename ─────────────────────────────────────────────────────────────
-    [ObservableProperty] private bool   _isRenaming;
-    [ObservableProperty] private string _renameInput = string.Empty;
-
-    // ── playback mode ───────────────────────────────────────────────────────
     [ObservableProperty] private PlaybackMode _playbackMode;
 
-    // ── clip assignment ────────────────────────────────────────────────────
-    [ObservableProperty] private bool  _isClipPickerOpen;
-    [ObservableProperty] private Clip? _clipToAssign;
-
     public ObservableCollection<ClipItemViewModel> AssignedClips { get; } = new();
-
-    public IEnumerable<Clip> UnassignedClips =>
-        _allClips.Where(c => AssignedClips.All(ac => ac.Model.Id != c.Id));
 
     public StateItemViewModel(
         State model,
         IReadOnlyList<Clip> allClips,
         Func<StateItemViewModel, Task> onSaveRename,
-        Action<StateItemViewModel> onRemove)
+        Action<StateItemViewModel> onRemove,
+        Action<StateItemViewModel> onEdit)
     {
-        Model          = model;
-        _allClips      = allClips;
-        _onSaveRename  = onSaveRename;
-        _onRemove      = onRemove;
-        _playbackMode  = model.PlaybackMode;
+        Model         = model;
+        _allClips     = allClips;
+        _onSaveRename = onSaveRename;
+        _onRemove     = onRemove;
+        _onEdit       = onEdit;
+        _playbackMode = model.PlaybackMode;
 
         foreach (var clip in model.Clips)
             AssignedClips.Add(new ClipItemViewModel(clip, Unassign));
-
-        AssignedClips.CollectionChanged += (_, _) =>
-            OnPropertyChanged(nameof(UnassignedClips));
     }
 
     partial void OnPlaybackModeChanged(PlaybackMode value)
@@ -60,60 +58,30 @@ public partial class StateItemViewModel : ObservableObject
         _ = _onSaveRename(this);
     }
 
-    // ── rename commands ────────────────────────────────────────────────────
-
     [RelayCommand]
-    private void StartRename()
-    {
-        RenameInput = Model.Name;
-        IsRenaming  = true;
-    }
-
-    [RelayCommand]
-    private async Task SaveRenameAsync()
-    {
-        if (string.IsNullOrWhiteSpace(RenameInput)) return;
-        Model.Name = RenameInput.Trim();
-        await _onSaveRename(this);
-        OnPropertyChanged(nameof(Name));
-        IsRenaming = false;
-    }
-
-    [RelayCommand]
-    private void CancelRename()
-    {
-        IsRenaming  = false;
-        RenameInput = string.Empty;
-    }
+    private void OpenEdit() => _onEdit(this);
 
     [RelayCommand]
     private void Remove() => _onRemove(this);
 
-    // ── clip commands ──────────────────────────────────────────────────────
-
-    [RelayCommand]
-    private void ToggleClipPicker()
-    {
-        IsClipPickerOpen = !IsClipPickerOpen;
-        ClipToAssign     = null;
-    }
-
-    [RelayCommand]
-    private void AssignClip()
-    {
-        if (ClipToAssign is null) return;
-        if (AssignedClips.Any(c => c.Model.Id == ClipToAssign.Id)) return;
-
-        Model.Clips.Add(ClipToAssign);
-        AssignedClips.Add(new ClipItemViewModel(ClipToAssign, Unassign));
-
-        ClipToAssign     = null;
-        IsClipPickerOpen = false;
-    }
+    // ── clip support (used internally / future UI) ─────────────────────────
 
     private void Unassign(ClipItemViewModel item)
     {
         Model.Clips.Remove(item.Model);
         AssignedClips.Remove(item);
+    }
+
+    /// <summary>
+    /// Apply pending edits from the parent modal and notify the view.
+    /// </summary>
+    public void ApplyEdit(string newName, string newColor)
+    {
+        if (!string.IsNullOrWhiteSpace(newName))
+            Model.Name  = newName.Trim();
+        Model.Color = newColor;
+        OnPropertyChanged(nameof(Name));
+        OnPropertyChanged(nameof(Color));
+        OnPropertyChanged(nameof(ColorBrush));
     }
 }

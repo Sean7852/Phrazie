@@ -16,9 +16,9 @@ public sealed class MockCollectionRepository : ICollectionRepository
             Name = "Dark",
             States =
             [
-                new State { Name = "Normal" },
-                new State { Name = "Break" },
-                new State { Name = "Drop" },
+                new State { Name = "Normal", Color = "#FF3D3D" },
+                new State { Name = "Break",  Color = "#FFCC00" },
+                new State { Name = "Drop",   Color = "#3388FF" },
             ]
         },
         new Collection
@@ -27,9 +27,9 @@ public sealed class MockCollectionRepository : ICollectionRepository
             Name = "Tech",
             States =
             [
-                new State { Name = "Normal" },
-                new State { Name = "Break" },
-                new State { Name = "Drop" },
+                new State { Name = "Normal", Color = "#FF3D3D" },
+                new State { Name = "Break",  Color = "#FFCC00" },
+                new State { Name = "Drop",   Color = "#3388FF" },
             ]
         },
         new Collection
@@ -38,9 +38,9 @@ public sealed class MockCollectionRepository : ICollectionRepository
             Name = "Euphoric",
             States =
             [
-                new State { Name = "Normal" },
-                new State { Name = "Break" },
-                new State { Name = "Drop" },
+                new State { Name = "Normal", Color = "#FF3D3D" },
+                new State { Name = "Break",  Color = "#FFCC00" },
+                new State { Name = "Drop",   Color = "#3388FF" },
             ]
         }
     };
@@ -58,9 +58,9 @@ public sealed class MockCollectionRepository : ICollectionRepository
             Name = name,
             States =
             [
-                new State { Name = "Normal" },
-                new State { Name = "Break" },
-                new State { Name = "Drop" },
+                new State { Name = "Normal", Color = "#FF3D3D" },
+                new State { Name = "Break",  Color = "#FFCC00" },
+                new State { Name = "Drop",   Color = "#3388FF" },
             ]
         };
         _store.Add(collection);

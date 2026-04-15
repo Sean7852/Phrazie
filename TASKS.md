@@ -57,7 +57,16 @@
 - [ ] Display settings
 - [ ] MIDI settings
 
-### 9. Account & Trial
+### 10. Database
+- [ ] Setup the local database
+- [ ] Setup the userlogin and monk a fake user ID
+- [ ] Save the collection, states, everything in the local database
+- [ ] Setup the remote database
+- [ ] Setup the communication between the rmote and local database.
+
+### 10. Account & Trial
+- [ ] Account registrition
+- [ ] Account login/logout
 - [ ] Free trial (7–14 days)
 - [ ] Subscription (basic implementation)
 

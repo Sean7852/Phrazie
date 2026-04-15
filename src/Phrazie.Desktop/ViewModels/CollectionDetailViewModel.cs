@@ -18,19 +18,19 @@ public partial class CollectionDetailViewModel : ViewModelBase
 
     public Collection Model { get; }
 
-    // ── header display (notified explicitly after save) ────────────────────
+    // ── header display ─────────────────────────────────────────────────────
     public string CollectionName        => Model.Name;
     public string CollectionDescription => Model.Description;
 
-    // ── cover image (current saved state) ─────────────────────────────────
+    // ── cover image ────────────────────────────────────────────────────────
     [ObservableProperty] private Bitmap? _coverImage;
 
-    // ── edit modal ─────────────────────────────────────────────────────────
+    // ── edit collection modal ──────────────────────────────────────────────
     [ObservableProperty] private bool    _isEditModalOpen;
     [ObservableProperty] private string  _editName        = string.Empty;
     [ObservableProperty] private string  _editDescription = string.Empty;
     [ObservableProperty] private Bitmap? _editCoverPreview;
-    private string? _pendingCoverPath;   // path chosen in modal but not yet committed
+    private string? _pendingCoverPath;
 
     // ── add state ──────────────────────────────────────────────────────────
     [ObservableProperty] private string _newStateName  = string.Empty;
@@ -41,6 +41,30 @@ public partial class CollectionDetailViewModel : ViewModelBase
     [NotifyPropertyChangedFor(nameof(HasImportedClips))]
     private int _importedClipCount;
     public bool HasImportedClips => ImportedClipCount > 0;
+
+    // ── state edit modal ───────────────────────────────────────────────────
+    private StateItemViewModel? _editingState;
+    public  StateItemViewModel? EditingState
+    {
+        get => _editingState;
+        private set
+        {
+            SetProperty(ref _editingState, value);
+            OnPropertyChanged(nameof(IsStateEditOpen));
+        }
+    }
+    public bool IsStateEditOpen => EditingState is not null;
+
+    [ObservableProperty] private string _stateEditName  = string.Empty;
+    [ObservableProperty] private string _stateEditColor = "#FF4444";
+
+    /// <summary>Preset palette shown in the state color picker.</summary>
+    public static IReadOnlyList<string> PresetColors { get; } =
+    [
+        "#FF3D3D", "#FF7A00", "#FFCC00", "#33CC66",
+        "#00CCEE", "#3388FF", "#9966FF", "#FF44AA",
+        "#FFFFFF", "#888888",
+    ];
 
     public ObservableCollection<StateItemViewModel> States { get; } = new();
 
@@ -74,7 +98,7 @@ public partial class CollectionDetailViewModel : ViewModelBase
     [RelayCommand]
     private void GoBack() => _goBack();
 
-    // ── edit modal ─────────────────────────────────────────────────────────
+    // ── edit collection modal ──────────────────────────────────────────────
 
     [RelayCommand]
     private void OpenEditModal()
@@ -83,7 +107,6 @@ public partial class CollectionDetailViewModel : ViewModelBase
         EditDescription = Model.Description;
         _pendingCoverPath = Model.CoverImagePath;
 
-        // Show current cover as preview inside the modal
         EditCoverPreview?.Dispose();
         EditCoverPreview = CoverImage is not null && Model.CoverImagePath is not null
             ? new Bitmap(Model.CoverImagePath)
@@ -122,7 +145,6 @@ public partial class CollectionDetailViewModel : ViewModelBase
 
         await _repository.UpdateAsync(Model);
 
-        // Refresh header display bindings
         OnPropertyChanged(nameof(CollectionName));
         OnPropertyChanged(nameof(CollectionDescription));
 
@@ -164,7 +186,7 @@ public partial class CollectionDetailViewModel : ViewModelBase
             var clip = new Clip
             {
                 FilePath    = path,
-                DisplayName = Path.GetFileNameWithoutExtension(path),
+                DisplayName = System.IO.Path.GetFileNameWithoutExtension(path),
                 Duration    = TimeSpan.Zero
             };
             await clipRepo.AddAsync(clip);
@@ -196,7 +218,7 @@ public partial class CollectionDetailViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(NewStateName)) return;
 
-        var state = new State { Name = NewStateName.Trim() };
+        var state = new State { Name = NewStateName.Trim(), Color = "#9966FF" };
         Model.States.Add(state);
         States.Add(MakeStateItem(state));
         await _repository.UpdateAsync(Model);
@@ -220,6 +242,32 @@ public partial class CollectionDetailViewModel : ViewModelBase
         _ = _repository.UpdateAsync(Model);
     }
 
+    // ── state edit modal ───────────────────────────────────────────────────
+
+    internal void BeginEditState(StateItemViewModel vm)
+    {
+        StateEditName  = vm.Name;
+        StateEditColor = vm.Color;
+        EditingState   = vm;
+    }
+
+    [RelayCommand]
+    private async Task SaveStateEditAsync()
+    {
+        if (EditingState is null) return;
+        EditingState.ApplyEdit(StateEditName, StateEditColor);
+        await _repository.UpdateAsync(Model);
+        EditingState = null;
+    }
+
+    [RelayCommand]
+    private void CancelStateEdit()
+    {
+        EditingState = null;
+    }
+
+    // ── helpers ────────────────────────────────────────────────────────────
+
     private StateItemViewModel MakeStateItem(State state) =>
         new(state, _allClips,
             onSaveRename: async _ => await _repository.UpdateAsync(Model),
@@ -228,5 +276,6 @@ public partial class CollectionDetailViewModel : ViewModelBase
                 Model.States.Remove(item.Model);
                 States.Remove(item);
                 _ = _repository.UpdateAsync(Model);
-            });
+            },
+            onEdit: item => BeginEditState(item));
 }
