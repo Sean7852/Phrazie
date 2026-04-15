@@ -13,19 +13,24 @@ namespace Phrazie.Desktop.ViewModels;
 public partial class CollectionDetailViewModel : ViewModelBase
 {
     private readonly ICollectionRepository _repository;
-    private readonly Action _goBack;
-    private IReadOnlyList<Clip> _allClips = [];
-
-    // ── cover image ────────────────────────────────────────────────────────
-    [ObservableProperty] private Bitmap? _coverImage;
+    private readonly Action                _goBack;
+    private IReadOnlyList<Clip>            _allClips = [];
 
     public Collection Model { get; }
 
-    public ObservableCollection<StateItemViewModel> States { get; } = new();
+    // ── header display (notified explicitly after save) ────────────────────
+    public string CollectionName        => Model.Name;
+    public string CollectionDescription => Model.Description;
 
-    // ── collection rename ──────────────────────────────────────────────────
-    [ObservableProperty] private bool   _isRenamingCollection;
-    [ObservableProperty] private string _collectionRenameInput = string.Empty;
+    // ── cover image (current saved state) ─────────────────────────────────
+    [ObservableProperty] private Bitmap? _coverImage;
+
+    // ── edit modal ─────────────────────────────────────────────────────────
+    [ObservableProperty] private bool    _isEditModalOpen;
+    [ObservableProperty] private string  _editName        = string.Empty;
+    [ObservableProperty] private string  _editDescription = string.Empty;
+    [ObservableProperty] private Bitmap? _editCoverPreview;
+    private string? _pendingCoverPath;   // path chosen in modal but not yet committed
 
     // ── add state ──────────────────────────────────────────────────────────
     [ObservableProperty] private string _newStateName = string.Empty;
@@ -34,13 +39,14 @@ public partial class CollectionDetailViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasImportedClips))]
     private int _importedClipCount;
-
     public bool HasImportedClips => ImportedClipCount > 0;
 
+    public ObservableCollection<StateItemViewModel> States { get; } = new();
+
     public CollectionDetailViewModel(
-        Collection model,
+        Collection            model,
         ICollectionRepository repository,
-        Action goBack)
+        Action                goBack)
     {
         Model       = model;
         _repository = repository;
@@ -54,13 +60,90 @@ public partial class CollectionDetailViewModel : ViewModelBase
 
     private async Task LoadAsync()
     {
-        // Repos/services are resolved from DI via App.Services to keep constructor simple
         var clipRepo = App.Services.GetRequiredService<IClipRepository>();
         _allClips    = await clipRepo.GetAllAsync();
 
         States.Clear();
         foreach (var state in Model.States)
             States.Add(MakeStateItem(state));
+    }
+
+    // ── back navigation ────────────────────────────────────────────────────
+
+    [RelayCommand]
+    private void GoBack() => _goBack();
+
+    // ── edit modal ─────────────────────────────────────────────────────────
+
+    [RelayCommand]
+    private void OpenEditModal()
+    {
+        EditName        = Model.Name;
+        EditDescription = Model.Description;
+        _pendingCoverPath = Model.CoverImagePath;
+
+        // Show current cover as preview inside the modal
+        EditCoverPreview?.Dispose();
+        EditCoverPreview = CoverImage is not null && Model.CoverImagePath is not null
+            ? new Bitmap(Model.CoverImagePath)
+            : null;
+
+        IsEditModalOpen = true;
+    }
+
+    [RelayCommand]
+    private async Task PickEditCoverImageAsync()
+    {
+        var filePicker = App.Services.GetRequiredService<IFilePickerService>();
+        var path = await filePicker.PickImageAsync();
+        if (path is null) return;
+
+        _pendingCoverPath = path;
+        EditCoverPreview?.Dispose();
+        EditCoverPreview = new Bitmap(path);
+    }
+
+    [RelayCommand]
+    private async Task SaveEditAsync()
+    {
+        var newName = EditName.Trim();
+        if (!string.IsNullOrWhiteSpace(newName))
+            Model.Name = newName;
+
+        Model.Description = EditDescription.Trim();
+
+        if (_pendingCoverPath != Model.CoverImagePath && _pendingCoverPath is not null)
+        {
+            Model.CoverImagePath = _pendingCoverPath;
+            CoverImage?.Dispose();
+            CoverImage = new Bitmap(_pendingCoverPath);
+        }
+
+        await _repository.UpdateAsync(Model);
+
+        // Refresh header display bindings
+        OnPropertyChanged(nameof(CollectionName));
+        OnPropertyChanged(nameof(CollectionDescription));
+
+        IsEditModalOpen = false;
+    }
+
+    [RelayCommand]
+    private void CancelEdit()
+    {
+        EditCoverPreview?.Dispose();
+        EditCoverPreview  = null;
+        _pendingCoverPath = null;
+        IsEditModalOpen   = false;
+    }
+
+    // ── delete collection ──────────────────────────────────────────────────
+
+    [RelayCommand]
+    private async Task DeleteCollectionAsync()
+    {
+        await _repository.DeleteAsync(Model.Id);
+        _goBack();
     }
 
     // ── clip import ────────────────────────────────────────────────────────
@@ -81,66 +164,14 @@ public partial class CollectionDetailViewModel : ViewModelBase
             {
                 FilePath    = path,
                 DisplayName = Path.GetFileNameWithoutExtension(path),
-                Duration    = TimeSpan.Zero   // real duration requires LibVLC (Phase 3)
+                Duration    = TimeSpan.Zero
             };
             await clipRepo.AddAsync(clip);
             added++;
         }
 
         ImportedClipCount = added;
-        // Reload so state pickers see the new clips
         await LoadAsync();
-    }
-
-    // ── back navigation ────────────────────────────────────────────────────
-
-    [RelayCommand]
-    private void GoBack() => _goBack();
-
-    // ── collection rename ──────────────────────────────────────────────────
-
-    [RelayCommand]
-    private void StartRenameCollection()
-    {
-        CollectionRenameInput    = Model.Name;
-        IsRenamingCollection     = true;
-    }
-
-    [RelayCommand]
-    private async Task SaveCollectionRenameAsync()
-    {
-        if (string.IsNullOrWhiteSpace(CollectionRenameInput)) return;
-        Model.Name = CollectionRenameInput.Trim();
-        await _repository.UpdateAsync(Model);
-        OnPropertyChanged(nameof(Model));
-        IsRenamingCollection = false;
-    }
-
-    [RelayCommand]
-    private void CancelCollectionRename() => IsRenamingCollection = false;
-
-    // ── cover image ────────────────────────────────────────────────────────
-
-    [RelayCommand]
-    private async Task ChangeCoverImageAsync()
-    {
-        var filePicker = App.Services.GetRequiredService<IFilePickerService>();
-        var path = await filePicker.PickImageAsync();
-        if (path is null) return;
-
-        Model.CoverImagePath = path;
-        CoverImage?.Dispose();
-        CoverImage = new Bitmap(path);
-        await _repository.UpdateAsync(Model);
-    }
-
-    // ── delete collection ──────────────────────────────────────────────────
-
-    [RelayCommand]
-    private async Task DeleteCollectionAsync()
-    {
-        await _repository.DeleteAsync(Model.Id);
-        _goBack();
     }
 
     // ── state management ───────────────────────────────────────────────────
