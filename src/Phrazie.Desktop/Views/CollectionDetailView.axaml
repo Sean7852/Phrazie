@@ -169,34 +169,66 @@
                                             </Button>
                                         </StackPanel>
 
-                                        <!-- Center: horizontal scrollable clip thumbnails -->
+                                        <!-- Center: horizontal scrollable clip row -->
                                         <ScrollViewer Grid.Column="1"
                                                       VerticalAlignment="Bottom"
                                                       Height="64"
                                                       HorizontalScrollBarVisibility="Auto"
                                                       VerticalScrollBarVisibility="Disabled">
-                                            <ItemsControl ItemsSource="{Binding PlaceholderSlots}">
-                                                <ItemsControl.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <StackPanel Orientation="Horizontal" Spacing="8" />
-                                                    </ItemsPanelTemplate>
-                                                </ItemsControl.ItemsPanel>
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Border Width="64" Height="64"
-                                                                CornerRadius="8"
-                                                                Background="#0E0E1C"
-                                                                BorderBrush="#1E1E30"
-                                                                BorderThickness="1">
-                                                            <TextBlock Text="▶"
-                                                                       Foreground="#2A2A44"
-                                                                       FontSize="16"
-                                                                       HorizontalAlignment="Center"
-                                                                       VerticalAlignment="Center" />
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+
+                                                <!-- Assigned clips -->
+                                                <ItemsControl ItemsSource="{Binding AssignedClips}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel Orientation="Horizontal" Spacing="8" />
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="vm:ClipItemViewModel">
+                                                            <Border Width="64" Height="64"
+                                                                    CornerRadius="8"
+                                                                    Background="#0E0E1C"
+                                                                    BorderBrush="#1E1E30"
+                                                                    BorderThickness="1">
+                                                                <StackPanel VerticalAlignment="Center"
+                                                                            HorizontalAlignment="Center"
+                                                                            Spacing="4">
+                                                                    <TextBlock Text="▶"
+                                                                               Foreground="#5566AA"
+                                                                               FontSize="14"
+                                                                               HorizontalAlignment="Center" />
+                                                                    <TextBlock Text="{Binding DisplayName}"
+                                                                               Foreground="#666688"
+                                                                               FontSize="9"
+                                                                               HorizontalAlignment="Center"
+                                                                               MaxWidth="56"
+                                                                               TextTrimming="CharacterEllipsis" />
+                                                                </StackPanel>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+
+                                                <!-- "+" add clip tile — always last -->
+                                                <Button Command="{Binding ImportClipsCommand}"
+                                                        Padding="0" BorderThickness="0"
+                                                        Background="Transparent"
+                                                        ToolTip.Tip="Click to add clips — or drag &amp; drop video files here">
+                                                    <Border Width="64" Height="64"
+                                                            CornerRadius="8"
+                                                            Background="#0A0A18"
+                                                            BorderBrush="#252540"
+                                                            BorderThickness="1">
+                                                        <TextBlock Text="+"
+                                                                   Foreground="#444466"
+                                                                   FontSize="24"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Center" />
+                                                    </Border>
+                                                </Button>
+
+                                            </StackPanel>
                                         </ScrollViewer>
 
                                         <!-- Right: Remove only -->

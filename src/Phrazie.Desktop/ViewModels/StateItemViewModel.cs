@@ -1,9 +1,13 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Extensions.DependencyInjection;
 using Phrazie.Core.Enums;
+using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
+using Phrazie.Desktop.Services;
 
 namespace Phrazie.Desktop.ViewModels;
 
@@ -18,14 +22,10 @@ public partial class StateItemViewModel : ObservableObject
 
     public string Name => Model.Name;
 
-    /// <summary>Hex color string (e.g. "#FF3D3D") used for the state indicator swatch.</summary>
     public string Color => Model.Color;
 
     public ISolidColorBrush ColorBrush =>
         new SolidColorBrush(Avalonia.Media.Color.Parse(Model.Color));
-
-    /// <summary>Five placeholder slots for the clip thumbnail row (MVP simulation).</summary>
-    public IEnumerable<int> PlaceholderSlots { get; } = Enumerable.Range(0, 5);
 
     public static IReadOnlyList<PlaybackMode> AllPlaybackModes { get; } =
         Enum.GetValues<PlaybackMode>();
@@ -64,17 +64,45 @@ public partial class StateItemViewModel : ObservableObject
     [RelayCommand]
     private void Remove() => _onRemove(this);
 
-    // ── clip support (used internally / future UI) ─────────────────────────
+    // ── clip import ────────────────────────────────────────────────────────
+
+    [RelayCommand]
+    private async Task ImportClipsAsync()
+    {
+        var filePicker = App.Services.GetRequiredService<IFilePickerService>();
+        var paths = await filePicker.PickVideoFilesAsync();
+        if (paths.Count == 0) return;
+        await AddClipsFromPathsAsync(paths);
+    }
+
+    /// <summary>Called by the view's file drag-drop handler to import clips.</summary>
+    public async Task AddClipsFromPathsAsync(IEnumerable<string> paths)
+    {
+        var clipRepo = App.Services.GetRequiredService<IClipRepository>();
+        foreach (var path in paths)
+        {
+            var clip = new Clip
+            {
+                FilePath    = path,
+                DisplayName = Path.GetFileNameWithoutExtension(path),
+                Duration    = TimeSpan.Zero,
+            };
+            await clipRepo.AddAsync(clip);
+            Model.Clips.Add(clip);
+            AssignedClips.Add(new ClipItemViewModel(clip, Unassign));
+        }
+        await _onSaveRename(this);
+    }
+
+    // ── helpers ────────────────────────────────────────────────────────────
 
     private void Unassign(ClipItemViewModel item)
     {
         Model.Clips.Remove(item.Model);
         AssignedClips.Remove(item);
+        _ = _onSaveRename(this);
     }
 
-    /// <summary>
-    /// Apply pending edits from the parent modal and notify the view.
-    /// </summary>
     public void ApplyEdit(string newName, string newColor)
     {
         if (!string.IsNullOrWhiteSpace(newName))

@@ -1,7 +1,9 @@
 using System.ComponentModel;
+using System.IO;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Platform.Storage;
 using Avalonia.VisualTree;
 using Phrazie.Desktop.ViewModels;
 
@@ -114,17 +116,54 @@ public partial class CollectionDetailView : UserControl
 
     private void StateBorder_DragOver(object? sender, DragEventArgs e)
     {
-        e.DragEffects = _dragging is not null ? DragDropEffects.Move : DragDropEffects.None;
+        if (_dragging is not null)
+            e.DragEffects = DragDropEffects.Move;
+        else if (e.DataTransfer.Contains(DataFormat.File))
+            e.DragEffects = DragDropEffects.Copy;
+        else
+            e.DragEffects = DragDropEffects.None;
         e.Handled = true;
     }
 
     private void StateBorder_Drop(object? sender, DragEventArgs e)
     {
-        if (_dragging is null) return;
-        var target = FindStateItem(e.Source);
-        if (target is null || ReferenceEquals(target, _dragging)) return;
-        if (DataContext is CollectionDetailViewModel vm) vm.MoveState(_dragging, target);
-        e.Handled = true;
+        // Case 1: state reorder
+        if (_dragging is not null)
+        {
+            var target = FindStateItem(e.Source);
+            if (target is not null && !ReferenceEquals(target, _dragging))
+                if (DataContext is CollectionDetailViewModel vm) vm.MoveState(_dragging, target);
+            e.Handled = true;
+            return;
+        }
+
+        // Case 2: files dragged from OS file manager
+        if (e.DataTransfer.Contains(DataFormat.File))
+        {
+            var targetState = FindStateItem(e.Source);
+            if (targetState is null) return;
+
+            var files = e.DataTransfer.TryGetFiles();
+            if (files is null) return;
+
+            var paths = files
+                .OfType<IStorageFile>()
+                .Select(f => f.Path.LocalPath)
+                .Where(IsVideoFile)
+                .ToList();
+
+            if (paths.Count > 0)
+                _ = targetState.AddClipsFromPathsAsync(paths);
+
+            e.Handled = true;
+        }
+    }
+
+    private static bool IsVideoFile(string path)
+    {
+        var ext = Path.GetExtension(path).ToLowerInvariant();
+        return ext is ".mp4" or ".mov" or ".avi" or ".mkv"
+                   or ".wmv" or ".webm" or ".m4v" or ".flv";
     }
 
     private static StateItemViewModel? FindStateItem(object? element)

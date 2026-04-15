@@ -18,7 +18,8 @@
       "Bash(start:*)",
       "Bash(taskkill /PID 37488 /F)",
       "Bash(cmd *)",
-      "Bash(powershell -Command ' *)"
+      "Bash(powershell -Command ' *)",
+      "Bash(xargs -I{} sh -c 'dotnet ilverify \"{}\" 2>/dev/null || true')"
     ]
   }
 }
