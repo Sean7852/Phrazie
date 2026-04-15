@@ -4,18 +4,18 @@
 
 ### 1. Collections (Content Organization)
 - [x] Create collections
-- [ ] Rename collections
+- [x] Rename collections
 - [x] Delete collections
 
 ### 2. State System
 - [x] Default states: Normal, Break, Drop
-- [ ] Rename states
-- [ ] Add custom states
-- [ ] Remove states
+- [x] Rename states
+- [x] Add custom states
+- [x] Remove states
 
 ### 3. Clip Management
 - [ ] Import local video files
-- [ ] Assign clips to states
+- [x] Assign clips to states (mock)
 - [ ] Playback mode: Loop
 - [ ] Playback mode: Random
 - [ ] Playback mode: Sequential
@@ -67,8 +67,8 @@
 ### Phase 2 — Data Model & Mock Interaction (2 weeks)
 > Goal: Fully simulated workflow
 
-- [x] Collection / State CRUD (create + delete done; rename pending)
-- [ ] Mock clip assignment
+- [x] Collection / State CRUD (create, delete, rename, add/remove states)
+- [x] Mock clip assignment
 - [x] Trigger simulation
 - [x] Countdown UI
 

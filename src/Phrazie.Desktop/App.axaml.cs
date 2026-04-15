@@ -40,6 +40,7 @@ public partial class App : Application
 
         // ── Core interfaces → mock implementations ──────────────────────────
         services.AddSingleton<ICollectionRepository, MockCollectionRepository>();
+        services.AddSingleton<IClipRepository,        MockClipRepository>();
         services.AddSingleton<IPlaybackService,       MockPlaybackService>();
         services.AddSingleton<ITriggerService,         MockTriggerService>();
         services.AddSingleton<ISessionService,         MockSessionService>();
