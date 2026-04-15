@@ -14,7 +14,7 @@
 - [x] Remove states
 
 ### 3. Clip Management
-- [ ] Import local video files
+- [x] Import local video files
 - [x] Assign clips to states (mock)
 - [ ] Playback mode: Loop
 - [ ] Playback mode: Random
@@ -75,7 +75,7 @@
 ### Phase 3 — Core Functionality (3–4 weeks)
 > Goal: Functional prototype
 
-- [ ] Clip import
+- [x] Clip import
 - [ ] Playback switching
 - [ ] State transitions
 - [ ] Trigger execution

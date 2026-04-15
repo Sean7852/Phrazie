@@ -6,7 +6,7 @@
              x:DataType="vm:CollectionDetailViewModel"
              Background="Transparent">
 
-    <Grid RowDefinitions="Auto,Auto,*" Margin="32">
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="32">
 
         <!-- ── Back + Title ── -->
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,24">
@@ -51,8 +51,22 @@
             </StackPanel>
         </Grid>
 
+        <!-- ── Import Clips ── -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,0,0,12">
+            <Button Command="{Binding ImportClipsCommand}"
+                    Content="⬆ Import Clips"
+                    Background="#1A2A1A" Foreground="#66AA66"
+                    BorderBrush="#2A4A2A" BorderThickness="1"
+                    Padding="14,7" CornerRadius="4" FontSize="13"
+                    ToolTip.Tip="Import local video files into the clip library" />
+            <TextBlock IsVisible="{Binding HasImportedClips}"
+                       Text="{Binding ImportedClipCount, StringFormat='{}{0} clip(s) imported'}"
+                       Foreground="#448844" FontSize="12"
+                       VerticalAlignment="Center" />
+        </StackPanel>
+
         <!-- ── Add State ── -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" Margin="0,0,0,20">
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,0,0,20">
             <TextBox Text="{Binding NewStateName}"
                      PlaceholderText="New state name…"
                      Width="240"
@@ -66,7 +80,7 @@
         </StackPanel>
 
         <!-- ── States list ── -->
-        <ScrollViewer Grid.Row="2">
+        <ScrollViewer Grid.Row="3">
             <ItemsControl ItemsSource="{Binding States}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:StateItemViewModel">

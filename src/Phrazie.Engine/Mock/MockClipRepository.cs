@@ -4,11 +4,12 @@ using Phrazie.Core.Models;
 namespace Phrazie.Engine.Mock;
 
 /// <summary>
-/// Hard-coded mock clips. Replace with a real file-system scan in Phase 3.
+/// In-memory clip library. Hard-coded seeds are included for demo purposes.
+/// Replace with a real file-system scan / SQLite store in Phase 3.
 /// </summary>
 public sealed class MockClipRepository : IClipRepository
 {
-    private static readonly IReadOnlyList<Clip> _clips =
+    private readonly List<Clip> _clips =
     [
         new Clip { DisplayName = "Dark Tunnel Loop",   Duration = TimeSpan.FromSeconds(12) },
         new Clip { DisplayName = "Strobe Flash",       Duration = TimeSpan.FromSeconds(4)  },
@@ -18,5 +19,13 @@ public sealed class MockClipRepository : IClipRepository
         new Clip { DisplayName = "Abstract Grid",      Duration = TimeSpan.FromSeconds(10) },
     ];
 
-    public Task<IReadOnlyList<Clip>> GetAllAsync() => Task.FromResult(_clips);
+    public Task<IReadOnlyList<Clip>> GetAllAsync() =>
+        Task.FromResult<IReadOnlyList<Clip>>(_clips.AsReadOnly());
+
+    public Task AddAsync(Clip clip)
+    {
+        if (_clips.All(c => c.Id != clip.Id))
+            _clips.Add(clip);
+        return Task.CompletedTask;
+    }
 }
