@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -18,6 +19,84 @@ public partial class CollectionDetailView : UserControl
         AddHandler(DragDrop.DropEvent,     StateBorder_Drop);
     }
 
+    // ── auto-focus inline editors when editing mode activates ─────────────
+
+    protected override void OnDataContextChanged(EventArgs e)
+    {
+        base.OnDataContextChanged(e);
+        if (DataContext is CollectionDetailViewModel vm)
+            vm.PropertyChanged += ViewModel_PropertyChanged;
+    }
+
+    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is not CollectionDetailViewModel vm) return;
+
+        if (e.PropertyName == nameof(CollectionDetailViewModel.IsEditingName) && vm.IsEditingName)
+        {
+            // Defer until after layout so the TextBox is visible
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                NameTextBox?.Focus();
+                if (NameTextBox is not null)
+                {
+                    NameTextBox.SelectionStart = NameTextBox.Text?.Length ?? 0;
+                    NameTextBox.SelectionEnd   = NameTextBox.Text?.Length ?? 0;
+                }
+            });
+        }
+
+        if (e.PropertyName == nameof(CollectionDetailViewModel.IsEditingDescription) && vm.IsEditingDescription)
+        {
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                DescriptionTextBox?.Focus();
+                if (DescriptionTextBox is not null)
+                {
+                    DescriptionTextBox.SelectionStart = DescriptionTextBox.Text?.Length ?? 0;
+                    DescriptionTextBox.SelectionEnd   = DescriptionTextBox.Text?.Length ?? 0;
+                }
+            });
+        }
+    }
+
+    // ── inline name TextBox ────────────────────────────────────────────────
+
+    private void NameTextBox_LostFocus(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is CollectionDetailViewModel vm)
+            vm.CommitNameCommand.Execute(null);
+    }
+
+    private void NameTextBox_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (DataContext is not CollectionDetailViewModel vm) return;
+        if (e.Key == Key.Enter)  { vm.CommitNameCommand.Execute(null);  e.Handled = true; }
+        if (e.Key == Key.Escape) { vm.CancelEditNameCommand.Execute(null); e.Handled = true; }
+    }
+
+    // ── inline description TextBox ─────────────────────────────────────────
+
+    private void DescriptionTextBox_LostFocus(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        if (DataContext is CollectionDetailViewModel vm)
+            vm.CommitDescriptionCommand.Execute(null);
+    }
+
+    private void DescriptionTextBox_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (DataContext is not CollectionDetailViewModel vm) return;
+        // Shift+Enter inserts a newline; plain Enter saves
+        if (e.Key == Key.Enter && e.KeyModifiers == KeyModifiers.None)
+        {
+            vm.CommitDescriptionCommand.Execute(null);
+            e.Handled = true;
+        }
+        if (e.Key == Key.Escape) { vm.CancelEditDescriptionCommand.Execute(null); e.Handled = true; }
+    }
+
+    // ── drag-drop ─────────────────────────────────────────────────────────
+
     private async void DragHandle_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed) return;
@@ -26,8 +105,6 @@ public partial class CollectionDetailView : UserControl
 
         _dragging = vm;
 
-        // DataTransfer is the Avalonia 12 replacement for DataObject.
-        // We just need any payload to initiate the drag session.
         var dt = new DataTransfer();
         dt.Add(DataTransferItem.CreateText("phrazie/state"));
         await DragDrop.DoDragDropAsync(e, dt, DragDropEffects.Move);

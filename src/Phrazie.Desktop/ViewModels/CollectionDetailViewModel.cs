@@ -25,12 +25,13 @@ public partial class CollectionDetailViewModel : ViewModelBase
     // ── cover image ────────────────────────────────────────────────────────
     [ObservableProperty] private Bitmap? _coverImage;
 
-    // ── edit collection modal ──────────────────────────────────────────────
-    [ObservableProperty] private bool    _isEditModalOpen;
-    [ObservableProperty] private string  _editName        = string.Empty;
-    [ObservableProperty] private string  _editDescription = string.Empty;
-    [ObservableProperty] private Bitmap? _editCoverPreview;
-    private string? _pendingCoverPath;
+    // ── inline name editing ────────────────────────────────────────────────
+    [ObservableProperty] private bool   _isEditingName;
+    [ObservableProperty] private string _editName = string.Empty;
+
+    // ── inline description editing ─────────────────────────────────────────
+    [ObservableProperty] private bool   _isEditingDescription;
+    [ObservableProperty] private string _editDescription = string.Empty;
 
     // ── add state ──────────────────────────────────────────────────────────
     [ObservableProperty] private string _newStateName  = string.Empty;
@@ -58,7 +59,6 @@ public partial class CollectionDetailViewModel : ViewModelBase
     [ObservableProperty] private string _stateEditName  = string.Empty;
     [ObservableProperty] private string _stateEditColor = "#FF4444";
 
-    /// <summary>Preset palette shown in the state color picker.</summary>
     public static IReadOnlyList<string> PresetColors { get; } =
     [
         "#FF3D3D", "#FF7A00", "#FFCC00", "#33CC66",
@@ -98,66 +98,71 @@ public partial class CollectionDetailViewModel : ViewModelBase
     [RelayCommand]
     private void GoBack() => _goBack();
 
-    // ── edit collection modal ──────────────────────────────────────────────
+    // ── cover image (direct pick + save) ──────────────────────────────────
 
     [RelayCommand]
-    private void OpenEditModal()
-    {
-        EditName        = Model.Name;
-        EditDescription = Model.Description;
-        _pendingCoverPath = Model.CoverImagePath;
-
-        EditCoverPreview?.Dispose();
-        EditCoverPreview = CoverImage is not null && Model.CoverImagePath is not null
-            ? new Bitmap(Model.CoverImagePath)
-            : null;
-
-        IsEditModalOpen = true;
-    }
-
-    [RelayCommand]
-    private async Task PickEditCoverImageAsync()
+    private async Task PickCoverImageDirectAsync()
     {
         var filePicker = App.Services.GetRequiredService<IFilePickerService>();
         var path = await filePicker.PickImageAsync();
         if (path is null) return;
 
-        _pendingCoverPath = path;
-        EditCoverPreview?.Dispose();
-        EditCoverPreview = new Bitmap(path);
-    }
-
-    [RelayCommand]
-    private async Task SaveEditAsync()
-    {
-        var newName = EditName.Trim();
-        if (!string.IsNullOrWhiteSpace(newName))
-            Model.Name = newName;
-
-        Model.Description = EditDescription.Trim();
-
-        if (_pendingCoverPath != Model.CoverImagePath && _pendingCoverPath is not null)
-        {
-            Model.CoverImagePath = _pendingCoverPath;
-            CoverImage?.Dispose();
-            CoverImage = new Bitmap(_pendingCoverPath);
-        }
-
+        Model.CoverImagePath = path;
+        CoverImage?.Dispose();
+        CoverImage = new Bitmap(path);
         await _repository.UpdateAsync(Model);
+    }
 
-        OnPropertyChanged(nameof(CollectionName));
-        OnPropertyChanged(nameof(CollectionDescription));
+    // ── inline name editing ────────────────────────────────────────────────
 
-        IsEditModalOpen = false;
+    [RelayCommand]
+    private void StartEditName()
+    {
+        EditName       = Model.Name;
+        IsEditingName  = true;
     }
 
     [RelayCommand]
-    private void CancelEdit()
+    private async Task CommitNameAsync()
     {
-        EditCoverPreview?.Dispose();
-        EditCoverPreview  = null;
-        _pendingCoverPath = null;
-        IsEditModalOpen   = false;
+        if (!IsEditingName) return;
+        IsEditingName = false;          // flip immediately — guards against double-fire
+        var trimmed = EditName.Trim();
+        if (!string.IsNullOrWhiteSpace(trimmed))
+            Model.Name = trimmed;
+        await _repository.UpdateAsync(Model);
+        OnPropertyChanged(nameof(CollectionName));
+    }
+
+    [RelayCommand]
+    private void CancelEditName()
+    {
+        IsEditingName = false;
+    }
+
+    // ── inline description editing ─────────────────────────────────────────
+
+    [RelayCommand]
+    private void StartEditDescription()
+    {
+        EditDescription       = Model.Description;
+        IsEditingDescription  = true;
+    }
+
+    [RelayCommand]
+    private async Task CommitDescriptionAsync()
+    {
+        if (!IsEditingDescription) return;
+        IsEditingDescription = false;   // flip immediately — guards against double-fire
+        Model.Description = EditDescription.Trim();
+        await _repository.UpdateAsync(Model);
+        OnPropertyChanged(nameof(CollectionDescription));
+    }
+
+    [RelayCommand]
+    private void CancelEditDescription()
+    {
+        IsEditingDescription = false;
     }
 
     // ── delete collection ──────────────────────────────────────────────────
@@ -226,7 +231,6 @@ public partial class CollectionDetailViewModel : ViewModelBase
         IsAddingState = false;
     }
 
-    /// <summary>Called by the view's drag-drop handler to reorder states.</summary>
     public void MoveState(StateItemViewModel source, StateItemViewModel target)
     {
         int fromIdx = States.IndexOf(source);
