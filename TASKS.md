@@ -6,6 +6,10 @@
 - [x] Create collections
 - [x] Rename collections
 - [x] Delete collections
+- [x] Collection description
+- [x] Collection cover image (with fallback "P" glyph)
+- [x] Collection detail header (cover + name + description)
+- [x] Edit collection modal (name, description, cover image, delete)
 
 ### 2. State System
 - [x] Default states: Normal, Break, Drop
@@ -53,7 +57,16 @@
 - [ ] Display settings
 - [ ] MIDI settings
 
-### 9. Account & Trial
+### 10. Database
+- [ ] Setup the local database
+- [ ] Setup the userlogin and monk a fake user ID
+- [ ] Save the collection, states, everything in the local database
+- [ ] Setup the remote database
+- [ ] Setup the communication between the rmote and local database.
+
+### 10. Account & Trial
+- [ ] Account registrition
+- [ ] Account login/logout
 - [ ] Free trial (7–14 days)
 - [ ] Subscription (basic implementation)
 
@@ -99,3 +112,14 @@
 - [ ] Bug fixes
 - [ ] UI refinement
 - [ ] Performance tuning
+
+---
+
+## UI / UX Improvements (Done)
+
+- [x] Remove gear icon from collection cards — settings moved to management page
+- [x] Single-click collection card opens management page
+- [x] Collection detail rich header — cover image, name, description, edit icon
+- [x] Edit collection modal — name, description, cover image picker, delete
+- [x] Settings page with master menu + detail panel
+- [x] Hotkey mapping — rebindable shortcuts, live key capture

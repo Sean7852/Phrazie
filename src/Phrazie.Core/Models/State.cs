@@ -6,6 +6,7 @@ public class State
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = string.Empty;
+    public string Color { get; set; } = "#FF4444";
     public PlaybackMode PlaybackMode { get; set; } = PlaybackMode.Loop;
     public List<Clip> Clips { get; set; } = new();
 }
