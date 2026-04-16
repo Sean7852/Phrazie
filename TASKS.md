@@ -10,6 +10,7 @@
 - [x] Collection cover image (with fallback "P" glyph)
 - [x] Collection detail header (cover + name + description)
 - [x] Edit collection modal (name, description, cover image, delete)
+- [x] Cover image copied to app storage on pick (survives original file deletion)
 
 ### 2. State System
 - [x] Default states: Normal, Break, Drop
@@ -57,16 +58,15 @@
 - [ ] Display settings
 - [ ] MIDI settings
 
-### 10. Database
-- [ ] Setup the local database
-- [ ] Setup the userlogin and monk a fake user ID
-- [ ] Save the collection, states, everything in the local database
-- [ ] Setup the remote database
-- [ ] Setup the communication between the rmote and local database.
-
-### 10. Account & Trial
-- [ ] Account registrition
-- [ ] Account login/logout
+### 9. Account & Auth
+- [x] IAuthService interface (SignUp, SignIn, SignOut)
+- [x] ISessionStore interface (CurrentUser, IsAuthenticated, AuthStateChanged)
+- [x] AuthService — Supabase Gotrue implementation
+- [x] SessionStore — in-memory, fires AuthStateChanged on transition
+- [x] Login / sign-up UI (email + password, toggle between modes, error banner)
+- [x] Auth gate in MainWindow — shows login overlay when not authenticated
+- [x] Account section in Settings — shows email, sign-out button, About dialog
+- [x] Persist session across restarts (tokens saved to disk, restored via SetSession on launch)
 - [ ] Free trial (7–14 days)
 - [ ] Subscription (basic implementation)
 
@@ -94,10 +94,16 @@
 ### Phase 3 — Core Functionality (3–4 weeks)
 > Goal: Functional prototype
 
-- [x] Clip import
-- [ ] Playback switching
-- [ ] State transitions
-- [ ] Trigger execution
+- [x] Clip import (drag & drop + file picker)
+- [x] Video thumbnail extraction (Windows Shell)
+- [x] Video playback (LibVLC)
+- [x] State-based clip switching
+- [x] Auth service (Supabase sign-up / sign-in / sign-out)
+- [x] Auth gate UI (login screen before app)
+- [x] Local database persistence (SQLite — collections, states, clips)
+- [x] Account settings section (email display, sign-out, About dialog)
+- [x] Session persistence across restarts
+- [ ] Trigger execution wired to real playback
 
 ### Phase 4 — Output & Remote (2–3 weeks)
 > Goal: Real-world testable
@@ -123,3 +129,17 @@
 - [x] Edit collection modal — name, description, cover image picker, delete
 - [x] Settings page with master menu + detail panel
 - [x] Hotkey mapping — rebindable shortcuts, live key capture
+- [x] State cards redesigned — thin color tab on left edge, horizontal clip scroll row
+- [x] Video thumbnails in clip tiles (Windows Shell thumbnail API)
+- [x] State name and color strip both clickable to open edit modal
+- [x] Live page redesigned — video output left, controls panel right
+- [x] Login / sign-up screen with toggle, error handling, dark card design
+- [x] Account section in Settings — email display, sign-out, About Phrazie dialog
+- [x] Cover image saved to app-owned storage (resilient to original file deletion)
+- [x] Session persists across restarts — no re-login until explicit sign-out
+
+---
+
+## Releases
+
+- [x] v0.1.0 — First public preview (Apr 2026) — collections, states, clip import, live page with video playback
