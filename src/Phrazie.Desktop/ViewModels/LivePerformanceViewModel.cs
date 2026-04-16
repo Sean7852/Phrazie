@@ -1,9 +1,11 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using LibVLCSharp.Shared;
 using Phrazie.Core.Enums;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
+using Phrazie.Desktop.Services;
 
 namespace Phrazie.Desktop.ViewModels;
 
@@ -13,6 +15,9 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private readonly ITriggerService _trigger;
     private readonly IPlaybackService _playback;
 
+    /// <summary>Exposed so LivePerformanceView.axaml.cs can wire it to VideoView.</summary>
+    public MediaPlayer? MediaPlayer => (_playback as VideoPlaybackService)?.MediaPlayer;
+
     // ── state options (the three buttons: Normal / Break / Drop) ──────────
 
     public ObservableCollection<StateOptionViewModel> StateOptions { get; } = new();
@@ -20,6 +25,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
     // ── current state display ─────────────────────────────────────────────
 
     [ObservableProperty] private string _currentStateName  = "—";
+    [ObservableProperty] private string _currentClipName   = string.Empty;
 
     /// <summary>Phrazie UI language: Waiting · Locked · Triggered</summary>
     [ObservableProperty] private string _statusLabel       = "Waiting";
@@ -72,6 +78,10 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
         _trigger.TriggerFired  += OnTriggerFired;
         _trigger.CountdownTick += OnCountdownTick;
+
+        _playback.ClipChanged += clip =>
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                CurrentClipName = clip?.DisplayName ?? string.Empty);
     }
 
     // ── commands ──────────────────────────────────────────────────────────

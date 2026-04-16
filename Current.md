@@ -1,3 +1,6 @@
-"Please update the UI for each state block (Normal, Break, Drop) to match the 'StateInstance.jpg' design exactly. Follow these requirements:
-
-Just finished a very important change, create a new branch to work on big page logic & UI.
+Now we need to implement the local database.
+Once the user loged in, we save the data, and 
+In the globle setting menu:
+- Add a new option names "Account" 
+- Add a button logout 
+- Add an "About" button and the popup window.

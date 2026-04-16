@@ -14,10 +14,13 @@ public partial class SettingsViewModel : ViewModelBase
 
     public bool HasSelectedSection => SelectedSection is not null;
 
-    public SettingsViewModel(IHotkeyService hotkeyService)
+    public SettingsViewModel(
+        IHotkeyService hotkeyService,
+        ISessionStore  sessionStore,
+        Func<Task>     signOut)
     {
+        Sections.Add(new AccountSectionViewModel(sessionStore, signOut));
         Sections.Add(new HotkeyMappingViewModel(hotkeyService));
-        // Future sections: Display, MIDI, Audio, Account…
         SelectedSection = Sections[0];
     }
 }

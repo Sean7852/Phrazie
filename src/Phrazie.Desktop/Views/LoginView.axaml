@@ -1,0 +1,125 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Phrazie.Desktop.ViewModels"
+             x:Class="Phrazie.Desktop.Views.LoginView"
+             x:DataType="vm:LoginViewModel"
+             Background="Transparent">
+
+    <Grid>
+        <!-- Background gradient -->
+        <Border>
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                    <GradientStop Color="#070710" Offset="0" />
+                    <GradientStop Color="#0D1035" Offset="1" />
+                </LinearGradientBrush>
+            </Border.Background>
+        </Border>
+
+        <!-- Centered card -->
+        <Border HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Width="380"
+                Background="#0E0E1A"
+                BorderBrush="#1E1E30"
+                BorderThickness="1"
+                CornerRadius="12"
+                Padding="36,32">
+            <StackPanel Spacing="24">
+
+                <!-- Brand -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="PHRAZIE"
+                               Foreground="#444466"
+                               FontSize="11"
+                               LetterSpacing="3" />
+                    <TextBlock Text="{Binding HeadingLabel}"
+                               Foreground="White"
+                               FontSize="24"
+                               FontWeight="Light" />
+                </StackPanel>
+
+                <!-- Fields -->
+                <StackPanel Spacing="12">
+
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="Email"
+                                   Foreground="#666688"
+                                   FontSize="12" />
+                        <TextBox Text="{Binding Email}"
+                                 PlaceholderText="you@example.com"
+                                 Background="#12121E"
+                                 BorderBrush="#2A2A44"
+                                 CornerRadius="6"
+                                 Padding="12,9"
+                                 FontSize="14" />
+                    </StackPanel>
+
+                    <StackPanel Spacing="5">
+                        <TextBlock Text="Password"
+                                   Foreground="#666688"
+                                   FontSize="12" />
+                        <TextBox Text="{Binding Password}"
+                                 PasswordChar="•"
+                                 PlaceholderText="Min. 6 characters"
+                                 Background="#12121E"
+                                 BorderBrush="#2A2A44"
+                                 CornerRadius="6"
+                                 Padding="12,9"
+                                 FontSize="14" />
+                    </StackPanel>
+
+                </StackPanel>
+
+                <!-- Error message -->
+                <Border IsVisible="{Binding ErrorMessage,
+                            Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                        Background="#1A0A0A"
+                        BorderBrush="#5A2222"
+                        BorderThickness="1"
+                        CornerRadius="6"
+                        Padding="12,9">
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               Foreground="#CC6666"
+                               FontSize="13"
+                               TextWrapping="Wrap" />
+                </Border>
+
+                <!-- Submit button -->
+                <Button Command="{Binding SubmitCommand}"
+                        HorizontalAlignment="Stretch"
+                        HorizontalContentAlignment="Center"
+                        Background="#1E3A5F"
+                        Foreground="White"
+                        BorderThickness="0"
+                        Padding="0,13"
+                        CornerRadius="6"
+                        FontSize="14"
+                        FontWeight="Medium">
+                    <Panel>
+                        <TextBlock Text="{Binding SubmitLabel}"
+                                   IsVisible="{Binding !IsBusy}"
+                                   HorizontalAlignment="Center" />
+                        <TextBlock Text="Please wait…"
+                                   IsVisible="{Binding IsBusy}"
+                                   Foreground="#8899BB"
+                                   HorizontalAlignment="Center" />
+                    </Panel>
+                </Button>
+
+                <!-- Toggle sign-in / sign-up -->
+                <Button Command="{Binding ToggleModeCommand}"
+                        HorizontalAlignment="Center"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="0"
+                        Foreground="#555577"
+                        FontSize="13">
+                    <TextBlock Text="{Binding ToggleLabel}" TextDecorations="Underline" />
+                </Button>
+
+            </StackPanel>
+        </Border>
+    </Grid>
+
+</UserControl>
