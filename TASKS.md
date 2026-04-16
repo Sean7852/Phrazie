@@ -137,6 +137,16 @@
 - [ ] UI refinement
 - [ ] Performance tuning
 
+### 11. Window Chrome
+- [x] Remove OS title bar (WindowDecorations="None" — Avalonia 12)
+- [x] Custom 36px title bar on MainWindow — PHRAZIE label + min/max/close buttons
+- [x] Title bar draggable (BeginMoveDrag + ElementRole="TitleBar")
+- [x] Double-click title bar to maximize/restore
+- [x] Max button icon syncs with window state (▢ / ⊐)
+- [x] Close button hover turns red (#C42B1C)
+- [x] AboutDialog — floating ✕ close button (top-right), no OS chrome
+- [x] ClipManagerWindow — draggable header + ✕ close button, no OS chrome
+
 ---
 
 ## UI / UX Improvements (Done)
@@ -158,6 +168,7 @@
 - [x] Session persists across restarts — no re-login until explicit sign-out
 - [x] Clip manager window — "Manage" button on each state card, per-state grid view, right-click context menu (disable/enable/delete), drag-drop import
 - [x] Clip manager rubber-band multi-select with dark-themed context menu (delete selected)
+- [x] Custom dark window chrome — frameless MainWindow with min/max/close buttons, AboutDialog + ClipManagerWindow with ✕ close, no OS title bar
 
 ---
 

@@ -21,7 +21,8 @@ public partial class ClipManagerWindow : Window
     {
         InitializeComponent();
 
-        DoneButton.Click += (_, _) => Close();
+        DoneButton.Click      += (_, _) => Close();
+        HeaderCloseBtn.Click  += (_, _) => Close();
 
         // File drag-drop from OS
         DropTarget.AddHandler(DragDrop.DropEvent,     OnFileDrop);
@@ -31,6 +32,14 @@ public partial class ClipManagerWindow : Window
         ClipCanvas.AddHandler(PointerPressedEvent,  OnCanvasPointerPressed,  handledEventsToo: true);
         ClipCanvas.AddHandler(PointerMovedEvent,    OnCanvasPointerMoved,    handledEventsToo: true);
         ClipCanvas.AddHandler(PointerReleasedEvent, OnCanvasPointerReleased, handledEventsToo: true);
+    }
+
+    // ── header drag / close ───────────────────────────────────────────────────
+
+    private void Header_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+            BeginMoveDrag(e);
     }
 
     // ── marquee selection ─────────────────────────────────────────────────────
