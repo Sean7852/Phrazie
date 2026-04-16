@@ -25,6 +25,10 @@
 - [x] Assign clips to states
 - [x] Video thumbnail preview in state card
 - [x] Playback mode per state: Loop / Random / Sequential
+- [x] Clip manager window (grid view per state, opened via "Manage" button)
+- [x] Disable / enable clips (greyed-out thumbnail overlay when disabled)
+- [x] Delete clips from manager
+- [x] Drag & drop video files into clip manager window to add clips
 
 ### 4. Live Performance Screen
 - [x] Current state display
@@ -114,6 +118,7 @@
 - [x] Local database persistence (SQLite — collections, states, clips)
 - [x] Account settings section (email display, sign-out, About dialog)
 - [x] Session persistence across restarts
+- [x] Clip manager window (per-state grid, disable/enable, delete, drag-drop import)
 - [ ] Trigger execution wired to real playback
 
 ### Phase 4 — Output & Remote (not started)
@@ -148,6 +153,7 @@
 - [x] Account section in Settings — email display, sign-out, About Phrazie dialog
 - [x] Cover image saved to app-owned storage (resilient to original file deletion)
 - [x] Session persists across restarts — no re-login until explicit sign-out
+- [x] Clip manager window — "Manage" button on each state card, per-state grid view, right-click context menu (disable/enable/delete), drag-drop import
 
 ---
 

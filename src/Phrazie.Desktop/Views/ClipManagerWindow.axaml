@@ -1,0 +1,117 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Phrazie.Desktop.ViewModels"
+        x:Class="Phrazie.Desktop.Views.ClipManagerWindow"
+        x:DataType="vm:ClipManagerViewModel"
+        Title="{Binding StateName, StringFormat='Clips — {0}'}"
+        Width="720" Height="520"
+        MinWidth="480" MinHeight="340"
+        Background="#0D0D1A"
+        WindowStartupLocation="CenterOwner"
+        ExtendClientAreaToDecorationsHint="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="24,20,24,20">
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,16" Spacing="4">
+            <TextBlock Text="{Binding StateName, StringFormat='Clips — {0}'}"
+                       Foreground="White" FontSize="20" FontWeight="Light" />
+            <TextBlock Text="Drag &amp; drop video files here to add clips"
+                       Foreground="#444466" FontSize="12" />
+        </StackPanel>
+
+        <!-- Clip grid with drop zone -->
+        <ScrollViewer Grid.Row="1"
+                      DragDrop.AllowDrop="True"
+                      x:Name="DropTarget">
+            <ItemsControl ItemsSource="{Binding Clips}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:ManagedClipViewModel">
+                        <Border Width="148" Height="120"
+                                Margin="0,0,10,10"
+                                CornerRadius="8"
+                                ClipToBounds="True"
+                                Background="#12121E"
+                                BorderBrush="#1E1E30"
+                                BorderThickness="1"
+                                Cursor="Hand">
+
+                            <!-- Context menu -->
+                            <Border.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Disable"
+                                              Command="{Binding ToggleEnabledCommand}"
+                                              IsVisible="{Binding IsEnabled}" />
+                                    <MenuItem Header="Enable"
+                                              Command="{Binding ToggleEnabledCommand}"
+                                              IsVisible="{Binding !IsEnabled}" />
+                                    <Separator />
+                                    <MenuItem Header="Delete"
+                                              Command="{Binding DeleteCommand}" />
+                                </ContextMenu>
+                            </Border.ContextMenu>
+
+                            <Panel>
+                                <!-- Thumbnail -->
+                                <Image Source="{Binding Thumbnail}"
+                                       Stretch="UniformToFill"
+                                       IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                                <!-- Placeholder (no thumbnail) -->
+                                <StackPanel VerticalAlignment="Center"
+                                            HorizontalAlignment="Center"
+                                            Spacing="4"
+                                            IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNull}}">
+                                    <TextBlock Text="▶" Foreground="#5566AA" FontSize="20"
+                                               HorizontalAlignment="Center" />
+                                </StackPanel>
+
+                                <!-- Disabled overlay: greyed out + label -->
+                                <Border Background="#B3000000"
+                                        IsVisible="{Binding !IsEnabled}">
+                                    <TextBlock Text="Disabled"
+                                               Foreground="#887799"
+                                               FontSize="11"
+                                               HorizontalAlignment="Center"
+                                               VerticalAlignment="Center" />
+                                </Border>
+
+                                <!-- Name strip at bottom -->
+                                <Border VerticalAlignment="Bottom"
+                                        Background="#CC0A0A18"
+                                        Padding="6,4">
+                                    <TextBlock Text="{Binding DisplayName}"
+                                               Foreground="#AAAACC"
+                                               FontSize="10"
+                                               TextTrimming="CharacterEllipsis" />
+                                </Border>
+                            </Panel>
+
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right"
+                    Margin="0,12,0,0" Spacing="8">
+            <TextBlock Text="{Binding Clips.Count, StringFormat='{}{0} clip(s)'}"
+                       Foreground="#444466" FontSize="12"
+                       VerticalAlignment="Center" Margin="0,0,12,0" />
+            <Button Content="Done"
+                    Background="#1E3A5F" Foreground="White"
+                    BorderThickness="0" Padding="24,8" CornerRadius="4" FontSize="13"
+                    x:Name="DoneButton"
+                    ToolTip.Tip="Close this window" />
+        </StackPanel>
+
+    </Grid>
+
+</Window>

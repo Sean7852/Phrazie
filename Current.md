@@ -1,6 +1,5 @@
-Now we need to implement the local database.
-Once the user loged in, we save the data, and 
-In the globle setting menu:
-- Add a new option names "Account" 
-- Add a button logout 
-- Add an "About" button and the popup window.
+Now we need to implement the video clip management:
+Add a button "Manage" bellow "Remove" on each state card, click it open a window where we can manage the video clips.
+In the new window, we show the video clips in grid view.
+Right click each video clip thumbnail open the option menu to delet or disable/enable, disabled card thumbnail is greyed out.
+new video clips can be drag dropped in this window.

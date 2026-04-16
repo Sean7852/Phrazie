@@ -18,7 +18,7 @@ public sealed class SqliteClipRepository : IClipRepository
         {
             var clips = new List<Clip>();
             using var cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT id, file_path, display_name, duration_ticks FROM clips ORDER BY display_name";
+            cmd.CommandText = "SELECT id, file_path, display_name, duration_ticks, is_enabled FROM clips ORDER BY display_name";
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
                 clips.Add(new Clip
@@ -27,6 +27,7 @@ public sealed class SqliteClipRepository : IClipRepository
                     FilePath    = reader.GetString(1),
                     DisplayName = reader.GetString(2),
                     Duration    = TimeSpan.FromTicks(reader.GetInt64(3)),
+                    IsEnabled   = reader.GetInt32(4) != 0,
                 });
             return clips;
         });
@@ -36,13 +37,39 @@ public sealed class SqliteClipRepository : IClipRepository
         {
             using var cmd = conn.CreateCommand();
             cmd.CommandText = """
-                INSERT OR REPLACE INTO clips (id, file_path, display_name, duration_ticks)
-                VALUES ($id, $path, $name, $ticks)
+                INSERT OR REPLACE INTO clips (id, file_path, display_name, duration_ticks, is_enabled)
+                VALUES ($id, $path, $name, $ticks, $enabled)
                 """;
-            cmd.Parameters.AddWithValue("$id",    clip.Id.ToString());
-            cmd.Parameters.AddWithValue("$path",  clip.FilePath);
-            cmd.Parameters.AddWithValue("$name",  clip.DisplayName);
-            cmd.Parameters.AddWithValue("$ticks", clip.Duration.Ticks);
+            cmd.Parameters.AddWithValue("$id",      clip.Id.ToString());
+            cmd.Parameters.AddWithValue("$path",    clip.FilePath);
+            cmd.Parameters.AddWithValue("$name",    clip.DisplayName);
+            cmd.Parameters.AddWithValue("$ticks",   clip.Duration.Ticks);
+            cmd.Parameters.AddWithValue("$enabled", clip.IsEnabled ? 1 : 0);
+            cmd.ExecuteNonQuery();
+        });
+
+    public Task UpdateAsync(Clip clip) =>
+        _db.ExecuteAsync(conn =>
+        {
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = """
+                UPDATE clips SET file_path=$path, display_name=$name, duration_ticks=$ticks, is_enabled=$enabled
+                WHERE id=$id
+                """;
+            cmd.Parameters.AddWithValue("$id",      clip.Id.ToString());
+            cmd.Parameters.AddWithValue("$path",    clip.FilePath);
+            cmd.Parameters.AddWithValue("$name",    clip.DisplayName);
+            cmd.Parameters.AddWithValue("$ticks",   clip.Duration.Ticks);
+            cmd.Parameters.AddWithValue("$enabled", clip.IsEnabled ? 1 : 0);
+            cmd.ExecuteNonQuery();
+        });
+
+    public Task DeleteAsync(Guid id) =>
+        _db.ExecuteAsync(conn =>
+        {
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "DELETE FROM clips WHERE id=$id";
+            cmd.Parameters.AddWithValue("$id", id.ToString());
             cmd.ExecuteNonQuery();
         });
 }

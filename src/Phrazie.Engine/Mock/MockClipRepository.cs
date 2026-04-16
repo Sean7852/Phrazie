@@ -28,4 +28,17 @@ public sealed class MockClipRepository : IClipRepository
             _clips.Add(clip);
         return Task.CompletedTask;
     }
+
+    public Task UpdateAsync(Clip clip)
+    {
+        var i = _clips.FindIndex(c => c.Id == clip.Id);
+        if (i >= 0) _clips[i] = clip;
+        return Task.CompletedTask;
+    }
+
+    public Task DeleteAsync(Guid id)
+    {
+        _clips.RemoveAll(c => c.Id == id);
+        return Task.CompletedTask;
+    }
 }

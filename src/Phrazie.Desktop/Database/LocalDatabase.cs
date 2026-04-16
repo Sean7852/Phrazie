@@ -32,6 +32,7 @@ public sealed class LocalDatabase : IDisposable
         });
 
         CreateSchema();
+        MigrateSchema();
     }
 
     // ── public helpers ────────────────────────────────────────────────────────
@@ -59,6 +60,28 @@ public sealed class LocalDatabase : IDisposable
     // ── private ───────────────────────────────────────────────────────────────
 
     private void Execute(Action<SqliteConnection> work) => work(_connection);
+
+    /// <summary>Adds columns introduced after the initial schema without dropping data.</summary>
+    private void MigrateSchema()
+    {
+        Execute(conn =>
+        {
+            // Add is_enabled to clips if it doesn't exist (v2 migration)
+            using var check = conn.CreateCommand();
+            check.CommandText = "PRAGMA table_info(clips)";
+            bool hasIsEnabled = false;
+            using (var r = check.ExecuteReader())
+                while (r.Read())
+                    if (r.GetString(1) == "is_enabled") { hasIsEnabled = true; break; }
+
+            if (!hasIsEnabled)
+            {
+                using var alter = conn.CreateCommand();
+                alter.CommandText = "ALTER TABLE clips ADD COLUMN is_enabled INTEGER NOT NULL DEFAULT 1";
+                alter.ExecuteNonQuery();
+            }
+        });
+    }
 
     private void CreateSchema()
     {
@@ -89,7 +112,8 @@ public sealed class LocalDatabase : IDisposable
                     id            TEXT PRIMARY KEY,
                     file_path     TEXT NOT NULL,
                     display_name  TEXT NOT NULL,
-                    duration_ticks INTEGER NOT NULL DEFAULT 0
+                    duration_ticks INTEGER NOT NULL DEFAULT 0,
+                    is_enabled    INTEGER NOT NULL DEFAULT 1
                 );
 
                 CREATE TABLE IF NOT EXISTS state_clips (

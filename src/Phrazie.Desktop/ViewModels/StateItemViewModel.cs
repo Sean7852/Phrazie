@@ -1,5 +1,8 @@
 using System.Collections.ObjectModel;
 using System.IO;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -8,6 +11,7 @@ using Phrazie.Core.Enums;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
 using Phrazie.Desktop.Services;
+using Phrazie.Desktop.Views;
 
 namespace Phrazie.Desktop.ViewModels;
 
@@ -63,6 +67,28 @@ public partial class StateItemViewModel : ObservableObject
 
     [RelayCommand]
     private void Remove() => _onRemove(this);
+
+    [RelayCommand]
+    private void ManageClips()
+    {
+        var vm     = new ClipManagerViewModel(Model, () => _onSaveRename(this));
+        var window = new ClipManagerWindow { DataContext = vm };
+
+        // Re-sync AssignedClips when the window closes (clips may have been added/removed)
+        window.Closed += (_, _) =>
+        {
+            AssignedClips.Clear();
+            foreach (var clip in Model.Clips)
+                AssignedClips.Add(new ClipItemViewModel(clip, Unassign));
+        };
+
+        var owner = (Application.Current?.ApplicationLifetime as IClassicDesktopStyleApplicationLifetime)
+            ?.MainWindow;
+        if (owner is not null)
+            window.ShowDialog(owner);
+        else
+            window.Show();
+    }
 
     // ── clip import ────────────────────────────────────────────────────────
 
