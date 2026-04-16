@@ -27,7 +27,8 @@
       "Read(//c/Users/syliu/.nuget/packages/**)",
       "Bash(powershell *)",
       "Bash(dotnet tool *)",
-      "Bash(tasklist)"
+      "Bash(tasklist)",
+      "Bash(echo \"exit: $?\")"
     ]
   }
 }
