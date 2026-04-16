@@ -107,9 +107,19 @@ public partial class CollectionDetailViewModel : ViewModelBase
         var path = await filePicker.PickImageAsync();
         if (path is null) return;
 
-        Model.CoverImagePath = path;
+        // Copy to app-owned storage so the cover survives if the original is deleted.
+        var coversDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Phrazie", "covers");
+        Directory.CreateDirectory(coversDir);
+
+        var ext      = Path.GetExtension(path);
+        var destPath = Path.Combine(coversDir, $"{Model.Id}{ext}");
+        File.Copy(path, destPath, overwrite: true);
+
+        Model.CoverImagePath = destPath;
         CoverImage?.Dispose();
-        CoverImage = new Bitmap(path);
+        CoverImage = new Bitmap(destPath);
         await _repository.UpdateAsync(Model);
     }
 

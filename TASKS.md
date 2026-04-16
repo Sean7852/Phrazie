@@ -17,33 +17,38 @@
 - [x] Rename states
 - [x] Add custom states
 - [x] Remove states
+- [x] State color coding (color tab on card, color picker in edit modal)
+- [x] Drag to reorder states
 
 ### 3. Clip Management
-- [x] Import local video files
-- [x] Assign clips to states (mock)
-- [x] Playback mode: Loop
-- [x] Playback mode: Random
-- [x] Playback mode: Sequential
+- [x] Import local video files (drag & drop or file picker)
+- [x] Assign clips to states
+- [x] Video thumbnail preview in state card
+- [x] Playback mode per state: Loop / Random / Sequential
 
 ### 4. Live Performance Screen
 - [x] Current state display
 - [x] Next state selection
-- [x] Trigger scheduling
+- [x] Trigger scheduling (immediate / bars / seconds)
 - [x] Countdown indicator
-- [x] Emergency switch
+- [x] Emergency switch (immediate cut)
+- [x] Video output area (LibVLC via custom NativeControlHost)
+- [x] Clip name overlay on video
+- [ ] Play / pause controls
+- [ ] Manual clip advance
 
 ### 5. Trigger System
 - [x] Trigger type: Immediate
 - [x] Trigger type: After X seconds
-- [x] Trigger type: After X bars
+- [x] Trigger type: After X bars (BPM-based)
 - [x] UI label: "Drop in 8 bars"
-- [x] UI label: "Break in 4 bars"
 
 ### 6. Playback (Basic)
-- [ ] Video playback
-- [ ] State-based switching
-- [ ] External full-screen output
-- [ ] Preview window
+- [x] Video playback (LibVLC, Windows)
+- [x] Loop clip when it ends
+- [x] State-based clip switching (respects PlaybackMode)
+- [ ] External full-screen output (second monitor)
+- [ ] Preview window separate from output
 
 ### 7. Mobile Remote (Basic)
 - [ ] View current state
@@ -66,15 +71,21 @@
 - [x] Login / sign-up UI (email + password, toggle between modes, error banner)
 - [x] Auth gate in MainWindow — shows login overlay when not authenticated
 - [x] Account section in Settings — shows email, sign-out button, About dialog
-- [x] Persist session across restarts (tokens saved to disk, restored via SetSession on launch)
+- [ ] Persist session across restarts (custom Supabase SessionHandler)
 - [ ] Free trial (7–14 days)
 - [ ] Subscription (basic implementation)
+
+### 10. Database
+- [x] Setup local SQLite database (Microsoft.Data.Sqlite, WAL mode, foreign keys)
+- [x] Save collections, states, clips locally (SqliteCollectionRepository, SqliteClipRepository)
+- [ ] Setup remote database (Supabase)
+- [ ] Sync between local and remote
 
 ---
 
 ## Development Phases
 
-### Phase 1 — App Foundation (1–2 weeks)
+### Phase 1 — App Foundation ✅
 > Goal: App runs with basic structure
 
 - [x] Project setup
@@ -83,7 +94,7 @@
 - [x] UI component base
 - [x] Mock data
 
-### Phase 2 — Data Model & Mock Interaction (2 weeks)
+### Phase 2 — Data Model & Mock Interaction ✅
 > Goal: Fully simulated workflow
 
 - [x] Collection / State CRUD (create, delete, rename, add/remove states)
@@ -91,7 +102,7 @@
 - [x] Trigger simulation
 - [x] Countdown UI
 
-### Phase 3 — Core Functionality (3–4 weeks)
+### Phase 3 — Core Functionality (in progress)
 > Goal: Functional prototype
 
 - [x] Clip import (drag & drop + file picker)
@@ -105,14 +116,14 @@
 - [x] Session persistence across restarts
 - [ ] Trigger execution wired to real playback
 
-### Phase 4 — Output & Remote (2–3 weeks)
+### Phase 4 — Output & Remote (not started)
 > Goal: Real-world testable
 
-- [ ] External display output
+- [ ] External display output (second monitor / fullscreen)
 - [ ] Mobile remote control
 - [ ] Session sync
 
-### Phase 5 — Polish & Testing (2 weeks)
+### Phase 5 — Polish & Testing (not started)
 > Goal: Stable MVP
 
 - [ ] Bug fixes
@@ -125,7 +136,7 @@
 
 - [x] Remove gear icon from collection cards — settings moved to management page
 - [x] Single-click collection card opens management page
-- [x] Collection detail rich header — cover image, name, description, edit icon
+- [x] Collection detail rich header — cover image, name, description inline editing
 - [x] Edit collection modal — name, description, cover image picker, delete
 - [x] Settings page with master menu + detail panel
 - [x] Hotkey mapping — rebindable shortcuts, live key capture
