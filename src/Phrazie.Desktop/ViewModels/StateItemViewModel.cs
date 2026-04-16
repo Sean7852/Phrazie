@@ -71,7 +71,7 @@ public partial class StateItemViewModel : ObservableObject
     [RelayCommand]
     private void ManageClips()
     {
-        var vm     = new ClipManagerViewModel(Model, () => _onSaveRename(this));
+        var vm     = new ClipManagerViewModel(Model, () => _onSaveRename(this), ApplyEdit);
         var window = new ClipManagerWindow { DataContext = vm };
 
         // Re-sync AssignedClips when the window closes (clips may have been added/removed)

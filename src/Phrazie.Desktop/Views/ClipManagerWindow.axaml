@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Phrazie.Desktop.ViewModels"
         xmlns:chrome="using:Avalonia.Controls.Chrome"
+        xmlns:conv="using:Phrazie.Desktop.Converters"
         x:Class="Phrazie.Desktop.Views.ClipManagerWindow"
         x:DataType="vm:ClipManagerViewModel"
         Title="{Binding StateName, StringFormat='Clips — {0}'}"
@@ -15,6 +16,7 @@
 
     <!-- ── Context-menu dark styling ───────────────────────────────────────── -->
     <Window.Resources>
+        <conv:HexToBrushConverter x:Key="HexToBrush" />
         <SolidColorBrush x:Key="MenuFlyoutPresenterBackground"       Color="#1A1A2E" />
         <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush"      Color="#2A2A44" />
         <SolidColorBrush x:Key="MenuFlyoutItemBackground"            Color="Transparent" />
@@ -57,6 +59,8 @@
         </Style>
     </Window.Styles>
 
+    <Panel>
+
     <!-- ── Outer frame (matches AboutDialog / app secondary-window pattern) ── -->
     <Border Background="#0E0E1A"
             BorderBrush="#1E1E30"
@@ -72,11 +76,23 @@
                   chrome:WindowDecorationProperties.ElementRole="TitleBar"
                   PointerPressed="Header_PointerPressed">
                 <StackPanel Margin="32,28,80,20" Spacing="4">
-                    <!-- State name as title -->
-                    <TextBlock Text="{Binding StateName}"
-                               Foreground="White"
-                               FontSize="24"
-                               FontWeight="Light" />
+
+                    <!-- Color swatch + state name — click either to edit -->
+                    <Button Command="{Binding OpenEditCommand}"
+                            Background="Transparent" BorderThickness="0" Padding="0"
+                            Cursor="Hand" HorizontalAlignment="Left"
+                            ToolTip.Tip="Click to edit state name and color">
+                        <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+                            <Border Width="16" Height="16"
+                                    CornerRadius="4"
+                                    Background="{Binding StateColor, Converter={StaticResource HexToBrush}}"
+                                    VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding StateName}"
+                                       Foreground="White"
+                                       FontSize="24"
+                                       FontWeight="Light" />
+                        </StackPanel>
+                    </Button>
 
                     <!-- Hint -->
                     <TextBlock Text="Drag &amp; drop to add · drag to select · right-click for options"
@@ -233,5 +249,99 @@
 
         </Grid>
     </Border>
+
+    <!-- ── State edit modal overlay ──────────────────────────────────────── -->
+    <Border IsVisible="{Binding IsStateEditOpen}"
+            Background="#B3000000">
+        <Border Background="#1A1A2E"
+                BorderBrush="#2A2A44"
+                BorderThickness="1"
+                CornerRadius="12"
+                Width="400"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Padding="28,24">
+            <StackPanel Spacing="20">
+
+                <TextBlock Text="Edit State"
+                           Foreground="White" FontSize="18" FontWeight="Light" />
+
+                <!-- Name -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Name" Foreground="#888899" FontSize="12" />
+                    <TextBox Text="{Binding StateEditName}"
+                             Background="#12121E" BorderBrush="#3A3A5A"
+                             CornerRadius="6" FontSize="14" Padding="12,8"
+                             ToolTip.Tip="State name" />
+                </StackPanel>
+
+                <!-- Color picker -->
+                <StackPanel Spacing="8">
+                    <TextBlock Text="Color" Foreground="#888899" FontSize="12" />
+
+                    <!-- Preview swatch -->
+                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                        <Border Width="28" Height="28" CornerRadius="6"
+                                Background="{Binding StateEditColor, Converter={StaticResource HexToBrush}}" />
+                        <TextBlock Text="{Binding StateEditColor}"
+                                   Foreground="#555577" FontSize="12"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Preset swatches -->
+                    <ListBox ItemsSource="{x:Static vm:ClipManagerViewModel.PresetColors}"
+                             SelectedItem="{Binding StateEditColor}"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             Padding="0">
+                        <ListBox.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ListBox.ItemsPanel>
+                        <ListBox.Styles>
+                            <Style Selector="ListBoxItem">
+                                <Setter Property="Padding" Value="4" />
+                                <Setter Property="Background" Value="Transparent" />
+                                <Setter Property="CornerRadius" Value="20" />
+                            </Style>
+                            <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+                                <Setter Property="Background" Value="Transparent" />
+                            </Style>
+                            <Style Selector="ListBoxItem:selected > Border">
+                                <Setter Property="BorderBrush" Value="White" />
+                                <Setter Property="BorderThickness" Value="2" />
+                            </Style>
+                        </ListBox.Styles>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Border Width="32" Height="32" CornerRadius="16"
+                                        Background="{Binding Converter={StaticResource HexToBrush}}"
+                                        Cursor="Hand"
+                                        ToolTip.Tip="{Binding}" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <!-- Save / Cancel -->
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Button Command="{Binding SaveStateEditCommand}"
+                            Content="Save"
+                            Background="#1E3A5F" Foreground="White"
+                            BorderThickness="0" Padding="20,9" CornerRadius="6" FontSize="13"
+                            ToolTip.Tip="Save state changes" />
+                    <Button Command="{Binding CancelStateEditCommand}"
+                            Content="Cancel"
+                            Background="Transparent" Foreground="#555566"
+                            BorderThickness="0" Padding="14,9" FontSize="13"
+                            ToolTip.Tip="Discard changes" />
+                </StackPanel>
+
+            </StackPanel>
+        </Border>
+    </Border>
+
+    </Panel>
 
 </Window>

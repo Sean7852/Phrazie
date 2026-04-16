@@ -1,13 +1,4 @@
-I want to unify the application so it only shows one icon in the Windows Taskbar. the "ClipManageWindow" window is currently showing up as a separate instance in the System menu.
-
-Task: Convert the ClipManageWindow into a Modal Dialog or a Child Window.
-
-Requirements:
-
-Set the Owner of the ClipManageWindow to MainWindow.
-
-Set ShowInTaskbar="False" in the ClipManageWindow XAML.
-
-Ensure the ClipManageWindow opens centered relative to the main app window.
-
-Please update the logic where the ClipManageWindow is instantiated and the ClipManageWindow.axaml file.
+I need to change the State card editing a little:
+1. Disable all State edit in the CollectionDetailView, clicking the state name doesn't open the edit window
+2. On the ClipManageWindow, add a round coner rectangle next to the name shows the color of the state.
+3. Click the Name or the color shows the State edit window.

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
@@ -13,21 +14,53 @@ namespace Phrazie.Desktop.ViewModels;
 /// </summary>
 public partial class ClipManagerViewModel : ObservableObject
 {
-    private readonly State    _state;
-    private readonly Func<Task> _onSave;
+    private readonly State               _state;
+    private readonly Func<Task>          _onSave;
+    private readonly Action<string, string> _onApplyEdit;
 
-    public string StateName => _state.Name;
+    public string StateName  => _state.Name;
+    public string StateColor => _state.Color;
+
+    // ── state edit modal ───────────────────────────────────────────────────
+    [ObservableProperty] private bool   _isStateEditOpen;
+    [ObservableProperty] private string _stateEditName  = string.Empty;
+    [ObservableProperty] private string _stateEditColor = string.Empty;
+
+    public static IReadOnlyList<string> PresetColors =>
+        CollectionDetailViewModel.PresetColors;
 
     public ObservableCollection<ManagedClipViewModel> Clips { get; } = new();
 
-    public ClipManagerViewModel(State state, Func<Task> onSave)
+    public ClipManagerViewModel(State state, Func<Task> onSave, Action<string, string> onApplyEdit)
     {
-        _state  = state;
-        _onSave = onSave;
+        _state        = state;
+        _onSave       = onSave;
+        _onApplyEdit  = onApplyEdit;
 
         foreach (var clip in state.Clips)
             Clips.Add(MakeVm(clip));
     }
+
+    [RelayCommand]
+    private void OpenEdit()
+    {
+        StateEditName  = _state.Name;
+        StateEditColor = _state.Color;
+        IsStateEditOpen = true;
+    }
+
+    [RelayCommand]
+    private async Task SaveStateEditAsync()
+    {
+        _onApplyEdit(StateEditName, StateEditColor);
+        OnPropertyChanged(nameof(StateName));
+        OnPropertyChanged(nameof(StateColor));
+        IsStateEditOpen = false;
+        await _onSave();
+    }
+
+    [RelayCommand]
+    private void CancelStateEdit() => IsStateEditOpen = false;
 
     // ── drag-drop / import ─────────────────────────────────────────────────
 
