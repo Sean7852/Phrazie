@@ -27,6 +27,9 @@ public sealed class AuthService : IAuthService
             if (session?.User is null)
                 return AuthResult.Fail("Sign-up failed — no user returned.");
 
+            if (session.AccessToken is not null && session.RefreshToken is not null)
+                SupabaseSessionHandler.Save(session.AccessToken, session.RefreshToken);
+
             var user = new AuthUser { Id = session.User.Id!, Email = session.User.Email! };
             _store.SetUser(user);
             return AuthResult.Ok(user);
@@ -45,6 +48,9 @@ public sealed class AuthService : IAuthService
             if (session?.User is null)
                 return AuthResult.Fail("Invalid email or password.");
 
+            if (session.AccessToken is not null && session.RefreshToken is not null)
+                SupabaseSessionHandler.Save(session.AccessToken, session.RefreshToken);
+
             var user = new AuthUser { Id = session.User.Id!, Email = session.User.Email! };
             _store.SetUser(user);
             return AuthResult.Ok(user);
@@ -59,7 +65,11 @@ public sealed class AuthService : IAuthService
     {
         try   { await _supabase.Auth.SignOut(); }
         catch { /* ignore network errors on sign-out */ }
-        finally { _store.ClearUser(); }
+        finally
+        {
+            SupabaseSessionHandler.Destroy();
+            _store.ClearUser();
+        }
     }
 
     // ── helpers ───────────────────────────────────────────────────────────────
