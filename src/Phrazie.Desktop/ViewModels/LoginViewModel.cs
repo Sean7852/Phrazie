@@ -33,11 +33,25 @@ public partial class LoginViewModel : ViewModelBase
         OnPropertyChanged(nameof(HeadingLabel));
     }
 
-    [RelayCommand(CanExecute = nameof(CanSubmit))]
+    [RelayCommand]
     private async Task SubmitAsync()
     {
+        if (IsBusy) return;
+
         ErrorMessage = string.Empty;
-        IsBusy       = true;
+
+        if (string.IsNullOrWhiteSpace(Email))
+        {
+            ErrorMessage = "Please enter your email address.";
+            return;
+        }
+        if (Password.Length < 6)
+        {
+            ErrorMessage = "Password must be at least 6 characters.";
+            return;
+        }
+
+        IsBusy = true;
 
         var result = IsSignUpMode
             ? await _auth.SignUpAsync(Email.Trim(), Password)
@@ -50,13 +64,4 @@ public partial class LoginViewModel : ViewModelBase
         else
             ErrorMessage = result.ErrorMessage ?? "Something went wrong.";
     }
-
-    private bool CanSubmit() =>
-        !IsBusy &&
-        !string.IsNullOrWhiteSpace(Email) &&
-        Password.Length >= 6;
-
-    partial void OnEmailChanged(string    value) => SubmitCommand.NotifyCanExecuteChanged();
-    partial void OnPasswordChanged(string value) => SubmitCommand.NotifyCanExecuteChanged();
-    partial void OnIsBusyChanged(bool     value) => SubmitCommand.NotifyCanExecuteChanged();
 }

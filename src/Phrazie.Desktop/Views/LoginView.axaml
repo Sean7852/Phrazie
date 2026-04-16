@@ -95,8 +95,7 @@
                         Padding="0,13"
                         CornerRadius="6"
                         FontSize="14"
-                        FontWeight="Medium"
-                        IsEnabled="{Binding !IsBusy}">
+                        FontWeight="Medium">
                     <Panel>
                         <TextBlock Text="{Binding SubmitLabel}"
                                    IsVisible="{Binding !IsBusy}"
