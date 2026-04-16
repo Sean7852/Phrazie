@@ -149,30 +149,39 @@
 
                                 <Border Background="#12121E"
                                         BorderBrush="#1E1E30" BorderThickness="1"
-                                        CornerRadius="8" Margin="0,0,0,10" Padding="14,12,14,12"
+                                        CornerRadius="8" Margin="0,0,0,10"
+                                        ClipToBounds="True"
                                         DragDrop.AllowDrop="True">
                                     <Grid ColumnDefinitions="Auto,*,Auto">
 
-                                        <!-- Left: state name label + large color square (click to edit) -->
-                                        <StackPanel Grid.Column="0" Spacing="6" Margin="0,0,10,0">
-                                            <TextBlock Text="{Binding Name}"
-                                                       Foreground="#888899"
-                                                       FontSize="11" FontWeight="Medium"
-                                                       LetterSpacing="1" />
-                                            <Button Command="{Binding OpenEditCommand}"
-                                                    Padding="0" BorderThickness="0"
-                                                    Background="Transparent"
-                                                    CornerRadius="10"
-                                                    ToolTip.Tip="Click to edit state name and color">
-                                                <Border Width="64" Height="64" CornerRadius="10"
-                                                        Background="{Binding Color, Converter={StaticResource HexToBrush}}" />
-                                            </Button>
-                                        </StackPanel>
+                                        <!-- Left: thin color tab — full height, click to edit -->
+                                        <Button Grid.Column="0"
+                                                Command="{Binding OpenEditCommand}"
+                                                Padding="0" BorderThickness="0"
+                                                Background="Transparent"
+                                                VerticalAlignment="Stretch"
+                                                ToolTip.Tip="Click to edit state name and color">
+                                            <Border Width="18"
+                                                    VerticalAlignment="Stretch"
+                                                    Background="{Binding Color, Converter={StaticResource HexToBrush}}" />
+                                        </Button>
 
-                                        <!-- Center: horizontal scrollable clip row -->
-                                        <ScrollViewer Grid.Column="1"
-                                                      VerticalAlignment="Bottom"
-                                                      Height="64"
+                                        <!-- Center: name + horizontal scrollable clip row -->
+                                        <StackPanel Grid.Column="1" Spacing="6" Margin="14,12,0,12">
+                                            <Button Command="{Binding OpenEditCommand}"
+                                                      Margin="10,0,0,0"
+                                                         Padding="0" BorderThickness="0"
+                                                         Background="Transparent"
+                                                         Cursor="Hand"
+                                                         HorizontalAlignment="Left"
+                                                         ToolTip.Tip="Click to edit state name and color">
+                                                      <TextBlock Text="{Binding Name}"
+                                                          Foreground="#AAAAAA"
+                                                          FontSize="11" FontWeight="Medium"
+                                                          LetterSpacing="1" />
+                                            </Button>
+
+                                        <ScrollViewer Height="64"
                                                       HorizontalScrollBarVisibility="Auto"
                                                       VerticalScrollBarVisibility="Disabled">
                                             <StackPanel Orientation="Horizontal" Spacing="8">
@@ -186,25 +195,60 @@
                                                     </ItemsControl.ItemsPanel>
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate x:DataType="vm:ClipItemViewModel">
-                                                            <Border Width="64" Height="64"
+                                                            <Border Width="96" Height="64"
                                                                     CornerRadius="8"
+                                                                    ClipToBounds="True"
                                                                     Background="#0E0E1C"
                                                                     BorderBrush="#1E1E30"
-                                                                    BorderThickness="1">
-                                                                <StackPanel VerticalAlignment="Center"
-                                                                            HorizontalAlignment="Center"
-                                                                            Spacing="4">
-                                                                    <TextBlock Text="▶"
-                                                                               Foreground="#5566AA"
-                                                                               FontSize="14"
-                                                                               HorizontalAlignment="Center" />
-                                                                    <TextBlock Text="{Binding DisplayName}"
-                                                                               Foreground="#666688"
-                                                                               FontSize="9"
-                                                                               HorizontalAlignment="Center"
-                                                                               MaxWidth="56"
-                                                                               TextTrimming="CharacterEllipsis" />
-                                                                </StackPanel>
+                                                                    BorderThickness="1"
+                                                                    ToolTip.Tip="{Binding DisplayName}">
+                                                                <Panel>
+                                                                    <!-- Thumbnail (shown when loaded) -->
+                                                                    <Image Source="{Binding Thumbnail}"
+                                                                           Stretch="UniformToFill"
+                                                                           IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNotNull}}" />
+
+                                                                    <!-- Placeholder (shown while loading or on failure) -->
+                                                                    <StackPanel VerticalAlignment="Center"
+                                                                                HorizontalAlignment="Center"
+                                                                                Spacing="4"
+                                                                                IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNull}}">
+                                                                        <TextBlock Text="▶"
+                                                                                   Foreground="#5566AA"
+                                                                                   FontSize="14"
+                                                                                   HorizontalAlignment="Center" />
+                                                                        <TextBlock Text="{Binding DisplayName}"
+                                                                                   Foreground="#666688"
+                                                                                   FontSize="9"
+                                                                                   HorizontalAlignment="Center"
+                                                                                   MaxWidth="88"
+                                                                                   TextTrimming="CharacterEllipsis" />
+                                                                    </StackPanel>
+
+                                                                    <!-- Unassign overlay on hover -->
+                                                                    <Button Command="{Binding UnassignCommand}"
+                                                                            Padding="0" BorderThickness="0"
+                                                                            Background="Transparent"
+                                                                            HorizontalAlignment="Stretch"
+                                                                            VerticalAlignment="Stretch"
+                                                                            ToolTip.Tip="Remove clip">
+                                                                        <Button.Styles>
+                                                                            <Style Selector="Button > Panel">
+                                                                                <Setter Property="Opacity" Value="0" />
+                                                                            </Style>
+                                                                            <Style Selector="Button:pointerover > Panel">
+                                                                                <Setter Property="Opacity" Value="1" />
+                                                                            </Style>
+                                                                        </Button.Styles>
+                                                                        <Panel Background="#CC000000">
+                                                                            <TextBlock Text="✕"
+                                                                                       Foreground="#FF6666"
+                                                                                       FontSize="16"
+                                                                                       HorizontalAlignment="Center"
+                                                                                       VerticalAlignment="Center" />
+                                                                        </Panel>
+                                                                    </Button>
+                                                                </Panel>
                                                             </Border>
                                                         </DataTemplate>
                                                     </ItemsControl.ItemTemplate>
@@ -231,6 +275,8 @@
                                             </StackPanel>
                                         </ScrollViewer>
 
+                                        </StackPanel>
+
                                         <!-- Right: Remove only -->
                                         <Button Grid.Column="2"
                                                 Command="{Binding RemoveCommand}"
@@ -239,7 +285,7 @@
                                                 BorderBrush="#2A1818" BorderThickness="1"
                                                 Padding="14,6" CornerRadius="4" FontSize="11"
                                                 VerticalAlignment="Center"
-                                                Margin="12,0,0,0"
+                                                Margin="12,0,14,0"
                                                 ToolTip.Tip="Remove this state" />
 
                                     </Grid>
