@@ -7,65 +7,75 @@
         CanResize="False"
         WindowStartupLocation="CenterOwner"
         Background="#080810"
-        Icon="/Assets/icon.png">
+        Icon="/Assets/icon.png"
+        WindowDecorations="None">
 
     <Border Background="#0E0E1A"
             BorderBrush="#1E1E30"
             BorderThickness="1"
             CornerRadius="12"
-            Margin="1"
-            Padding="36,32">
-        <StackPanel Spacing="20">
+            Margin="1">
 
-            <!-- Brand -->
-            <StackPanel Spacing="6">
-                <TextBlock Text="PHRAZIE"
-                           Foreground="#444466"
-                           FontSize="11"
-                           LetterSpacing="4" />
-                <TextBlock Text="Visual performance toolkit"
-                           Foreground="White"
-                           FontSize="22"
-                           FontWeight="Light" />
+        <!-- Panel lets the X button float over the content -->
+        <Panel>
+
+            <!-- ── Content ── -->
+            <StackPanel Spacing="20" Margin="36,32,36,32">
+
+                <!-- Brand -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="PHRAZIE"
+                               Foreground="#444466"
+                               FontSize="11"
+                               LetterSpacing="4" />
+                    <TextBlock Text="Visual performance toolkit"
+                               Foreground="White"
+                               FontSize="22"
+                               FontWeight="Light" />
+                </StackPanel>
+
+                <!-- Version info -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Version 0.1.0 — Early Preview"
+                               Foreground="#888899"
+                               FontSize="13" />
+                    <TextBlock Text="Built with .NET 9 · Avalonia 12 · LibVLC · Supabase"
+                               Foreground="#555566"
+                               FontSize="12" />
+                </StackPanel>
+
+                <!-- Divider -->
+                <Border Height="1" Background="#1E1E30" />
+
+                <!-- Credits -->
+                <StackPanel Spacing="4">
+                    <TextBlock Text="© 2026 Sean Liu. All rights reserved."
+                               Foreground="#555566"
+                               FontSize="12" />
+                    <TextBlock Text="Video decoding powered by VideoLAN / LibVLC."
+                               Foreground="#444455"
+                               FontSize="11" />
+                </StackPanel>
+
             </StackPanel>
 
-            <!-- Version info -->
-            <StackPanel Spacing="4">
-                <TextBlock Text="Version 0.1.0 — Early Preview"
-                           Foreground="#888899"
-                           FontSize="13" />
-                <TextBlock Text="Built with .NET 9 · Avalonia 12 · LibVLC · Supabase"
-                           Foreground="#555566"
-                           FontSize="12" />
-            </StackPanel>
-
-            <!-- Divider -->
-            <Border Height="1" Background="#1E1E30" />
-
-            <!-- Credits -->
-            <StackPanel Spacing="4">
-                <TextBlock Text="© 2026 Sean Liu. All rights reserved."
-                           Foreground="#555566"
-                           FontSize="12" />
-                <TextBlock Text="Video decoding powered by VideoLAN / LibVLC."
-                           Foreground="#444455"
-                           FontSize="11" />
-            </StackPanel>
-
-            <!-- Close button -->
+            <!-- ── X close button (top-right) ── -->
             <Button Click="OnCloseClick"
                     HorizontalAlignment="Right"
-                    Background="#12121E"
-                    Foreground="#AAAACC"
-                    BorderBrush="#2A2A44"
-                    BorderThickness="1"
-                    Padding="20,8"
-                    CornerRadius="6"
-                    FontSize="13">
-                Close
-            </Button>
+                    VerticalAlignment="Top"
+                    Margin="0,10,10,0"
+                    Background="Transparent"
+                    Foreground="#555566"
+                    BorderThickness="0"
+                    Width="28" Height="28"
+                    FontSize="13"
+                    Padding="0"
+                    CornerRadius="4"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center"
+                    ToolTip.Tip="Close">&#x2715;</Button>
 
-        </StackPanel>
+        </Panel>
     </Border>
 
 </Window>

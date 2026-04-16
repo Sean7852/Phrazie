@@ -25,7 +25,9 @@
       "Bash(dotnet restore *)",
       "Bash(dotnet script *)",
       "Read(//c/Users/syliu/.nuget/packages/**)",
-      "Bash(powershell *)"
+      "Bash(powershell *)",
+      "Bash(dotnet tool *)",
+      "Bash(tasklist)"
     ]
   }
 }

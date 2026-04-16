@@ -1,6 +1,4 @@
-Now we need to implement the local database.
-Once the user loged in, we save the data, and 
-In the globle setting menu:
-- Add a new option names "Account" 
-- Add a button logout 
-- Add an "About" button and the popup window.
+I need to change the State card editing a little:
+1. Disable all State edit in the CollectionDetailView, clicking the state name doesn't open the edit window
+2. On the ClipManageWindow, add a round coner rectangle next to the name shows the color of the state.
+3. Click the Name or the color shows the State edit window.

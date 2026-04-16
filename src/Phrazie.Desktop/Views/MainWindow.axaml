@@ -3,15 +3,51 @@
         xmlns:vm="using:Phrazie.Desktop.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:chrome="using:Avalonia.Controls.Chrome"
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
         x:Class="Phrazie.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Background="#080810"
         Title="Phrazie"
         Icon="/Assets/icon.png"
-        xmlns:views="using:Phrazie.Desktop.Views">
+        xmlns:views="using:Phrazie.Desktop.Views"
+        WindowDecorations="None">
 
-    <Panel>
+    <Grid RowDefinitions="36,*">
+
+    <!-- ── Custom title bar ───────────────────────────────────────────────── -->
+    <Grid Grid.Row="0"
+          Background="#0A0A14"
+          chrome:WindowDecorationProperties.ElementRole="TitleBar"
+          PointerPressed="TitleBar_PointerPressed"
+          DoubleTapped="TitleBar_DoubleTapped">
+        <TextBlock Text="PHRAZIE"
+                   Foreground="#3A3A55"
+                   FontSize="11"
+                   LetterSpacing="3"
+                   VerticalAlignment="Center"
+                   Margin="20,0,0,0"
+                   IsHitTestVisible="False" />
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Stretch">
+            <Button x:Name="MinBtn"
+                    Classes="titlebar-btn"
+                    Click="MinBtn_Click"
+                    chrome:WindowDecorationProperties.ElementRole="MinimizeButton">&#x2014;</Button>
+            <Button x:Name="MaxBtn"
+                    Classes="titlebar-btn"
+                    Click="MaxBtn_Click"
+                    chrome:WindowDecorationProperties.ElementRole="MaximizeButton">&#x25A1;</Button>
+            <Button x:Name="CloseBtn"
+                    Classes="titlebar-btn close"
+                    Click="CloseBtn_Click"
+                    chrome:WindowDecorationProperties.ElementRole="CloseButton">&#x2715;</Button>
+        </StackPanel>
+    </Grid>
+
+    <!-- ── App body ───────────────────────────────────────────────────────── -->
+    <Panel Grid.Row="1">
 
     <!-- ── Login overlay (shown when not authenticated) ───────────────────── -->
     <Panel IsVisible="{Binding !IsAuthenticated}">
@@ -29,13 +65,8 @@
                 BorderThickness="0,0,1,0">
             <Grid RowDefinitions="Auto,*,Auto">
 
-                <!-- Brand + top nav -->
-                <StackPanel Grid.Row="0" Margin="0,32,0,0" Spacing="2">
-                    <TextBlock Text="PHRAZIE"
-                               Foreground="#444466"
-                               FontSize="11"
-                               LetterSpacing="3"
-                               Margin="20,0,0,24" />
+                <!-- Top nav -->
+                <StackPanel Grid.Row="0" Margin="0,16,0,0" Spacing="2">
 
                     <Button Command="{Binding GoToCollectionsCommand}"
                             Classes="nav"
@@ -111,7 +142,10 @@
 
     </Panel>
 
+    </Grid>
+
     <Window.Styles>
+        <!-- ── Nav buttons ───────────────────────────────────────────────────── -->
         <Style Selector="Button.nav">
             <Setter Property="Background"                 Value="Transparent" />
             <Setter Property="Foreground"                 Value="#888899" />
@@ -127,6 +161,28 @@
         </Style>
         <Style Selector="Button.nav.active /template/ ContentPresenter">
             <Setter Property="Background"             Value="#1C1C32" />
+            <Setter Property="TextElement.Foreground" Value="White" />
+        </Style>
+
+        <!-- ── Title-bar window control buttons ──────────────────────────────── -->
+        <Style Selector="Button.titlebar-btn">
+            <Setter Property="Background"                 Value="Transparent" />
+            <Setter Property="Foreground"                 Value="#888899" />
+            <Setter Property="BorderThickness"            Value="0" />
+            <Setter Property="Width"                      Value="46" />
+            <Setter Property="Height"                     Value="36" />
+            <Setter Property="FontSize"                   Value="14" />
+            <Setter Property="Padding"                    Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment"   Value="Center" />
+            <Setter Property="CornerRadius"               Value="0" />
+        </Style>
+        <Style Selector="Button.titlebar-btn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background"             Value="#1E1E2E" />
+            <Setter Property="TextElement.Foreground" Value="White" />
+        </Style>
+        <Style Selector="Button.titlebar-btn.close:pointerover /template/ ContentPresenter">
+            <Setter Property="Background"             Value="#C42B1C" />
             <Setter Property="TextElement.Foreground" Value="White" />
         </Style>
     </Window.Styles>

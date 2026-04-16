@@ -7,4 +7,5 @@ public class Clip
     public string DisplayName { get; set; } = string.Empty;
     public TimeSpan Duration { get; set; }
     public bool Loop { get; set; } = true;
+    public bool IsEnabled { get; set; } = true;
 }
