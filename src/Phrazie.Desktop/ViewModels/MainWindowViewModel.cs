@@ -96,7 +96,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void GoToSettings()
     {
-        CurrentPage         = new SettingsViewModel(_hotkeys);
+        CurrentPage         = new SettingsViewModel(_hotkeys, _sessionStore, SignOutAsync);
         IsCollectionsActive = false;
         IsLiveActive        = false;
         IsSettingsActive    = true;

@@ -69,14 +69,14 @@
 - [x] SessionStore — in-memory, fires AuthStateChanged on transition
 - [x] Login / sign-up UI (email + password, toggle between modes, error banner)
 - [x] Auth gate in MainWindow — shows login overlay when not authenticated
+- [x] Account section in Settings — shows email, sign-out button, About dialog
 - [ ] Persist session across restarts (custom Supabase SessionHandler)
-- [ ] Sign-out button in sidebar
 - [ ] Free trial (7–14 days)
 - [ ] Subscription (basic implementation)
 
 ### 10. Database
-- [ ] Setup local SQLite database
-- [ ] Save collections, states, clips locally
+- [x] Setup local SQLite database (Microsoft.Data.Sqlite, WAL mode, foreign keys)
+- [x] Save collections, states, clips locally (SqliteCollectionRepository, SqliteClipRepository)
 - [ ] Setup remote database (Supabase)
 - [ ] Sync between local and remote
 
@@ -110,8 +110,9 @@
 - [x] State-based clip switching
 - [x] Auth service (Supabase sign-up / sign-in / sign-out)
 - [x] Auth gate UI (login screen before app)
+- [x] Local database persistence (SQLite — collections, states, clips)
+- [x] Account settings section (email display, sign-out, About dialog)
 - [ ] Trigger execution wired to real playback
-- [ ] Local database persistence
 
 ### Phase 4 — Output & Remote (not started)
 > Goal: Real-world testable

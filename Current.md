@@ -1,21 +1,6 @@
-Need to integrate supabase for registrition/log in/log out
-The app split into three services:
-
-- AuthService:
--- Responsibilities:
---- sign up
---- sign in
---- sign out
---- get current session/user
-- ProfileService:
--- Responsibilities:
---- create profile row after successful sign-up
---- load current user profile
---- update display name
-- SessionStore:
--- Responsibilities:
---- hold the current session/user in memory
---- restore auth state on app startup
---- notify UI when auth state changes
-
-Let's work on the AuthService right now
+Now we need to implement the local database.
+Once the user loged in, we save the data, and 
+In the globle setting menu:
+- Add a new option names "Account" 
+- Add a button logout 
+- Add an "About" button and the popup window.

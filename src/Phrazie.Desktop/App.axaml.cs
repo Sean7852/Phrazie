@@ -3,6 +3,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Phrazie.Core.Interfaces;
+using Phrazie.Desktop.Database;
 using Phrazie.Desktop.Services;
 using Phrazie.Desktop.ViewModels;
 using Phrazie.Desktop.Views;
@@ -51,9 +52,12 @@ public partial class App : Application
         services.AddSingleton<ISessionStore, SessionStore>();
         services.AddSingleton<IAuthService,  AuthService>();
 
-        // ── Core interfaces → mock implementations ─────────────────────────────
-        services.AddSingleton<ICollectionRepository, MockCollectionRepository>();
-        services.AddSingleton<IClipRepository,        MockClipRepository>();
+        // ── Local database ─────────────────────────────────────────────────────
+        services.AddSingleton<LocalDatabase>();
+
+        // ── Core interfaces → SQLite implementations ───────────────────────────
+        services.AddSingleton<ICollectionRepository, SqliteCollectionRepository>();
+        services.AddSingleton<IClipRepository,        SqliteClipRepository>();
         services.AddSingleton<IPlaybackService,       VideoPlaybackService>();
         services.AddSingleton<ITriggerService,         MockTriggerService>();
         services.AddSingleton<ISessionService,         MockSessionService>();
