@@ -29,6 +29,8 @@
 - [x] Disable / enable clips (greyed-out thumbnail overlay when disabled)
 - [x] Delete clips from manager
 - [x] Drag & drop video files into clip manager window to add clips
+- [x] Rubber-band / marquee multi-select in clip manager
+- [x] Multi-select context menu — delete all selected clips at once
 
 ### 4. Live Performance Screen
 - [x] Current state display
@@ -147,13 +149,15 @@
 - [x] Hotkey mapping — rebindable shortcuts, live key capture
 - [x] State cards redesigned — thin color tab on left edge, horizontal clip scroll row
 - [x] Video thumbnails in clip tiles (Windows Shell thumbnail API)
-- [x] State name and color strip both clickable to open edit modal
+- [x] State color tab is drag handle (pointer-capture reorder, no OS drag-drop dependency)
+- [x] State name click opens rename/color edit modal
 - [x] Live page redesigned — video output left, controls panel right
 - [x] Login / sign-up screen with toggle, error handling, dark card design
 - [x] Account section in Settings — email display, sign-out, About Phrazie dialog
 - [x] Cover image saved to app-owned storage (resilient to original file deletion)
 - [x] Session persists across restarts — no re-login until explicit sign-out
 - [x] Clip manager window — "Manage" button on each state card, per-state grid view, right-click context menu (disable/enable/delete), drag-drop import
+- [x] Clip manager rubber-band multi-select with dark-themed context menu (delete selected)
 
 ---
 

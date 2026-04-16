@@ -8,7 +8,53 @@
         MinWidth="480" MinHeight="340"
         Background="#0D0D1A"
         WindowStartupLocation="CenterOwner"
-        ExtendClientAreaToDecorationsHint="False">
+        ExtendClientAreaToDecorationsHint="False"
+        RequestedThemeVariant="Dark">
+
+    <!-- Override FluentTheme dark-variant resources to match the app's purple-navy palette -->
+    <Window.Resources>
+        <SolidColorBrush x:Key="MenuFlyoutPresenterBackground"            Color="#1A1A2E" />
+        <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush"           Color="#2A2A44" />
+        <SolidColorBrush x:Key="MenuFlyoutItemBackground"                 Color="Transparent" />
+        <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPointerOver"      Color="#2A2A44" />
+        <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed"          Color="#333355" />
+        <SolidColorBrush x:Key="MenuFlyoutItemForeground"                 Color="#CCCCDD" />
+        <SolidColorBrush x:Key="MenuFlyoutItemForegroundPointerOver"      Color="#FFFFFF" />
+        <SolidColorBrush x:Key="MenuFlyoutItemForegroundPressed"          Color="#FFFFFF" />
+        <SolidColorBrush x:Key="MenuFlyoutSeparatorThemeBrush"            Color="#2A2A44" />
+    </Window.Resources>
+
+    <!-- Belt-and-suspenders style selectors (cover cases where Fluent uses TemplateBinding) -->
+    <Window.Styles>
+        <Style Selector="ContextMenu">
+            <Setter Property="Background"       Value="#1A1A2E" />
+            <Setter Property="BorderBrush"      Value="#2A2A44" />
+            <Setter Property="BorderThickness"  Value="1" />
+            <Setter Property="Padding"          Value="4" />
+            <Setter Property="CornerRadius"     Value="6" />
+        </Style>
+        <Style Selector="MenuItem">
+            <Setter Property="Foreground"  Value="#CCCCDD" />
+            <Setter Property="FontSize"    Value="13" />
+            <Setter Property="Padding"     Value="10,7" />
+            <Setter Property="MinHeight"   Value="32" />
+            <Setter Property="Background"  Value="Transparent" />
+        </Style>
+        <Style Selector="MenuItem:pointerover /template/ Border#PART_LayoutRoot">
+            <Setter Property="Background"   Value="#2A2A44" />
+            <Setter Property="CornerRadius" Value="4" />
+        </Style>
+        <Style Selector="MenuItem:pointerover > ContentPresenter">
+            <Setter Property="TextElement.Foreground" Value="White" />
+        </Style>
+        <Style Selector="MenuItem:pressed /template/ Border#PART_LayoutRoot">
+            <Setter Property="Background" Value="#333355" />
+        </Style>
+        <Style Selector="Separator">
+            <Setter Property="Background" Value="#2A2A44" />
+            <Setter Property="Margin"     Value="6,3" />
+        </Style>
+    </Window.Styles>
 
     <Grid RowDefinitions="Auto,*,Auto" Margin="24,20,24,20">
 
@@ -16,87 +62,102 @@
         <StackPanel Grid.Row="0" Margin="0,0,0,16" Spacing="4">
             <TextBlock Text="{Binding StateName, StringFormat='Clips — {0}'}"
                        Foreground="White" FontSize="20" FontWeight="Light" />
-            <TextBlock Text="Drag &amp; drop video files here to add clips"
+            <TextBlock Text="Drag &amp; drop video files · drag to rubber-band select · right-click for options"
                        Foreground="#444466" FontSize="12" />
         </StackPanel>
 
-        <!-- Clip grid with drop zone -->
+        <!-- Clip grid: ScrollViewer > Grid(ClipCanvas) > ItemsControl + Canvas(marquee) -->
         <ScrollViewer Grid.Row="1"
                       DragDrop.AllowDrop="True"
                       x:Name="DropTarget">
-            <ItemsControl ItemsSource="{Binding Clips}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
 
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate x:DataType="vm:ManagedClipViewModel">
-                        <Border Width="148" Height="120"
-                                Margin="0,0,10,10"
-                                CornerRadius="8"
-                                ClipToBounds="True"
-                                Background="#12121E"
-                                BorderBrush="#1E1E30"
-                                BorderThickness="1"
-                                Cursor="Hand">
+            <!-- ClipCanvas is the hit-test surface for marquee and context menu -->
+            <Grid x:Name="ClipCanvas" Background="Transparent">
 
-                            <!-- Context menu -->
-                            <Border.ContextMenu>
-                                <ContextMenu>
-                                    <MenuItem Header="Disable"
-                                              Command="{Binding ToggleEnabledCommand}"
-                                              IsVisible="{Binding IsEnabled}" />
-                                    <MenuItem Header="Enable"
-                                              Command="{Binding ToggleEnabledCommand}"
-                                              IsVisible="{Binding !IsEnabled}" />
-                                    <Separator />
-                                    <MenuItem Header="Delete"
-                                              Command="{Binding DeleteCommand}" />
-                                </ContextMenu>
-                            </Border.ContextMenu>
+                <!-- Context menu (items are set dynamically in code-behind) -->
+                <Grid.ContextMenu>
+                    <ContextMenu x:Name="SelectionMenu"
+                                 Opening="SelectionMenu_Opening">
+                        <MenuItem x:Name="DeleteSelectionItem" Header="Delete" />
+                    </ContextMenu>
+                </Grid.ContextMenu>
 
-                            <Panel>
-                                <!-- Thumbnail -->
-                                <Image Source="{Binding Thumbnail}"
-                                       Stretch="UniformToFill"
-                                       IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                <!-- Clip thumbnails -->
+                <ItemsControl ItemsSource="{Binding Clips}" Background="Transparent">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
 
-                                <!-- Placeholder (no thumbnail) -->
-                                <StackPanel VerticalAlignment="Center"
-                                            HorizontalAlignment="Center"
-                                            Spacing="4"
-                                            IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNull}}">
-                                    <TextBlock Text="▶" Foreground="#5566AA" FontSize="20"
-                                               HorizontalAlignment="Center" />
-                                </StackPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ManagedClipViewModel">
+                            <Border Width="148" Height="120"
+                                    Margin="0,0,10,10"
+                                    CornerRadius="8"
+                                    ClipToBounds="True"
+                                    Background="#12121E"
+                                    BorderBrush="#1E1E30"
+                                    BorderThickness="1"
+                                    Cursor="Hand">
+                                <Panel>
+                                    <!-- Thumbnail -->
+                                    <Image Source="{Binding Thumbnail}"
+                                           Stretch="UniformToFill"
+                                           IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNotNull}}" />
 
-                                <!-- Disabled overlay: greyed out + label -->
-                                <Border Background="#B3000000"
-                                        IsVisible="{Binding !IsEnabled}">
-                                    <TextBlock Text="Disabled"
-                                               Foreground="#887799"
-                                               FontSize="11"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Center" />
-                                </Border>
+                                    <!-- Placeholder (no thumbnail) -->
+                                    <StackPanel VerticalAlignment="Center"
+                                                HorizontalAlignment="Center"
+                                                Spacing="4"
+                                                IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNull}}">
+                                        <TextBlock Text="▶" Foreground="#5566AA" FontSize="20"
+                                                   HorizontalAlignment="Center" />
+                                    </StackPanel>
 
-                                <!-- Name strip at bottom -->
-                                <Border VerticalAlignment="Bottom"
-                                        Background="#CC0A0A18"
-                                        Padding="6,4">
-                                    <TextBlock Text="{Binding DisplayName}"
-                                               Foreground="#AAAACC"
-                                               FontSize="10"
-                                               TextTrimming="CharacterEllipsis" />
-                                </Border>
-                            </Panel>
+                                    <!-- Disabled overlay -->
+                                    <Border Background="#B3000000"
+                                            IsVisible="{Binding !IsEnabled}">
+                                        <TextBlock Text="Disabled"
+                                                   Foreground="#887799"
+                                                   FontSize="11"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Border>
 
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                                    <!-- Name strip -->
+                                    <Border VerticalAlignment="Bottom"
+                                            Background="#CC0A0A18"
+                                            Padding="6,4">
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   Foreground="#AAAACC"
+                                                   FontSize="10"
+                                                   TextTrimming="CharacterEllipsis" />
+                                    </Border>
+
+                                    <!-- Selection highlight (on top of everything) -->
+                                    <Border IsVisible="{Binding IsSelected}"
+                                            BorderBrush="#4499FF"
+                                            BorderThickness="2"
+                                            CornerRadius="8"
+                                            Background="#1A2244BB" />
+                                </Panel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Rubber-band marquee rectangle (non-interactive overlay) -->
+                <Canvas IsHitTestVisible="False">
+                    <Border x:Name="MarqueeRect"
+                            IsVisible="False"
+                            BorderBrush="#5599EE"
+                            BorderThickness="1"
+                            Background="#12203866"
+                            CornerRadius="2" />
+                </Canvas>
+
+            </Grid>
         </ScrollViewer>
 
         <!-- Footer -->

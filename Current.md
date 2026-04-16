@@ -1,3 +1,4 @@
-Now we need to change the state card interaction a little:
-Click the state name name to change the color and rename
-Click and drag the very left color tab to trigger drag reposition of each state card. If the user press hold the color tab, the users can adjust each state position. Keep the color tab shrinking animation when dragging
+Now we need to add a feature in the ClipManagerWindow :
+
+Marquee Selection or Rubber Band Selection to drag a rectangle area multiselect a few video clips.
+Once the items are highlighted via the Marquee, the right-click shows a context menu (Let's put Delete) to the entire collection of selected items rather than just the one under the cursor.

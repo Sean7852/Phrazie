@@ -60,6 +60,23 @@ public partial class ClipManagerViewModel : ObservableObject
     private ManagedClipViewModel MakeVm(Clip clip) =>
         new(clip, DeleteClip, () => _ = PersistChangedAsync());
 
+    // ── selection ──────────────────────────────────────────────────────────
+
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    public void DeleteSelected()
+    {
+        var toDelete = Clips.Where(c => c.IsSelected).ToList();
+        if (toDelete.Count == 0) return;
+        foreach (var vm in toDelete)
+        {
+            _state.Clips.Remove(vm.Model);
+            Clips.Remove(vm);
+        }
+        _ = _onSave();
+    }
+
+    // ── private ────────────────────────────────────────────────────────────
+
     private void DeleteClip(ManagedClipViewModel vm)
     {
         _state.Clips.Remove(vm.Model);

@@ -21,6 +21,7 @@ public partial class ManagedClipViewModel : ObservableObject
 
     [ObservableProperty] private Bitmap? _thumbnail;
     [ObservableProperty] private bool    _isEnabled;
+    [ObservableProperty] private bool    _isSelected;
 
     partial void OnIsEnabledChanged(bool value)
     {
