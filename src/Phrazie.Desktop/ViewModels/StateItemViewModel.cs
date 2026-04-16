@@ -86,8 +86,7 @@ public partial class StateItemViewModel : ObservableObject
             ?.MainWindow;
         if (owner is not null)
             window.ShowDialog(owner);
-        else
-            window.Show();
+        // If no owner is resolvable the command is a no-op — this should not happen in practice.
     }
 
     // ── clip import ────────────────────────────────────────────────────────

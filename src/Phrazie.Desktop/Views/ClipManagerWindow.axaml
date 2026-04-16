@@ -9,6 +9,7 @@
         MinWidth="520" MinHeight="380"
         Background="#080810"
         WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False"
         WindowDecorations="None"
         RequestedThemeVariant="Dark">
 

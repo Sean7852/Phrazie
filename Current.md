@@ -1,4 +1,13 @@
-Now we need to add a feature in the ClipManagerWindow :
+I want to unify the application so it only shows one icon in the Windows Taskbar. the "ClipManageWindow" window is currently showing up as a separate instance in the System menu.
 
-Marquee Selection or Rubber Band Selection to drag a rectangle area multiselect a few video clips.
-Once the items are highlighted via the Marquee, the right-click shows a context menu (Let's put Delete) to the entire collection of selected items rather than just the one under the cursor.
+Task: Convert the ClipManageWindow into a Modal Dialog or a Child Window.
+
+Requirements:
+
+Set the Owner of the ClipManageWindow to MainWindow.
+
+Set ShowInTaskbar="False" in the ClipManageWindow XAML.
+
+Ensure the ClipManageWindow opens centered relative to the main app window.
+
+Please update the logic where the ClipManageWindow is instantiated and the ClipManageWindow.axaml file.
