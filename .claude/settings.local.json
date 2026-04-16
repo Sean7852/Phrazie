@@ -20,7 +20,8 @@
       "Bash(cmd *)",
       "Bash(powershell -Command ' *)",
       "Bash(xargs -I{} sh -c 'dotnet ilverify \"{}\" 2>/dev/null || true')",
-      "Bash(powershell -Command \"Compress-Archive -Path 'v0.1.0/Phrazie.Desktop.exe' -DestinationPath 'Phrazie-v0.1.0-win-x64.zip' -Force\")"
+      "Bash(powershell -Command \"Compress-Archive -Path 'v0.1.0/Phrazie.Desktop.exe' -DestinationPath 'Phrazie-v0.1.0-win-x64.zip' -Force\")",
+      "Bash(dotnet list *)"
     ]
   }
 }

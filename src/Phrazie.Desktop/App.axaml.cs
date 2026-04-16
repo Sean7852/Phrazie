@@ -7,6 +7,7 @@ using Phrazie.Desktop.Services;
 using Phrazie.Desktop.ViewModels;
 using Phrazie.Desktop.Views;
 using Phrazie.Engine.Mock;
+using Supabase;
 
 namespace Phrazie.Desktop;
 
@@ -38,18 +39,31 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
 
-        // ── Core interfaces → mock implementations ──────────────────────────
+        // ── Supabase client ────────────────────────────────────────────────────
+        var supabase = new Client(
+            SupabaseConfig.Url,
+            SupabaseConfig.AnonKey,
+            new SupabaseOptions { AutoRefreshToken = true, AutoConnectRealtime = false });
+        supabase.InitializeAsync().GetAwaiter().GetResult();
+        services.AddSingleton(supabase);
+
+        // ── Auth services ──────────────────────────────────────────────────────
+        services.AddSingleton<ISessionStore, SessionStore>();
+        services.AddSingleton<IAuthService,  AuthService>();
+
+        // ── Core interfaces → mock implementations ─────────────────────────────
         services.AddSingleton<ICollectionRepository, MockCollectionRepository>();
         services.AddSingleton<IClipRepository,        MockClipRepository>();
-        services.AddSingleton<IPlaybackService,       MockPlaybackService>();
+        services.AddSingleton<IPlaybackService,       VideoPlaybackService>();
         services.AddSingleton<ITriggerService,         MockTriggerService>();
         services.AddSingleton<ISessionService,         MockSessionService>();
         services.AddSingleton<IHotkeyService,          MockHotkeyService>();
 
-        // ── Desktop services ─────────────────────────────────────────────────
+        // ── Desktop services ───────────────────────────────────────────────────
         services.AddSingleton<IFilePickerService, AvaloniaFilePickerService>();
 
-        // ── ViewModels ────────────────────────────────────────────────────────
+        // ── ViewModels ─────────────────────────────────────────────────────────
+        services.AddSingleton<LoginViewModel>();
         services.AddTransient<MainWindowViewModel>();
         services.AddTransient<CollectionsViewModel>();
         services.AddTransient<LivePerformanceViewModel>();

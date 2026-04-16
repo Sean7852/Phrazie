@@ -13,6 +13,12 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ISessionService       _session;
     private readonly ITriggerService       _trigger;
     private readonly IPlaybackService      _playback;
+    private readonly ISessionStore         _sessionStore;
+    private readonly IAuthService          _auth;
+
+    [ObservableProperty] private bool           _isAuthenticated;
+    [ObservableProperty] private LoginViewModel _loginPage;
+
     private readonly IFilePickerService    _filePicker;
     private readonly IHotkeyService        _hotkeys;
 
@@ -28,16 +34,41 @@ public partial class MainWindowViewModel : ViewModelBase
         ITriggerService       trigger,
         IPlaybackService      playback,
         IFilePickerService    filePicker,
-        IHotkeyService        hotkeys)
+        IHotkeyService        hotkeys,
+        ISessionStore         sessionStore,
+        IAuthService          auth,
+        LoginViewModel        loginPage)
     {
-        _collections = collections;
-        _session     = session;
-        _trigger     = trigger;
-        _playback    = playback;
-        _filePicker  = filePicker;
-        _hotkeys     = hotkeys;
+        _collections  = collections;
+        _session      = session;
+        _trigger      = trigger;
+        _playback     = playback;
+        _filePicker   = filePicker;
+        _hotkeys      = hotkeys;
+        _sessionStore = sessionStore;
+        _auth         = auth;
+        _loginPage    = loginPage;
+        _currentPage  = BuildCollectionsPage();
 
-        _currentPage = BuildCollectionsPage();
+        _isAuthenticated = sessionStore.IsAuthenticated;
+
+        loginPage.LoginSucceeded += () =>
+        {
+            IsAuthenticated = true;
+            CurrentPage     = BuildCollectionsPage();
+        };
+
+        sessionStore.AuthStateChanged += () =>
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                IsAuthenticated = sessionStore.IsAuthenticated);
+    }
+
+    [RelayCommand]
+    private async Task SignOutAsync()
+    {
+        await _auth.SignOutAsync();
+        IsAuthenticated = false;
+        CurrentPage     = BuildCollectionsPage();
     }
 
     // ── nav commands ───────────────────────────────────────────────────────

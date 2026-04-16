@@ -8,9 +8,19 @@
         x:DataType="vm:MainWindowViewModel"
         Background="#080810"
         Title="Phrazie"
-        Icon="/Assets/icon.png">
+        Icon="/Assets/icon.png"
+        xmlns:views="using:Phrazie.Desktop.Views">
 
-    <Grid ColumnDefinitions="180,*">
+    <Panel>
+
+    <!-- ── Login overlay (shown when not authenticated) ───────────────────── -->
+    <Panel IsVisible="{Binding !IsAuthenticated}">
+        <views:LoginView DataContext="{Binding LoginPage}" />
+    </Panel>
+
+    <!-- ── Main app (shown when authenticated) ────────────────────────────── -->
+    <Grid ColumnDefinitions="180,*"
+          IsVisible="{Binding IsAuthenticated}">
 
         <!-- ── Sidebar ── -->
         <Border Grid.Column="0"
@@ -98,6 +108,8 @@
         </Border>
 
     </Grid>
+
+    </Panel>
 
     <Window.Styles>
         <Style Selector="Button.nav">
