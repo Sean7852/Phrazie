@@ -1,5 +1,3 @@
-Now we need to implement the video clip management:
-Add a button "Manage" bellow "Remove" on each state card, click it open a window where we can manage the video clips.
-In the new window, we show the video clips in grid view.
-Right click each video clip thumbnail open the option menu to delet or disable/enable, disabled card thumbnail is greyed out.
-new video clips can be drag dropped in this window.
+Now we need to change the state card interaction a little:
+Click the state name name to change the color and rename
+Click and drag the very left color tab to trigger drag reposition of each state card. If the user press hold the color tab, the users can adjust each state position. Keep the color tab shrinking animation when dragging

@@ -154,17 +154,20 @@
                                         DragDrop.AllowDrop="True">
                                     <Grid ColumnDefinitions="Auto,*,Auto">
 
-                                        <!-- Left: thin color tab — full height, click to edit -->
-                                        <Button Grid.Column="0"
-                                                Command="{Binding OpenEditCommand}"
-                                                Padding="0" BorderThickness="0"
-                                                Background="Transparent"
+                                        <!-- Left: color tab — drag to reorder -->
+                                        <Border Grid.Column="0"
+                                                Width="18"
                                                 VerticalAlignment="Stretch"
-                                                ToolTip.Tip="Click to edit state name and color">
-                                            <Border Width="18"
-                                                    VerticalAlignment="Stretch"
-                                                    Background="{Binding Color, Converter={StaticResource HexToBrush}}" />
-                                        </Button>
+                                                Background="{Binding Color, Converter={StaticResource HexToBrush}}"
+                                                Cursor="SizeAll"
+                                                PointerPressed="DragHandle_PointerPressed"
+                                                ToolTip.Tip="Drag to reorder">
+                                            <Border.Styles>
+                                                <Style Selector="Border:pointerover">
+                                                    <Setter Property="Opacity" Value="0.65" />
+                                                </Style>
+                                            </Border.Styles>
+                                        </Border>
 
                                         <!-- Center: name + horizontal scrollable clip row -->
                                         <StackPanel Grid.Column="1" Spacing="6" Margin="14,12,0,12">
@@ -174,7 +177,7 @@
                                                          Background="Transparent"
                                                          Cursor="Hand"
                                                          HorizontalAlignment="Left"
-                                                         ToolTip.Tip="Click to edit state name and color">
+                                                         ToolTip.Tip="Click to rename or change color">
                                                       <TextBlock Text="{Binding Name}"
                                                           Foreground="#AAAAAA"
                                                           FontSize="11" FontWeight="Medium"

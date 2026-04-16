@@ -11,14 +11,18 @@ namespace Phrazie.Desktop.Views;
 
 public partial class CollectionDetailView : UserControl
 {
-    // Static field holds the item being dragged for in-process transfers.
-    private static StateItemViewModel? _dragging;
+    // Tracks the state card being reordered via pointer-drag.
+    private StateItemViewModel? _dragging;
 
     public CollectionDetailView()
     {
         InitializeComponent();
-        AddHandler(DragDrop.DragOverEvent, StateBorder_DragOver);
-        AddHandler(DragDrop.DropEvent,     StateBorder_Drop);
+        // File-drop from OS file manager (still uses the DragDrop system)
+        AddHandler(DragDrop.DragOverEvent, FileDragOver);
+        AddHandler(DragDrop.DropEvent,     FileDrop);
+        // State reorder — pointer-capture approach (bypasses AllowDrop routing issues)
+        AddHandler(PointerMovedEvent,   OnPointerMoved,   handledEventsToo: true);
+        AddHandler(PointerReleasedEvent, OnPointerReleased, handledEventsToo: true);
     }
 
     // ── auto-focus inline editors when editing mode activates ─────────────
@@ -97,66 +101,80 @@ public partial class CollectionDetailView : UserControl
         if (e.Key == Key.Escape) { vm.CancelEditDescriptionCommand.Execute(null); e.Handled = true; }
     }
 
-    // ── drag-drop ─────────────────────────────────────────────────────────
+    // ── state-reorder drag (pointer-capture, no OS DragDrop) ─────────────────
 
-    private async void DragHandle_PointerPressed(object? sender, PointerPressedEventArgs e)
+    private void DragHandle_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(null).Properties.IsLeftButtonPressed) return;
-        if (sender is not Control { DataContext: StateItemViewModel vm }) return;
-        e.Handled = true;
+        if (sender is not StyledElement { DataContext: StateItemViewModel vm }) return;
 
         _dragging = vm;
-
-        var dt = new DataTransfer();
-        dt.Add(DataTransferItem.CreateText("phrazie/state"));
-        await DragDrop.DoDragDropAsync(e, dt, DragDropEffects.Move);
-
-        _dragging = null;
-    }
-
-    private void StateBorder_DragOver(object? sender, DragEventArgs e)
-    {
-        if (_dragging is not null)
-            e.DragEffects = DragDropEffects.Move;
-        else if (e.DataTransfer.Contains(DataFormat.File))
-            e.DragEffects = DragDropEffects.Copy;
-        else
-            e.DragEffects = DragDropEffects.None;
+        // Capture to this UserControl so PointerMoved/Released always arrive here,
+        // even when the cursor leaves the originating element.
+        e.Pointer.Capture(this);
         e.Handled = true;
     }
 
-    private void StateBorder_Drop(object? sender, DragEventArgs e)
+    private void OnPointerMoved(object? sender, PointerEventArgs e)
     {
-        // Case 1: state reorder
-        if (_dragging is not null)
-        {
-            var target = FindStateItem(e.Source);
-            if (target is not null && !ReferenceEquals(target, _dragging))
-                if (DataContext is CollectionDetailViewModel vm) vm.MoveState(_dragging, target);
-            e.Handled = true;
-            return;
-        }
+        if (_dragging is null) return;
+        e.Handled = true;   // suppress other hover effects while dragging
+    }
 
-        // Case 2: files dragged from OS file manager
-        if (e.DataTransfer.Contains(DataFormat.File))
-        {
-            var targetState = FindStateItem(e.Source);
-            if (targetState is null) return;
+    private void OnPointerReleased(object? sender, PointerReleasedEventArgs e)
+    {
+        if (_dragging is null) return;
 
-            var files = e.DataTransfer.TryGetFiles();
-            if (files is null) return;
+        var source = _dragging;
+        _dragging = null;
+        e.Pointer.Capture(null);
 
-            var paths = files
-                .OfType<IStorageFile>()
-                .Select(f => f.Path.LocalPath)
-                .Where(IsVideoFile)
-                .ToList();
+        var target = HitTestStateItem(e.GetPosition(this));
+        if (target is not null && !ReferenceEquals(target, source))
+            if (DataContext is CollectionDetailViewModel detailVm)
+                detailVm.MoveState(source, target);
 
-            if (paths.Count > 0)
-                _ = targetState.AddClipsFromPathsAsync(paths);
+        e.Handled = true;
+    }
 
-            e.Handled = true;
-        }
+    // ── file drop from OS file manager ────────────────────────────────────────
+
+    private void FileDragOver(object? sender, DragEventArgs e)
+    {
+        e.DragEffects = e.DataTransfer.Contains(DataFormat.File)
+            ? DragDropEffects.Copy
+            : DragDropEffects.None;
+        e.Handled = true;
+    }
+
+    private void FileDrop(object? sender, DragEventArgs e)
+    {
+        if (!e.DataTransfer.Contains(DataFormat.File)) return;
+
+        var targetState = HitTestStateItem(e.GetPosition(this));
+        if (targetState is null) return;
+
+        var files = e.DataTransfer.TryGetFiles();
+        if (files is null) return;
+
+        var paths = files
+            .OfType<IStorageFile>()
+            .Select(f => f.Path.LocalPath)
+            .Where(IsVideoFile)
+            .ToList();
+
+        if (paths.Count > 0)
+            _ = targetState.AddClipsFromPathsAsync(paths);
+
+        e.Handled = true;
+    }
+
+    // ── helpers ───────────────────────────────────────────────────────────────
+
+    private StateItemViewModel? HitTestStateItem(Point position)
+    {
+        var hit = this.InputHitTest(position);
+        return hit is Visual v ? FindStateItem(v) : null;
     }
 
     private static bool IsVideoFile(string path)
