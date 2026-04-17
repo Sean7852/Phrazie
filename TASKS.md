@@ -57,11 +57,13 @@
 - [ ] Preview window separate from output
 
 ### 7. Mobile Remote (Basic)
-- [ ] View current state
-- [ ] Select next state
-- [ ] Control trigger
-- [ ] Emergency override
-- [ ] First version: web-based remote
+- [x] View current collection & state
+- [x] Select next state from remote
+- [x] Control playback (play / pause)
+- [x] First version: web-based remote (embedded HTTP + WebSocket, no deps)
+- [x] QR code on Live page — scan to open remote on phone
+- [ ] Control trigger from remote
+- [ ] Emergency override from remote
 
 ### 8. Settings
 - [x] Settings page (master menu + detail panel)
@@ -127,7 +129,7 @@
 > Goal: Real-world testable
 
 - [ ] External display output (second monitor / fullscreen)
-- [ ] Mobile remote control
+- [x] Mobile remote control (web-based, QR code, WebSocket)
 - [ ] Session sync
 
 ### Phase 5 — Polish & Testing (not started)

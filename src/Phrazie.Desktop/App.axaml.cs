@@ -63,6 +63,9 @@ public partial class App : Application
         services.AddSingleton<ISessionService,         MockSessionService>();
         services.AddSingleton<IHotkeyService,          MockHotkeyService>();
 
+        // ── Remote server ──────────────────────────────────────────────────────
+        services.AddSingleton<IRemoteServer, RemoteServer>();
+
         // ── Desktop services ───────────────────────────────────────────────────
         services.AddSingleton<IFilePickerService, AvaloniaFilePickerService>();
 
@@ -70,7 +73,7 @@ public partial class App : Application
         services.AddSingleton<LoginViewModel>();
         services.AddTransient<MainWindowViewModel>();
         services.AddTransient<CollectionsViewModel>();
-        services.AddTransient<LivePerformanceViewModel>();
+        services.AddSingleton<LivePerformanceViewModel>();
 
         var provider = services.BuildServiceProvider();
 
@@ -108,6 +111,10 @@ public partial class App : Application
                 SupabaseSessionHandler.Destroy();
             }
         }
+
+        // ── Start remote server ────────────────────────────────────────────────
+        provider.GetRequiredService<IRemoteServer>()
+                .StartAsync().GetAwaiter().GetResult();
 
         return provider;
     }

@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.IO;
+using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using LibVLCSharp.Shared;
@@ -6,14 +8,16 @@ using Phrazie.Core.Enums;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
 using Phrazie.Desktop.Services;
+using QRCoder;
 
 namespace Phrazie.Desktop.ViewModels;
 
 public partial class LivePerformanceViewModel : ViewModelBase
 {
-    private readonly ISessionService _session;
-    private readonly ITriggerService _trigger;
+    private readonly ISessionService  _session;
+    private readonly ITriggerService  _trigger;
     private readonly IPlaybackService _playback;
+    private readonly IRemoteServer    _remote;
 
     /// <summary>Exposed so LivePerformanceView.axaml.cs can wire it to VideoView.</summary>
     public MediaPlayer? MediaPlayer => (_playback as VideoPlaybackService)?.MediaPlayer;
@@ -55,16 +59,28 @@ public partial class LivePerformanceViewModel : ViewModelBase
     partial void OnBpmChanged(double value) =>
         _ = _session.SetBpmAsync(value);
 
+    // ── remote QR overlay ─────────────────────────────────────────────────
+
+    [ObservableProperty] private bool    _isQrVisible   = false;
+    [ObservableProperty] private Bitmap? _qrCodeBitmap  = null;
+
+    public string RemoteUrl => _remote.LocalUrl ?? "—";
+
+    [RelayCommand]
+    private void ToggleQr() => IsQrVisible = !IsQrVisible;
+
     // ── ctor ──────────────────────────────────────────────────────────────
 
     public LivePerformanceViewModel(
-        ISessionService session,
-        ITriggerService trigger,
-        IPlaybackService playback)
+        ISessionService  session,
+        ITriggerService  trigger,
+        IPlaybackService playback,
+        IRemoteServer    remote)
     {
         _session  = session;
         _trigger  = trigger;
         _playback = playback;
+        _remote   = remote;
 
         BuildStateOptions(_session.Current);
         SyncFromSession(_session.Current);
@@ -82,6 +98,18 @@ public partial class LivePerformanceViewModel : ViewModelBase
         _playback.ClipChanged += clip =>
             Avalonia.Threading.Dispatcher.UIThread.Post(() =>
                 CurrentClipName = clip?.DisplayName ?? string.Empty);
+
+        // Remote: when a phone selects a next state, apply it in the UI
+        _remote.NextStateRequested += stateId =>
+            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            {
+                var opt = StateOptions.FirstOrDefault(o => o.Model.Id == stateId);
+                if (opt is not null) SelectNextState(opt);
+            });
+
+        // Generate QR code once the remote URL is known
+        if (_remote.LocalUrl is not null)
+            QrCodeBitmap = GenerateQrBitmap(_remote.LocalUrl);
     }
 
     // ── commands ──────────────────────────────────────────────────────────
@@ -224,4 +252,21 @@ public partial class LivePerformanceViewModel : ViewModelBase
         TriggerDelayType.Bars      => $"{stateName} in {(int)DelayValue} bars",
         _                          => string.Empty
     };
+
+    private static Bitmap? GenerateQrBitmap(string url)
+    {
+        try
+        {
+            var gen  = new QRCodeGenerator();
+            var data = gen.CreateQrCode(url, QRCodeGenerator.ECCLevel.M);
+            var code = new PngByteQRCode(data);
+            // Light modules on dark background to match the app theme
+            var png  = code.GetGraphic(8,
+                new byte[] { 220, 220, 230 },  // module colour (light)
+                new byte[] { 10,  10,  20  }); // background (dark)
+            using var ms = new MemoryStream(png);
+            return new Bitmap(ms);
+        }
+        catch { return null; }
+    }
 }

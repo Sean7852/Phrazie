@@ -61,6 +61,7 @@
                                Foreground="White"
                                FontSize="12" />
                 </Border>
+
             </Panel>
 
             <!-- RIGHT: Controls panel -->
@@ -71,7 +72,42 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="0" Margin="0,0,0,16">
 
-                        <!-- Header: title + BPM -->
+                        <!-- QR / remote panel — shown when 📱 button is toggled -->
+                        <Border IsVisible="{Binding IsQrVisible}"
+                                Background="#0D0D1A"
+                                BorderBrush="#1E1E30"
+                                BorderThickness="0,0,0,1"
+                                Padding="20,16">
+                            <StackPanel Spacing="12" HorizontalAlignment="Center">
+                                <TextBlock Text="REMOTE CONTROL"
+                                           Foreground="#444466"
+                                           FontSize="9"
+                                           LetterSpacing="3"
+                                           HorizontalAlignment="Center" />
+                                <Border CornerRadius="6"
+                                        ClipToBounds="True"
+                                        HorizontalAlignment="Center"
+                                        IsVisible="{Binding QrCodeBitmap,
+                                            Converter={x:Static ObjectConverters.IsNotNull}}">
+                                    <Image Source="{Binding QrCodeBitmap}"
+                                           Width="220" Height="220"
+                                           Stretch="Uniform"
+                                           RenderOptions.BitmapInterpolationMode="None" />
+                                </Border>
+                                <TextBlock Text="{Binding RemoteUrl}"
+                                           Foreground="#44CC88"
+                                           FontSize="11"
+                                           HorizontalAlignment="Center"
+                                           TextWrapping="Wrap"
+                                           TextAlignment="Center" />
+                                <TextBlock Text="Scan or open the URL on your phone"
+                                           Foreground="#333355"
+                                           FontSize="10"
+                                           HorizontalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Header: title + BPM + QR button -->
                         <Grid ColumnDefinitions="*,Auto" Margin="20,24,20,20">
                             <TextBlock Grid.Column="0"
                                        Text="Live"
@@ -83,6 +119,21 @@
                                         Orientation="Horizontal"
                                         Spacing="8"
                                         VerticalAlignment="Center">
+
+                                <!-- QR / remote button -->
+                                <Button Command="{Binding ToggleQrCommand}"
+                                        Background="Transparent"
+                                        BorderBrush="#1E1E30"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="7,5"
+                                        VerticalAlignment="Center"
+                                        ToolTip.Tip="{Binding RemoteUrl}">
+                                    <TextBlock Text="📱"
+                                               FontSize="13"
+                                               VerticalAlignment="Center" />
+                                </Button>
+
                                 <TextBlock Text="BPM"
                                            Foreground="#444466"
                                            FontSize="10"

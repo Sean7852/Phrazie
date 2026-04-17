@@ -9,12 +9,13 @@ namespace Phrazie.Desktop.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private readonly ICollectionRepository _collections;
-    private readonly ISessionService       _session;
-    private readonly ITriggerService       _trigger;
-    private readonly IPlaybackService      _playback;
-    private readonly ISessionStore         _sessionStore;
-    private readonly IAuthService          _auth;
+    private readonly ICollectionRepository    _collections;
+    private readonly ISessionService          _session;
+    private readonly ITriggerService          _trigger;
+    private readonly IPlaybackService         _playback;
+    private readonly ISessionStore            _sessionStore;
+    private readonly IAuthService             _auth;
+    private readonly LivePerformanceViewModel _liveVm;
 
     [ObservableProperty] private bool           _isAuthenticated;
     [ObservableProperty] private LoginViewModel _loginPage;
@@ -29,15 +30,16 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] private bool _isHelpActive        = false;
 
     public MainWindowViewModel(
-        ICollectionRepository collections,
-        ISessionService       session,
-        ITriggerService       trigger,
-        IPlaybackService      playback,
-        IFilePickerService    filePicker,
-        IHotkeyService        hotkeys,
-        ISessionStore         sessionStore,
-        IAuthService          auth,
-        LoginViewModel        loginPage)
+        ICollectionRepository    collections,
+        ISessionService          session,
+        ITriggerService          trigger,
+        IPlaybackService         playback,
+        IFilePickerService       filePicker,
+        IHotkeyService           hotkeys,
+        ISessionStore            sessionStore,
+        IAuthService             auth,
+        LoginViewModel           loginPage,
+        LivePerformanceViewModel liveVm)
     {
         _collections  = collections;
         _session      = session;
@@ -48,6 +50,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _sessionStore = sessionStore;
         _auth         = auth;
         _loginPage    = loginPage;
+        _liveVm       = liveVm;
         _currentPage  = BuildCollectionsPage();
 
         _isAuthenticated = sessionStore.IsAuthenticated;
@@ -86,7 +89,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void GoToLive()
     {
-        CurrentPage         = new LivePerformanceViewModel(_session, _trigger, _playback);
+        CurrentPage         = _liveVm;
         IsCollectionsActive = false;
         IsLiveActive        = true;
         IsSettingsActive    = false;

@@ -52,6 +52,19 @@ public sealed class VideoPlaybackService : IPlaybackService, IDisposable
         return Task.CompletedTask;
     }
 
+    public Task PauseAsync()
+    {
+        MediaPlayer.SetPause(true);
+        return Task.CompletedTask;
+    }
+
+    public Task ResumeAsync()
+    {
+        if (_currentMedia is not null)
+            MediaPlayer.SetPause(false);
+        return Task.CompletedTask;
+    }
+
     public Task StopAsync()
     {
         MediaPlayer.Stop();

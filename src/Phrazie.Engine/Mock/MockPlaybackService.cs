@@ -21,6 +21,19 @@ public sealed class MockPlaybackService : IPlaybackService
         return Task.CompletedTask;
     }
 
+    public Task PauseAsync()
+    {
+        IsPlaying = false;
+        return Task.CompletedTask;
+    }
+
+    public Task ResumeAsync()
+    {
+        if (CurrentClip is not null)
+            IsPlaying = true;
+        return Task.CompletedTask;
+    }
+
     public Task StopAsync()
     {
         CurrentClip = null;
