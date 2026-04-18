@@ -69,7 +69,7 @@
 
     </UserControl.Styles>
 
-    <Grid RowDefinitions="*, 96, 58">
+    <Grid RowDefinitions="*, 108, 72">
 
         <!-- ── Row 0: Video output ───────────────────────────────────── -->
         <Grid Grid.Row="0">

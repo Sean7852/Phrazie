@@ -21,13 +21,17 @@ public sealed class BeatGrid : Control
     public static readonly StyledProperty<int> TotalPhrasesProperty =
         AvaloniaProperty.Register<BeatGrid, int>(nameof(TotalPhrases), 8);
 
+    public static readonly StyledProperty<bool> AnimateProperty =
+        AvaloniaProperty.Register<BeatGrid, bool>(nameof(Animate), false);
+
     public double Phase        { get => GetValue(PhaseProperty);        set => SetValue(PhaseProperty,        value); }
     public int    PhraseNumber { get => GetValue(PhraseNumberProperty); set => SetValue(PhraseNumberProperty, value); }
     public int    TotalPhrases { get => GetValue(TotalPhrasesProperty); set => SetValue(TotalPhrasesProperty, value); }
+    public bool   Animate      { get => GetValue(AnimateProperty);      set => SetValue(AnimateProperty,      value); }
 
     static BeatGrid()
     {
-        AffectsRender<BeatGrid>(PhaseProperty, PhraseNumberProperty, TotalPhrasesProperty);
+        AffectsRender<BeatGrid>(PhaseProperty, PhraseNumberProperty, TotalPhrasesProperty, AnimateProperty);
     }
 
     // ── Constants ─────────────────────────────────────────────────────────────
@@ -107,18 +111,23 @@ public sealed class BeatGrid : Control
                 active ? LabelAccent : LabelMuted);
             ctx.DrawText(ftLabel, new Point(barX + BarPad, barAreaTop + 4.0));
 
-            var cellBottom = barAreaTop + barAreaH - 2.0;  // fixed bottom edge
+            const double BottomPad = 6.0;
+            var cellBottom = barAreaTop + barAreaH - BottomPad;
             var cellLeft   = barX + BarPad;
+
+            // Height tiers — all cells reach the same activeH when on the current beat
+            var kickH   = cellH * 0.45;
+            var normalH = cellH * 0.30;
+            var activeH = cellH * 0.62;
 
             for (int c = 0; c < BeatsPerBar; c++)
             {
                 var gbeat    = b * BeatsPerBar + c;
                 bool current = gbeat == beatIdx;
 
-                // Only the active beat cell animates; kick cell (c==0) is always taller base
-                var baseH     = c == 0 ? cellH : cellH * 2.0 / 3.0;
-                var extraH    = current ? pulseT * cellH * 0.35 : 0.0;
-                var thisCellH = baseH + extraH;
+                var baseH     = c == 0 ? kickH : normalH;
+                var targetH   = current ? activeH : baseH;
+                var thisCellH = current && Animate ? baseH + (activeH - baseH) * pulseT : targetH;
                 var cellX     = cellLeft + c * (cellW + CellGap);
                 var cellY     = cellBottom - thisCellH;
                 var cellRect  = new Rect(cellX, cellY, cellW, thisCellH);
@@ -130,10 +139,12 @@ public sealed class BeatGrid : Control
                 }
                 else if (current)
                 {
-                    // Glow halo behind the cell
-                    var expand   = pulseT * 4.0;
-                    var glowRect = new RoundedRect(cellRect.Inflate(expand), CellRadius + expand * 0.4);
-                    ctx.DrawRectangle(GlowMid, null, glowRect);
+                    if (Animate)
+                    {
+                        var expand   = pulseT * 4.0;
+                        var glowRect = new RoundedRect(cellRect.Inflate(expand), CellRadius + expand * 0.4);
+                        ctx.DrawRectangle(GlowMid, null, glowRect);
+                    }
                     ctx.DrawRectangle(CurrentBrush, null, rounded);
                 }
                 else
