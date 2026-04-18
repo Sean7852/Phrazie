@@ -87,8 +87,10 @@ public sealed class BeatGrid : Control
         for (int b = 0; b < Bars; b++)
         {
             var barX    = SidePad + b * (barW + BarGap);
-            var barRect = new Rect(barX, barAreaTop, barW, barAreaH);
             bool active = b == currentBar;
+
+            // Bar frame is always the same fixed size
+            var barRect = new Rect(barX, barAreaTop, barW, barAreaH);
 
             // Active bar: subtle bg tint + accent border
             if (active)
@@ -98,29 +100,35 @@ public sealed class BeatGrid : Control
             }
 
             // Bar label
-            var label   = $"{b + 1}BAR {b + 1}";
+            var label   = $"BAR {b + 1}";
             var ftLabel = new FormattedText(label,
                 System.Globalization.CultureInfo.InvariantCulture,
                 FlowDirection.LeftToRight, Mono, 9.5,
                 active ? LabelAccent : LabelMuted);
             ctx.DrawText(ftLabel, new Point(barX + BarPad, barAreaTop + 4.0));
 
-            // Beat cells
-            var cellTop  = barAreaTop + BarLabelH;
-            var cellLeft = barX + BarPad;
+            var cellBottom = barAreaTop + barAreaH - 2.0;  // fixed bottom edge
+            var cellLeft   = barX + BarPad;
 
             for (int c = 0; c < BeatsPerBar; c++)
             {
                 var gbeat    = b * BeatsPerBar + c;
-                var cellX    = cellLeft + c * (cellW + CellGap);
-                var cellRect = new Rect(cellX, cellTop, cellW, cellH);
-                var rounded  = new RoundedRect(cellRect, CellRadius);
+                bool current = gbeat == beatIdx;
+
+                // Only the active beat cell animates; kick cell (c==0) is always taller base
+                var baseH     = c == 0 ? cellH : cellH * 2.0 / 3.0;
+                var extraH    = current ? pulseT * cellH * 0.35 : 0.0;
+                var thisCellH = baseH + extraH;
+                var cellX     = cellLeft + c * (cellW + CellGap);
+                var cellY     = cellBottom - thisCellH;
+                var cellRect  = new Rect(cellX, cellY, cellW, thisCellH);
+                var rounded   = new RoundedRect(cellRect, CellRadius);
 
                 if (gbeat < beatIdx)
                 {
                     ctx.DrawRectangle(PastBrush, null, rounded);
                 }
-                else if (gbeat == beatIdx)
+                else if (current)
                 {
                     // Glow halo behind the cell
                     var expand   = pulseT * 4.0;
