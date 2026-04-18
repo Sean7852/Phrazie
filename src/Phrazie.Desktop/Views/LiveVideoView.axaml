@@ -7,7 +7,7 @@
              x:DataType="vm:LivePerformanceViewModel"
              Background="{StaticResource MainBackgroundBrush}">
 
-    <Grid RowDefinitions="*, 108, 72">
+    <Grid RowDefinitions="*, 108, 84">
 
         <!-- ── Row 0: Video output ───────────────────────────────────── -->
         <Grid Grid.Row="0">

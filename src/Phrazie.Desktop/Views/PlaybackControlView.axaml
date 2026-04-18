@@ -4,203 +4,132 @@
              x:Class="Phrazie.Desktop.Views.PlaybackControlView"
              x:DataType="vm:LivePerformanceViewModel">
 
-    <UserControl.Styles>
+  <UserControl.Styles>
+  </UserControl.Styles>
 
-        <!-- Base -->
-        <Style Selector="Button.transport">
-            <Setter Property="Background"        Value="Transparent" />
-            <Setter Property="Foreground"        Value="{StaticResource TextBrushPrimary}" />
-            <Setter Property="BorderThickness"   Value="0" />
-            <Setter Property="Padding"           Value="0" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="CornerRadius"      Value="4" />
-        </Style>
+  <Grid Height="100" VerticalAlignment="Bottom" Background="Transparent">
 
-        <!-- ◄ ► nav -->
-        <Style Selector="Button.transport.nav">
-            <Setter Property="Background"      Value="{StaticResource ControlBackgroundBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
-            <Setter Property="Width"           Value="28" />
-            <Setter Property="Height"          Value="28" />
-            <Setter Property="FontSize"        Value="11" />
-        </Style>
-
-        <!-- ▶ / ⏸  vibrant orange -->
-        <Style Selector="Button.transport.playpause">
-            <Setter Property="Background"  Value="#FF9900" />
-            <Setter Property="Foreground"  Value="#0A0A0B" />
-            <Setter Property="Width"       Value="36" />
-            <Setter Property="Height"      Value="32" />
-            <Setter Property="FontSize"    Value="14" />
-        </Style>
-
-        <!-- − + BPM step -->
-        <Style Selector="Button.transport.bpmstep">
-            <Setter Property="Background"      Value="{StaticResource ControlBackgroundBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
-            <Setter Property="Width"           Value="24" />
-            <Setter Property="Height"          Value="24" />
-            <Setter Property="FontSize"        Value="14" />
-        </Style>
-
-        <!-- TAP — orange border + text -->
-        <Style Selector="Button.transport.tap">
-            <Setter Property="Background"      Value="Transparent" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush"     Value="#FF9900" />
-            <Setter Property="Foreground"      Value="#FF9900" />
-            <Setter Property="Padding"         Value="12,5" />
-            <Setter Property="FontSize"        Value="11" />
-        </Style>
-
-        <!-- REC idle -->
-        <Style Selector="Button.transport.rec">
-            <Setter Property="Background"      Value="Transparent" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
-            <Setter Property="Padding"         Value="10,6" />
-            <Setter Property="FontSize"        Value="11" />
-        </Style>
-        <!-- REC active — red border tint -->
-        <Style Selector="Button.transport.rec.active">
-            <Setter Property="BorderBrush" Value="#CC3333" />
-            <Setter Property="Background"  Value="#1A0808" />
-        </Style>
-
-        <!-- BPM slider — orange filled track, dark unfilled, orange glowing thumb -->
-        <Style Selector="Slider.bpm /template/ RepeatButton#PART_DecreaseButton">
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border Background="#FF9900" Height="3" VerticalAlignment="Center" CornerRadius="2,0,0,2" />
-                </ControlTemplate>
-            </Setter>
-        </Style>
-        <Style Selector="Slider.bpm /template/ RepeatButton#PART_IncreaseButton">
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border Background="#2A2A2E" Height="3" VerticalAlignment="Center" CornerRadius="0,2,2,0" />
-                </ControlTemplate>
-            </Setter>
-        </Style>
-        <Style Selector="Slider.bpm /template/ Thumb">
-            <Setter Property="Template">
-                <ControlTemplate>
-                    <Border Width="14" Height="14" Background="#FF9900" CornerRadius="7"
-                            BoxShadow="0 0 8 2 #80FF9900" />
-                </ControlTemplate>
-            </Setter>
-        </Style>
-
-    </UserControl.Styles>
-
-    <Border Background="#0D0D12"
+    <Border Height="64"
+            VerticalAlignment="Bottom"
+            Background="#0D0D12"
             BorderBrush="{StaticResource BoxBorderDefault}"
-            BorderThickness="0,1,0,0">
-        <Grid ColumnDefinitions="Auto,*,Auto" Margin="14,0">
+            BorderThickness="0,1,0,0" />
 
-            <!-- Group 1: Play Controls -->
-            <StackPanel Grid.Column="0"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center"
-                        Spacing="4">
-                <Button Classes="transport nav" Content="◄" />
-                <Button Classes="transport playpause"
-                        Content="{Binding PlayPauseIcon}"
-                        Command="{Binding TogglePlayCommand}" />
-                <Button Classes="transport nav" Content="►" />
-            </StackPanel>
+    <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,0">
 
-            <!-- Group 2: BPM Controls -->
-            <Grid Grid.Column="1"
-                  ColumnDefinitions="Auto,Auto,*,Auto,Auto"
-                  VerticalAlignment="Center"
-                  Margin="24,0">
+      <StackPanel Grid.Column="0"
+                  Orientation="Horizontal"
+                  VerticalAlignment="Bottom"
+                  Height="64"
+                  Spacing="6">
+        <Button Classes="transport nav" Content="◄" />
+        <Button Classes="transport playpause"
+                Content="{Binding PlayPauseIcon}"
+                Command="{Binding TogglePlayCommand}" />
+        <Button Classes="transport nav" Content="►" />
+      </StackPanel>
 
-                <TextBlock Grid.Column="0"
-                           Text="BPM"
-                           Foreground="{StaticResource TextBrushDisabled}"
-                           FontSize="10"
-                           LetterSpacing="1.5"
-                           VerticalAlignment="Center"
-                           Margin="0,0,8,0" />
+      <Border Grid.Column="1"
+              Width="440"
+              Height="80"
+              VerticalAlignment="Bottom"
+              Background="#161622"
+              BorderBrush="#2A2A44"
+              BorderThickness="1,1,1,0"
+              CornerRadius="8,8,0,0"
+              Padding="20,8"
+              ZIndex="10">
 
-                <Button Grid.Column="1" Classes="transport bpmstep" Content="−"
-                        Command="{Binding DecreaseBpmCommand}" />
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+          <TextBlock Grid.Column="0"
+                     Text="BPM"
+                     Foreground="{StaticResource TextBrushDisabled}"
+                     FontSize="10"
+                     FontWeight="Bold"
+                     LetterSpacing="2"
+                     VerticalAlignment="Center"
+                     Margin="0,0,12,0" />
 
-                <StackPanel Grid.Column="2"
-                            Orientation="Vertical"
-                            VerticalAlignment="Center"
-                            Margin="6,0">
-                    <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
-                               FontSize="26"
-                               FontWeight="Bold"
-                               Foreground="{StaticResource TextBrushPrimary}"
-                               HorizontalAlignment="Center" />
-                    <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2,0,0">
-                        <TextBlock Grid.Column="0" Text="60"
-                                   FontSize="9" Foreground="{StaticResource TextBrushDisabled}"
-                                   VerticalAlignment="Center" Margin="0,0,4,0" />
-                        <Slider Grid.Column="1" Classes="bpm"
-                                Minimum="60" Maximum="200"
-                                Value="{Binding Bpm}"
-                                Height="18" />
-                        <TextBlock Grid.Column="2" Text="200"
-                                   FontSize="9" Foreground="{StaticResource TextBrushDisabled}"
-                                   VerticalAlignment="Center" Margin="4,0,0,0" />
-                    </Grid>
-                </StackPanel>
+          <Button Grid.Column="1"
+                  Classes="transport bpmstep"
+                  Content="−"
+                  Command="{Binding DecreaseBpmCommand}" />
 
-                <Button Grid.Column="3" Classes="transport bpmstep" Content="+"
-                        Command="{Binding IncreaseBpmCommand}" />
-
-                <Button Grid.Column="4" Classes="transport tap" Content="TAP"
-                        Margin="8,0,0,0" />
+          <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="12,0">
+            <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center" />
+            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,0">
+              <TextBlock Grid.Column="0"
+                         Text="60"
+                         FontSize="9"
+                         Foreground="{StaticResource TextBrushDisabled}"
+                         Margin="0,0,6,0" />
+              <Slider Grid.Column="1"
+                      Classes="bpm"
+                      Minimum="60"
+                      Maximum="200"
+                      Value="{Binding Bpm}"
+                      Height="40" />
+              <TextBlock Grid.Column="2"
+                         Text="200"
+                         FontSize="9"
+                         Foreground="{StaticResource TextBrushDisabled}"
+                         Margin="6,0,0,0" />
             </Grid>
+          </StackPanel>
 
-            <!-- Group 3: Record Controls -->
-            <StackPanel Grid.Column="2"
-                        Orientation="Horizontal"
-                        VerticalAlignment="Center"
-                        Spacing="10">
+          <Button Grid.Column="3"
+                  Classes="transport bpmstep"
+                  Content="+"
+                  Command="{Binding IncreaseBpmCommand}" />
 
-                <!-- REC button — glow panel when active -->
-                <Panel>
-                    <Border CornerRadius="5" Margin="-4"
-                            IsVisible="{Binding IsRecording}"
-                            BoxShadow="0 0 14 4 #80CC2222"
-                            Background="Transparent" />
-                    <Button Classes="transport rec"
-                            Classes.active="{Binding IsRecording}"
-                            Command="{Binding ToggleRecordCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                            <Ellipse Width="7" Height="7" Fill="#DD3333" VerticalAlignment="Center" />
-                            <TextBlock Text="REC" FontSize="11" LetterSpacing="1"
-                                       Foreground="{StaticResource TextBrushPrimary}"
-                                       VerticalAlignment="Center" />
-                        </StackPanel>
-                    </Button>
-                </Panel>
-
-                <!-- Status panel -->
-                <Border Background="#13141A" CornerRadius="4" Padding="10,6">
-                    <StackPanel Orientation="Vertical" Spacing="2">
-                        <TextBlock Text="00:00:00"
-                                   FontFamily="Consolas,monospace"
-                                   FontSize="14"
-                                   FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextBrushPrimary}" />
-                        <TextBlock Text="1080p60 · 0.0 MB"
-                                   FontFamily="Consolas,monospace"
-                                   FontSize="9"
-                                   Foreground="#7A8FA6" />
-                    </StackPanel>
-                </Border>
-
-            </StackPanel>
-
+          <Button Grid.Column="4"
+                  Classes="transport tap"
+                  Content="TAP"
+                  Margin="12,0,0,0" />
         </Grid>
-    </Border>
+      </Border>
 
+      <StackPanel Grid.Column="2"
+                  Orientation="Horizontal"
+                  VerticalAlignment="Bottom"
+                  Height="64"
+                  Spacing="12">
+
+        <Panel VerticalAlignment="Center">
+          <Border CornerRadius="5"
+                  Margin="-4"
+                  IsVisible="{Binding IsRecording}"
+                  BoxShadow="0 0 14 4 #80CC2222" />
+          <Button Classes="transport rec"
+                  Classes.active="{Binding IsRecording}"
+                  Command="{Binding ToggleRecordCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Ellipse Width="8" Height="8" Fill="#DD3333" />
+              <TextBlock Text="REC" FontWeight="Bold" />
+            </StackPanel>
+          </Button>
+        </Panel>
+
+        <Border Background="#13141A"
+                CornerRadius="4"
+                Padding="12,8"
+                VerticalAlignment="Center">
+          <StackPanel Spacing="2">
+            <TextBlock Text="00:00:00"
+                       FontFamily="Consolas"
+                       FontSize="15"
+                       FontWeight="Bold" />
+            <TextBlock Text="1080p60 · 0.0 MB"
+                       FontSize="9"
+                       Foreground="#7A8FA6" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+    </Grid>
+  </Grid>
 </UserControl>
