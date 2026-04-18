@@ -28,7 +28,8 @@
       "Bash(powershell *)",
       "Bash(dotnet tool *)",
       "Bash(tasklist)",
-      "Bash(echo \"exit: $?\")"
+      "Bash(echo \"exit: $?\")",
+      "Bash(xargs grep *)"
     ]
   }
 }

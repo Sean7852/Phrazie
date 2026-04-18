@@ -26,6 +26,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     [ObservableProperty] private string _currentStateName  = "—";
     [ObservableProperty] private string _currentClipName   = string.Empty;
+    [ObservableProperty] private string _collectionName    = "—";
 
     /// <summary>Phrazie UI language: Waiting · Locked · Triggered</summary>
     [ObservableProperty] private string _statusLabel       = "Waiting";
@@ -199,6 +200,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private void SyncFromSession(Session s)
     {
         CurrentStateName = s.CurrentState?.Name ?? "—";
+        CollectionName   = s.ActiveCollection?.Name ?? "—";
         Bpm              = s.Bpm;
 
         foreach (var opt in StateOptions)

@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Phrazie.Desktop.Views.LiveVideoView"
+             Background="#050508">
+
+    <Panel>
+        <StackPanel VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Spacing="14">
+            <TextBlock Text="&#x25A3;"
+                       FontSize="56"
+                       Foreground="#1A1A2E"
+                       HorizontalAlignment="Center" />
+            <TextBlock Text="VIDEO OUTPUT"
+                       Foreground="#1A1A2E"
+                       FontSize="11"
+                       LetterSpacing="4"
+                       HorizontalAlignment="Center" />
+        </StackPanel>
+    </Panel>
+
+</UserControl>
