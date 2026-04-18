@@ -6,14 +6,16 @@ using Phrazie.Core.Enums;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
 using Phrazie.Desktop.Services;
+using Avalonia.Threading;
 
 namespace Phrazie.Desktop.ViewModels;
 
 public partial class LivePerformanceViewModel : ViewModelBase
 {
-    private readonly ISessionService _session;
-    private readonly ITriggerService _trigger;
+    private readonly ISessionService  _session;
+    private readonly ITriggerService  _trigger;
     private readonly IPlaybackService _playback;
+    private readonly IBeatClock       _beatClock;
 
     /// <summary>Exposed so LivePerformanceView.axaml.cs can wire it to VideoView.</summary>
     public MediaPlayer? MediaPlayer => (_playback as VideoPlaybackService)?.MediaPlayer;
@@ -53,25 +55,34 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     [ObservableProperty] private double _bpm = 128;
 
-    partial void OnBpmChanged(double value) =>
+    partial void OnBpmChanged(double value)
+    {
         _ = _session.SetBpmAsync(value);
+        _beatClock.Bpm = value;
+    }
+
+    // ── Phrase tracker ────────────────────────────────────────────────────
+
+    [ObservableProperty] private double _currentPhase = 0.0;
 
     // ── ctor ──────────────────────────────────────────────────────────────
 
     public LivePerformanceViewModel(
-        ISessionService session,
-        ITriggerService trigger,
-        IPlaybackService playback)
+        ISessionService  session,
+        ITriggerService  trigger,
+        IPlaybackService playback,
+        IBeatClock       beatClock)
     {
-        _session  = session;
-        _trigger  = trigger;
-        _playback = playback;
+        _session   = session;
+        _trigger   = trigger;
+        _playback  = playback;
+        _beatClock = beatClock;
 
         BuildStateOptions(_session.Current);
         SyncFromSession(_session.Current);
 
         _session.SessionChanged += s =>
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            Dispatcher.UIThread.Post(() =>
             {
                 RebuildOptionsIfCollectionChanged(s);
                 SyncFromSession(s);
@@ -81,8 +92,15 @@ public partial class LivePerformanceViewModel : ViewModelBase
         _trigger.CountdownTick += OnCountdownTick;
 
         _playback.ClipChanged += clip =>
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            Dispatcher.UIThread.Post(() =>
                 CurrentClipName = clip?.DisplayName ?? string.Empty);
+
+        _beatClock.Bpm = Bpm;
+        _beatClock.PhaseChanged += phase =>
+            Dispatcher.UIThread.Post(
+                () => CurrentPhase = phase,
+                DispatcherPriority.Render);
+        _beatClock.Start();
     }
 
     // ── commands ──────────────────────────────────────────────────────────
@@ -162,7 +180,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     private void OnTriggerFired(Trigger trigger)
     {
-        Avalonia.Threading.Dispatcher.UIThread.Post(async () =>
+        Dispatcher.UIThread.Post(async () =>
         {
             var opt = StateOptions.FirstOrDefault(o => o.Model.Id == trigger.TargetStateId);
             if (opt is not null)
@@ -179,7 +197,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     private void OnCountdownTick(TimeSpan remaining)
     {
-        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        Dispatcher.UIThread.Post(() =>
         {
             StatusLabel      = "Locked";
             CountdownDisplay = remaining.TotalSeconds < 60

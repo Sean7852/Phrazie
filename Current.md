@@ -1,4 +1,6 @@
-I need to change the State card editing a little:
-1. Disable all State edit in the CollectionDetailView, clicking the state name doesn't open the edit window
-2. On the ClipManageWindow, add a round coner rectangle next to the name shows the color of the state.
-3. Click the Name or the color shows the State edit window.
+OK, we need to fill the LiveVideoView, there are 3 sub views in it:
+ 1. The biggest area, currently playing.
+ 2. The tempo beats grid.
+ 3. Current play controls.
+
+ I updated the LivePage.png, please fill the views

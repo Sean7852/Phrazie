@@ -1,22 +1,136 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Phrazie.Desktop.ViewModels"
+             xmlns:controls="using:Phrazie.Desktop.Controls"
              x:Class="Phrazie.Desktop.Views.LiveVideoView"
+             x:DataType="vm:LivePerformanceViewModel"
              Background="#050508">
 
-    <Panel>
-        <StackPanel VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    Spacing="14">
-            <TextBlock Text="&#x25A3;"
-                       FontSize="56"
-                       Foreground="#1A1A2E"
-                       HorizontalAlignment="Center" />
-            <TextBlock Text="VIDEO OUTPUT"
-                       Foreground="#1A1A2E"
-                       FontSize="11"
-                       LetterSpacing="4"
-                       HorizontalAlignment="Center" />
-        </StackPanel>
-    </Panel>
+    <UserControl.Styles>
+        <Style Selector="Button.transport">
+            <Setter Property="Background"       Value="Transparent" />
+            <Setter Property="Foreground"       Value="#445566" />
+            <Setter Property="BorderThickness"  Value="0" />
+            <Setter Property="Padding"          Value="8,4" />
+            <Setter Property="FontSize"         Value="14" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+        <Style Selector="Button.transport:pointerover /template/ ContentPresenter">
+            <Setter Property="TextElement.Foreground" Value="#AAAACC" />
+        </Style>
+        <Style Selector="Button.transport.play">
+            <Setter Property="Foreground" Value="#6699CC" />
+            <Setter Property="FontSize"   Value="16" />
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="*, 48, 44">
+
+        <!-- ── Row 0: Video output ───────────────────────────────────── -->
+        <Grid Grid.Row="0">
+
+            <controls:VideoView x:Name="VideoOutput" />
+
+            <!-- NOW PLAYING (top-left) -->
+            <StackPanel Orientation="Horizontal" Spacing="6"
+                        VerticalAlignment="Top" HorizontalAlignment="Left"
+                        Margin="14,10">
+                <Ellipse Width="6" Height="6" Fill="#44DD44" VerticalAlignment="Center" />
+                <TextBlock Text="NOW PLAYING"
+                           Foreground="#445566"
+                           FontSize="10"
+                           LetterSpacing="2"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Clip name + state (bottom-left) -->
+            <StackPanel Orientation="Vertical" Spacing="2"
+                        VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                        Margin="14,0,0,10">
+                <TextBlock Text="{Binding CurrentClipName}"
+                           Foreground="#CCCCDD"
+                           FontSize="13"
+                           FontWeight="SemiBold" />
+                <TextBlock Text="{Binding CurrentStateName}"
+                           Foreground="#445566"
+                           FontSize="11" />
+            </StackPanel>
+
+            <!-- Position (bottom-right) -->
+            <TextBlock Text="0:00"
+                       VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                       Margin="0,0,14,10"
+                       Foreground="#445566"
+                       FontSize="12"
+                       FontFamily="Consolas,monospace" />
+
+        </Grid>
+
+        <!-- ── Row 1: Phrase tracker ─────────────────────────────────── -->
+        <Border Grid.Row="1"
+                Background="#0A0A12"
+                BorderBrush="#1E1E30"
+                BorderThickness="0,1">
+            <controls:PhraseTracker Phase="{Binding CurrentPhase}"
+                                    DotCount="16"
+                                    Margin="20,0" />
+        </Border>
+
+        <!-- ── Row 2: Transport controls ─────────────────────────────── -->
+        <Border Grid.Row="2"
+                Background="#0D0D1A"
+                BorderBrush="#1E1E30"
+                BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="Auto,*,Auto" Margin="14,0">
+
+                <!-- Transport buttons -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Spacing="0">
+                    <Button Classes="transport" Content="⏮" />
+                    <Button Classes="transport" Content="⏪" />
+                    <Button Classes="transport play" Content="▶" />
+                    <Button Classes="transport" Content="⏩" />
+                    <Button Classes="transport" Content="⏭" />
+                </StackPanel>
+
+                <!-- Position / BPM info -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="10">
+                    <TextBlock Text="0:00"
+                               Foreground="#445566"
+                               FontSize="11"
+                               FontFamily="Consolas,monospace"
+                               VerticalAlignment="Center" />
+                    <Rectangle Width="1" Height="12" Fill="#2A2A44" />
+                    <TextBlock Text="001 : 1"
+                               Foreground="#445566"
+                               FontSize="11"
+                               FontFamily="Consolas,monospace"
+                               VerticalAlignment="Center" />
+                    <Rectangle Width="1" Height="12" Fill="#2A2A44" />
+                    <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\} BPM}"
+                               Foreground="#445566"
+                               FontSize="11"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Loop / aux buttons -->
+                <StackPanel Grid.Column="2"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center"
+                            Spacing="4">
+                    <Button Classes="transport" Content="↺" />
+                    <Button Classes="transport" Content="⊞" />
+                </StackPanel>
+
+            </Grid>
+        </Border>
+
+    </Grid>
 
 </UserControl>
