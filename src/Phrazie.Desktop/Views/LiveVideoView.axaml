@@ -24,7 +24,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="*, 48, 44">
+    <Grid RowDefinitions="*, 96, 44">
 
         <!-- ── Row 0: Video output ───────────────────────────────────── -->
         <Grid Grid.Row="0">
@@ -66,14 +66,15 @@
 
         </Grid>
 
-        <!-- ── Row 1: Phrase tracker ─────────────────────────────────── -->
+        <!-- ── Row 1: Beat grid ──────────────────────────────────────── -->
         <Border Grid.Row="1"
                 Background="{StaticResource MainBackgroundBrush}"
                 BorderBrush="{StaticResource BoxBorderDefault}"
                 BorderThickness="0,1">
-            <controls:PhraseTracker Phase="{Binding CurrentPhase}"
-                                    DotCount="16"
-                                    Margin="20,0" />
+            <controls:BeatGrid Phase="{Binding CurrentPhase}"
+                               PhraseNumber="{Binding PhraseNumber}"
+                               TotalPhrases="{Binding TotalPhrases}"
+                               Margin="12,6,12,6" />
         </Border>
 
         <!-- ── Row 2: Transport controls ─────────────────────────────── -->

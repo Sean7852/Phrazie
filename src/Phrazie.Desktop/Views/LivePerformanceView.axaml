@@ -54,117 +54,55 @@
 
     </UserControl.Styles>
 
-    <Grid RowDefinitions="44,*">
+    <!-- ── ROW 1: Main area ──────────────────────────────────────────── -->
+    <Grid ColumnDefinitions="*,340">
 
-        <!-- ── ROW 0: Header bar ─────────────────────────────────────────── -->
-        <Border Grid.Row="0"
-                Background="{StaticResource PanelBackgroundBrush}"
+        <views:LiveVideoView Grid.Column="0" />
+
+        <Border Grid.Column="1"
+                Background="{StaticResource MainBackgroundBrush}"
                 BorderBrush="{StaticResource BoxBorderDefault}"
-                BorderThickness="0,0,0,1">
-            <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,0">
+                BorderThickness="1,0,0,0">
+            <Grid RowDefinitions="140,*,120">
 
-                <StackPanel Grid.Column="1"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Spacing="20">
+                <Border Grid.Row="0"
+                        Background="{StaticResource PanelBackgroundBrush}"
+                        BorderBrush="{StaticResource BoxBorderDefault}"
+                        BorderThickness="0,0,0,1"
+                        Padding="20,16">
+                    <Grid ColumnDefinitions="*,Auto">
 
-                    <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                        <Ellipse Width="7" Height="7" Fill="#44DD44" VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding StatusLabel}"
-                                   Foreground="{StaticResource TextBrushSecondary}"
-                                   FontSize="11"
-                                   LetterSpacing="1"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
+                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="4">
+                            <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
+                                        Foreground="{StaticResource TextBrushPrimary}"
+                                        FontSize="64"
+                                        FontWeight="Light"
+                                        LineHeight="64" />
+                            <TextBlock Text="{Binding CollectionName}"
+                                        Foreground="{StaticResource TextBrushDisabled}"
+                                        FontSize="12"
+                                        LetterSpacing="1" />
+                        </StackPanel>
 
-                    <Rectangle Width="1" Height="16" Fill="{StaticResource BoxBorderDefault}" />
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Bottom"
+                                    Spacing="5">
+                            <Rectangle Width="8" Height="60" Fill="#FF4499" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
+                            <Rectangle Width="8" Height="88" Fill="#CC44FF" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
+                            <Rectangle Width="8" Height="48" Fill="#9955FF" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
+                            <Rectangle Width="8" Height="74" Fill="{StaticResource TextBrushAccent}" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
+                            <Rectangle Width="8" Height="38" Fill="#FF8800" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
+                        </StackPanel>
 
-                    <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                        <TextBlock Text="BPM"
-                                   Foreground="{StaticResource TextBrushDisabled}"
-                                   FontSize="10"
-                                   LetterSpacing="1"
-                                   VerticalAlignment="Center" />
-                        <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
-                                   Foreground="{StaticResource TextBrushPrimary}"
-                                   FontSize="13"
-                                   FontWeight="Medium"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
+                    </Grid>
+                </Border>
 
-                    <Rectangle Width="1" Height="16" Fill="{StaticResource BoxBorderDefault}" />
-
-                    <TextBlock Text="{Binding CollectionName}"
-                               Foreground="{StaticResource TextBrushSecondary}"
-                               FontSize="12"
-                               VerticalAlignment="Center" />
-
-                </StackPanel>
-
-                <StackPanel Grid.Column="2"
-                            Orientation="Horizontal"
-                            VerticalAlignment="Center"
-                            Spacing="8">
-                    <Button Classes="hdr" Content="Record" />
-                    <Button Classes="hdr" Content="Live Effect" />
-                    <Button Classes="hdr primary" Content="Done" />
-                </StackPanel>
+                <views:LiveClipInfoView Grid.Row="1" />
+                <views:LiveScheduleView Grid.Row="2" />
 
             </Grid>
         </Border>
-
-        <!-- ── ROW 1: Main area ──────────────────────────────────────────── -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,340">
-
-            <views:LiveVideoView Grid.Column="0" />
-
-            <Border Grid.Column="1"
-                    Background="{StaticResource MainBackgroundBrush}"
-                    BorderBrush="{StaticResource BoxBorderDefault}"
-                    BorderThickness="1,0,0,0">
-                <Grid RowDefinitions="140,*,120">
-
-                    <Border Grid.Row="0"
-                            Background="{StaticResource PanelBackgroundBrush}"
-                            BorderBrush="{StaticResource BoxBorderDefault}"
-                            BorderThickness="0,0,0,1"
-                            Padding="20,16">
-                        <Grid ColumnDefinitions="*,Auto">
-
-                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="4">
-                                <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
-                                           Foreground="{StaticResource TextBrushPrimary}"
-                                           FontSize="64"
-                                           FontWeight="Light"
-                                           LineHeight="64" />
-                                <TextBlock Text="{Binding CollectionName}"
-                                           Foreground="{StaticResource TextBrushDisabled}"
-                                           FontSize="12"
-                                           LetterSpacing="1" />
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="1"
-                                        Orientation="Horizontal"
-                                        VerticalAlignment="Bottom"
-                                        Spacing="5">
-                                <Rectangle Width="8" Height="60" Fill="#FF4499" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                                <Rectangle Width="8" Height="88" Fill="#CC44FF" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                                <Rectangle Width="8" Height="48" Fill="#9955FF" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                                <Rectangle Width="8" Height="74" Fill="{StaticResource TextBrushAccent}" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                                <Rectangle Width="8" Height="38" Fill="#FF8800" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                            </StackPanel>
-
-                        </Grid>
-                    </Border>
-
-                    <views:LiveClipInfoView Grid.Row="1" />
-                    <views:LiveScheduleView Grid.Row="2" />
-
-                </Grid>
-            </Border>
-
-        </Grid>
 
     </Grid>
 

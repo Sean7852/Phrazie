@@ -63,7 +63,11 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     // ── Phrase tracker ────────────────────────────────────────────────────
 
-    [ObservableProperty] private double _currentPhase = 0.0;
+    [ObservableProperty] private double _currentPhase  = 0.0;
+    [ObservableProperty] private int    _phraseNumber  = 1;
+    public int TotalPhrases { get; } = 8;
+
+    private double _lastPhase = -1.0;
 
     // ── ctor ──────────────────────────────────────────────────────────────
 
@@ -97,9 +101,13 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
         _beatClock.Bpm = Bpm;
         _beatClock.PhaseChanged += phase =>
-            Dispatcher.UIThread.Post(
-                () => CurrentPhase = phase,
-                DispatcherPriority.Render);
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_lastPhase > 0.9 && phase < 0.1)
+                    PhraseNumber = (PhraseNumber % TotalPhrases) + 1;
+                _lastPhase   = phase;
+                CurrentPhase = phase;
+            }, DispatcherPriority.Render);
         _beatClock.Start();
     }
 
