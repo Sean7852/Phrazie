@@ -51,6 +51,22 @@ public partial class LivePerformanceViewModel : ViewModelBase
     public IReadOnlyList<TriggerDelayType> DelayTypes { get; } =
         Enum.GetValues<TriggerDelayType>();
 
+    // ── Transport ─────────────────────────────────────────────────────────
+
+    [ObservableProperty] private bool _isPlaying   = true;
+    [ObservableProperty] private bool _isRecording = false;
+
+    public string PlayPauseIcon => IsPlaying ? "⏸" : "▶";
+
+    partial void OnIsPlayingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(PlayPauseIcon));
+        if (value) _beatClock.Start(); else _beatClock.Stop();
+    }
+
+    [RelayCommand] private void TogglePlay()   => IsPlaying   = !IsPlaying;
+    [RelayCommand] private void ToggleRecord() => IsRecording = !IsRecording;
+
     // ── BPM ───────────────────────────────────────────────────────────────
 
     [ObservableProperty] private double _bpm = 128;
@@ -60,6 +76,9 @@ public partial class LivePerformanceViewModel : ViewModelBase
         _ = _session.SetBpmAsync(value);
         _beatClock.Bpm = value;
     }
+
+    [RelayCommand] private void IncreaseBpm() => Bpm = Math.Min(200, Bpm + 1);
+    [RelayCommand] private void DecreaseBpm() => Bpm = Math.Max(60,  Bpm - 1);
 
     // ── Phrase tracker ────────────────────────────────────────────────────
 
