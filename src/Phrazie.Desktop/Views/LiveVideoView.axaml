@@ -7,24 +7,69 @@
              Background="{StaticResource MainBackgroundBrush}">
 
     <UserControl.Styles>
+
+        <!-- Base transport button -->
         <Style Selector="Button.transport">
             <Setter Property="Background"        Value="Transparent" />
-            <Setter Property="Foreground"        Value="{StaticResource TextBrushDisabled}" />
+            <Setter Property="Foreground"        Value="{StaticResource TextBrushPrimary}" />
             <Setter Property="BorderThickness"   Value="0" />
-            <Setter Property="Padding"           Value="8,4" />
-            <Setter Property="FontSize"          Value="14" />
+            <Setter Property="Padding"           Value="0" />
             <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="CornerRadius"      Value="4" />
         </Style>
-        <Style Selector="Button.transport:pointerover /template/ ContentPresenter">
-            <Setter Property="TextElement.Foreground" Value="{StaticResource TextBrushPrimary}" />
+
+        <!-- ◄ ► nav buttons -->
+        <Style Selector="Button.transport.nav">
+            <Setter Property="Background"      Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
+            <Setter Property="Foreground"      Value="{StaticResource TextBrushPrimary}" />
+            <Setter Property="Width"           Value="26" />
+            <Setter Property="Height"          Value="26" />
+            <Setter Property="FontSize"        Value="11" />
         </Style>
-        <Style Selector="Button.transport.play">
-            <Setter Property="Foreground" Value="#6699CC" />
-            <Setter Property="FontSize"   Value="16" />
+
+        <!-- ▶ / ⏸ play-pause button -->
+        <Style Selector="Button.transport.playpause">
+            <Setter Property="Background"      Value="{StaticResource TextBrushAccent}" />
+            <Setter Property="Foreground"      Value="#0A0A0B" />
+            <Setter Property="Width"           Value="34" />
+            <Setter Property="Height"          Value="30" />
+            <Setter Property="FontSize"        Value="14" />
         </Style>
+
+        <!-- − + BPM step buttons -->
+        <Style Selector="Button.transport.bpmstep">
+            <Setter Property="Background"      Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
+            <Setter Property="Width"           Value="22" />
+            <Setter Property="Height"          Value="22" />
+            <Setter Property="FontSize"        Value="14" />
+        </Style>
+
+        <!-- TAP button -->
+        <Style Selector="Button.transport.tap">
+            <Setter Property="Background"      Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush"     Value="{StaticResource TextBrushAccent}" />
+            <Setter Property="Foreground"      Value="{StaticResource TextBrushAccent}" />
+            <Setter Property="Padding"         Value="10,4" />
+            <Setter Property="FontSize"        Value="11" />
+        </Style>
+
+        <!-- REC button -->
+        <Style Selector="Button.transport.rec">
+            <Setter Property="Background"      Value="Transparent" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
+            <Setter Property="Padding"         Value="10,5" />
+            <Setter Property="FontSize"        Value="11" />
+        </Style>
+
     </UserControl.Styles>
 
-    <Grid RowDefinitions="*, 96, 44">
+    <Grid RowDefinitions="*, 96, 58">
 
         <!-- ── Row 0: Video output ───────────────────────────────────── -->
         <Grid Grid.Row="0">
@@ -82,48 +127,81 @@
                 Background="{StaticResource PanelBackgroundBrush}"
                 BorderBrush="{StaticResource BoxBorderDefault}"
                 BorderThickness="0,1,0,0">
-            <Grid ColumnDefinitions="Auto,*,Auto" Margin="14,0">
+            <Grid ColumnDefinitions="Auto,*,Auto" Margin="12,0">
 
+                <!-- Left: ◄  ⏸  ► -->
                 <StackPanel Grid.Column="0"
                             Orientation="Horizontal"
                             VerticalAlignment="Center"
-                            Spacing="0">
-                    <Button Classes="transport" Content="⏮" />
-                    <Button Classes="transport" Content="⏪" />
-                    <Button Classes="transport play" Content="▶" />
-                    <Button Classes="transport" Content="⏩" />
-                    <Button Classes="transport" Content="⏭" />
+                            Spacing="4">
+                    <Button Classes="transport nav" Content="◄" />
+                    <Button Classes="transport playpause" Content="▶" />
+                    <Button Classes="transport nav" Content="►" />
                 </StackPanel>
 
-                <StackPanel Grid.Column="1"
-                            Orientation="Horizontal"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Spacing="10">
-                    <TextBlock Text="0:00"
-                               Foreground="{StaticResource TextBrushDisabled}"
-                               FontSize="11"
-                               FontFamily="Consolas,monospace"
-                               VerticalAlignment="Center" />
-                    <Rectangle Width="1" Height="12" Fill="{StaticResource BoxBorderDefault}" />
-                    <TextBlock Text="001 : 1"
-                               Foreground="{StaticResource TextBrushDisabled}"
-                               FontSize="11"
-                               FontFamily="Consolas,monospace"
-                               VerticalAlignment="Center" />
-                    <Rectangle Width="1" Height="12" Fill="{StaticResource BoxBorderDefault}" />
-                    <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\} BPM}"
-                               Foreground="{StaticResource TextBrushDisabled}"
-                               FontSize="11"
-                               VerticalAlignment="Center" />
-                </StackPanel>
+                <!-- Center: BPM label | − | large number + slider | + | TAP -->
+                <Grid Grid.Column="1"
+                      ColumnDefinitions="Auto,Auto,*,Auto,Auto"
+                      VerticalAlignment="Center"
+                      Margin="20,0">
 
+                    <TextBlock Grid.Column="0"
+                               Text="BPM"
+                               Foreground="{StaticResource TextBrushDisabled}"
+                               FontSize="10"
+                               LetterSpacing="1.5"
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0" />
+
+                    <Button Grid.Column="1" Classes="transport bpmstep" Content="−" />
+
+                    <StackPanel Grid.Column="2"
+                                Orientation="Vertical"
+                                VerticalAlignment="Center"
+                                Margin="6,0">
+                        <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
+                                   FontSize="24"
+                                   FontWeight="Bold"
+                                   Foreground="{StaticResource TextBrushPrimary}"
+                                   HorizontalAlignment="Center" />
+                        <Slider Minimum="40" Maximum="300"
+                                Value="{Binding Bpm}"
+                                Height="16"
+                                Margin="0,2,0,0" />
+                    </StackPanel>
+
+                    <Button Grid.Column="3" Classes="transport bpmstep" Content="+" />
+
+                    <Button Grid.Column="4" Classes="transport tap" Content="TAP"
+                            Margin="10,0,0,0" />
+                </Grid>
+
+                <!-- Right: REC | timecode -->
                 <StackPanel Grid.Column="2"
                             Orientation="Horizontal"
                             VerticalAlignment="Center"
-                            Spacing="4">
-                    <Button Classes="transport" Content="↺" />
-                    <Button Classes="transport" Content="⊞" />
+                            Spacing="10">
+                    <Button Classes="transport rec">
+                        <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                            <Ellipse Width="7" Height="7" Fill="#DD3333" VerticalAlignment="Center" />
+                            <TextBlock Text="REC"
+                                       FontSize="11"
+                                       LetterSpacing="1"
+                                       Foreground="{StaticResource TextBrushPrimary}"
+                                       VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <StackPanel Orientation="Vertical" VerticalAlignment="Center" Spacing="1">
+                        <TextBlock Text="00:00:00"
+                                   FontFamily="Consolas,monospace"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"
+                                   Foreground="{StaticResource TextBrushPrimary}" />
+                        <TextBlock Text="1080p60   0.0 MB"
+                                   FontFamily="Consolas,monospace"
+                                   FontSize="9"
+                                   Foreground="{StaticResource TextBrushDisabled}" />
+                    </StackPanel>
                 </StackPanel>
 
             </Grid>
