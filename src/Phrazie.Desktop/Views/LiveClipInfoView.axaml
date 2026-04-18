@@ -9,10 +9,10 @@
                     Spacing="12">
             <TextBlock Text="&#x266A;"
                        FontSize="42"
-                       Foreground="#1E1E30"
+                       Foreground="{StaticResource BoxBorderDefault}"
                        HorizontalAlignment="Center" />
             <TextBlock Text="CLIP INFO"
-                       Foreground="#1E1E30"
+                       Foreground="{StaticResource BoxBorderDefault}"
                        FontSize="10"
                        LetterSpacing="3"
                        HorizontalAlignment="Center" />

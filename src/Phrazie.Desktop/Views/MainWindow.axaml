@@ -7,7 +7,7 @@
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="800"
         x:Class="Phrazie.Desktop.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Background="#080810"
+        Background="{StaticResource MainBackgroundBrush}"
         Title="Phrazie"
         Icon="/Assets/icon.png"
         xmlns:views="using:Phrazie.Desktop.Views"
@@ -17,12 +17,12 @@
 
     <!-- ── Custom title bar ───────────────────────────────────────────────── -->
     <Grid Grid.Row="0"
-          Background="#0A0A14"
+          Background="{StaticResource PanelBackgroundBrush}"
           chrome:WindowDecorationProperties.ElementRole="TitleBar"
           PointerPressed="TitleBar_PointerPressed"
           DoubleTapped="TitleBar_DoubleTapped">
         <TextBlock Text="PHRAZIE"
-                   Foreground="#3A3A55"
+                   Foreground="{StaticResource TextBrushDisabled}"
                    FontSize="11"
                    LetterSpacing="3"
                    VerticalAlignment="Center"
@@ -49,32 +49,29 @@
     <!-- ── App body ───────────────────────────────────────────────────────── -->
     <Panel Grid.Row="1">
 
-    <!-- ── Login overlay (shown when not authenticated) ───────────────────── -->
+    <!-- ── Login overlay ─────────────────────────────────────────────────── -->
     <Panel IsVisible="{Binding !IsAuthenticated}">
         <views:LoginView DataContext="{Binding LoginPage}" />
     </Panel>
 
-    <!-- ── Main app (shown when authenticated) ────────────────────────────── -->
+    <!-- ── Main app ──────────────────────────────────────────────────────── -->
     <Grid ColumnDefinitions="180,*"
           IsVisible="{Binding IsAuthenticated}">
 
         <!-- ── Sidebar ── -->
         <Border Grid.Column="0"
-                Background="#0E0E18"
-                BorderBrush="#1E1E2E"
+                Background="{StaticResource PanelBackgroundBrush}"
+                BorderBrush="{StaticResource BoxBorderDefault}"
                 BorderThickness="0,0,1,0">
             <Grid RowDefinitions="Auto,*,Auto">
 
-                <!-- Top nav -->
                 <StackPanel Grid.Row="0" Margin="0,16,0,0" Spacing="2">
-
                     <Button Command="{Binding GoToCollectionsCommand}"
                             Classes="nav"
                             Classes.active="{Binding IsCollectionsActive}"
                             ToolTip.Tip="Browse and manage your visual collections">
                         Collections
                     </Button>
-
                     <Button Command="{Binding GoToLiveCommand}"
                             Classes="nav"
                             Classes.active="{Binding IsLiveActive}"
@@ -83,23 +80,19 @@
                     </Button>
                 </StackPanel>
 
-                <!-- Bottom: Settings + Help buttons -->
                 <StackPanel Grid.Row="2" Spacing="0" Margin="0,0,0,8">
-
                     <Button Command="{Binding GoToSettingsCommand}"
                             Classes="nav"
                             Classes.active="{Binding IsSettingsActive}"
                             ToolTip.Tip="App settings and preferences">
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <TextBlock Text="⚙"
-                                       Foreground="#666688"
+                                       Foreground="{StaticResource TextBrushSecondary}"
                                        FontSize="14"
                                        VerticalAlignment="Center" />
-                            <TextBlock Text="Settings"
-                                       VerticalAlignment="Center" />
+                            <TextBlock Text="Settings" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
-
                     <Button Command="{Binding GoToHelpCommand}"
                             Classes="nav"
                             Classes.active="{Binding IsHelpActive}"
@@ -107,21 +100,19 @@
                         <StackPanel Orientation="Horizontal" Spacing="10">
                             <Border Width="20" Height="20"
                                     CornerRadius="10"
-                                    BorderBrush="#444466"
+                                    BorderBrush="{StaticResource BoxBorderDefault}"
                                     BorderThickness="1"
                                     VerticalAlignment="Center">
                                 <TextBlock Text="?"
-                                           Foreground="#888899"
+                                           Foreground="{StaticResource TextBrushSecondary}"
                                            FontSize="12"
                                            FontWeight="SemiBold"
                                            HorizontalAlignment="Center"
                                            VerticalAlignment="Center" />
                             </Border>
-                            <TextBlock Text="Help &amp; Resources"
-                                       VerticalAlignment="Center" />
+                            <TextBlock Text="Help &amp; Resources" VerticalAlignment="Center" />
                         </StackPanel>
                     </Button>
-
                 </StackPanel>
 
             </Grid>
@@ -131,7 +122,7 @@
         <Border Grid.Column="1">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                    <GradientStop Color="#090912" Offset="0" />
+                    <GradientStop Color="{StaticResource SurfaceBlack}" Offset="0" />
                     <GradientStop Color="#0D1535" Offset="1" />
                 </LinearGradientBrush>
             </Border.Background>
@@ -145,10 +136,9 @@
     </Grid>
 
     <Window.Styles>
-        <!-- ── Nav buttons ───────────────────────────────────────────────────── -->
         <Style Selector="Button.nav">
             <Setter Property="Background"                 Value="Transparent" />
-            <Setter Property="Foreground"                 Value="#888899" />
+            <Setter Property="Foreground"                 Value="{StaticResource TextBrushSecondary}" />
             <Setter Property="BorderThickness"            Value="0" />
             <Setter Property="Padding"                    Value="20,10" />
             <Setter Property="HorizontalAlignment"        Value="Stretch" />
@@ -156,18 +146,17 @@
             <Setter Property="CornerRadius"               Value="0" />
         </Style>
         <Style Selector="Button.nav:pointerover /template/ ContentPresenter">
-            <Setter Property="Background"             Value="#16162A" />
-            <Setter Property="TextElement.Foreground" Value="White" />
+            <Setter Property="Background"             Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="TextElement.Foreground" Value="{StaticResource TextBrushPrimary}" />
         </Style>
         <Style Selector="Button.nav.active /template/ ContentPresenter">
-            <Setter Property="Background"             Value="#1C1C32" />
-            <Setter Property="TextElement.Foreground" Value="White" />
+            <Setter Property="Background"             Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="TextElement.Foreground" Value="{StaticResource TextBrushPrimary}" />
         </Style>
 
-        <!-- ── Title-bar window control buttons ──────────────────────────────── -->
         <Style Selector="Button.titlebar-btn">
             <Setter Property="Background"                 Value="Transparent" />
-            <Setter Property="Foreground"                 Value="#888899" />
+            <Setter Property="Foreground"                 Value="{StaticResource TextBrushSecondary}" />
             <Setter Property="BorderThickness"            Value="0" />
             <Setter Property="Width"                      Value="46" />
             <Setter Property="Height"                     Value="36" />
@@ -178,12 +167,12 @@
             <Setter Property="CornerRadius"               Value="0" />
         </Style>
         <Style Selector="Button.titlebar-btn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background"             Value="#1E1E2E" />
-            <Setter Property="TextElement.Foreground" Value="White" />
+            <Setter Property="Background"             Value="{StaticResource BoxBorderDefault}" />
+            <Setter Property="TextElement.Foreground" Value="{StaticResource TextBrushPrimary}" />
         </Style>
         <Style Selector="Button.titlebar-btn.close:pointerover /template/ ContentPresenter">
             <Setter Property="Background"             Value="#C42B1C" />
-            <Setter Property="TextElement.Foreground" Value="White" />
+            <Setter Property="TextElement.Foreground" Value="{StaticResource TextBrushPrimary}" />
         </Style>
     </Window.Styles>
 

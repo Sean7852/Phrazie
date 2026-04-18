@@ -4,45 +4,45 @@
              xmlns:views="using:Phrazie.Desktop.Views"
              x:Class="Phrazie.Desktop.Views.LivePerformanceView"
              x:DataType="vm:LivePerformanceViewModel"
-             Background="#0A0A12">
+             Background="{StaticResource MainBackgroundBrush}">
 
     <UserControl.Styles>
 
         <Style Selector="Button.hdr">
-            <Setter Property="Background"                 Value="Transparent" />
-            <Setter Property="Foreground"                 Value="#666688" />
-            <Setter Property="BorderBrush"                Value="#2A2A44" />
-            <Setter Property="BorderThickness"            Value="1" />
-            <Setter Property="CornerRadius"               Value="5" />
-            <Setter Property="Padding"                    Value="14,5" />
-            <Setter Property="FontSize"                   Value="12" />
-            <Setter Property="VerticalAlignment"          Value="Center" />
+            <Setter Property="Background"        Value="Transparent" />
+            <Setter Property="Foreground"        Value="{StaticResource TextBrushSecondary}" />
+            <Setter Property="BorderBrush"       Value="{StaticResource BoxBorderDefault}" />
+            <Setter Property="BorderThickness"   Value="1" />
+            <Setter Property="CornerRadius"      Value="5" />
+            <Setter Property="Padding"           Value="14,5" />
+            <Setter Property="FontSize"          Value="12" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
         <Style Selector="Button.hdr:pointerover /template/ ContentPresenter">
-            <Setter Property="Background"             Value="#1A1A2E" />
-            <Setter Property="TextElement.Foreground" Value="#AAAACC" />
+            <Setter Property="Background"             Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="TextElement.Foreground" Value="{StaticResource TextBrushPrimary}" />
         </Style>
 
         <Style Selector="Button.hdr.primary">
-            <Setter Property="Background"    Value="White" />
-            <Setter Property="Foreground"    Value="#0A0A14" />
-            <Setter Property="BorderBrush"   Value="White" />
-            <Setter Property="FontWeight"    Value="SemiBold" />
+            <Setter Property="Background"  Value="{StaticResource TextBrushPrimary}" />
+            <Setter Property="Foreground"  Value="{StaticResource MainBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource TextBrushPrimary}" />
+            <Setter Property="FontWeight"  Value="SemiBold" />
         </Style>
         <Style Selector="Button.hdr.primary:pointerover /template/ ContentPresenter">
             <Setter Property="Background"             Value="#DDDDEE" />
-            <Setter Property="TextElement.Foreground" Value="#0A0A14" />
+            <Setter Property="TextElement.Foreground" Value="{StaticResource MainBackgroundBrush}" />
         </Style>
 
         <Style Selector="Button.clip-card">
-            <Setter Property="Background"    Value="#12121E" />
-            <Setter Property="Foreground"    Value="#888899" />
-            <Setter Property="BorderBrush"   Value="#1E1E30" />
+            <Setter Property="Background"      Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="Foreground"      Value="{StaticResource TextBrushSecondary}" />
+            <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius"  Value="6" />
-            <Setter Property="Padding"       Value="12,8" />
-            <Setter Property="MinWidth"      Value="100" />
-            <Setter Property="FontSize"      Value="12" />
+            <Setter Property="CornerRadius"    Value="6" />
+            <Setter Property="Padding"         Value="12,8" />
+            <Setter Property="MinWidth"        Value="100" />
+            <Setter Property="FontSize"        Value="12" />
         </Style>
         <Style Selector="Button.clip-card.active /template/ ContentPresenter">
             <Setter Property="Background"             Value="#0E1E0E" />
@@ -58,60 +58,50 @@
 
         <!-- ── ROW 0: Header bar ─────────────────────────────────────────── -->
         <Border Grid.Row="0"
-                Background="#0D0D1A"
-                BorderBrush="#1E1E30"
+                Background="{StaticResource PanelBackgroundBrush}"
+                BorderBrush="{StaticResource BoxBorderDefault}"
                 BorderThickness="0,0,0,1">
-            <Grid ColumnDefinitions="Auto,*,Auto"
-                  Margin="20,0">
+            <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,0">
 
-                <!-- Center: live status strip -->
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal"
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
                             Spacing="20">
 
-                    <!-- Playing indicator dot -->
                     <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                        <Ellipse Width="7" Height="7"
-                                 Fill="#44DD44"
-                                 VerticalAlignment="Center" />
+                        <Ellipse Width="7" Height="7" Fill="#44DD44" VerticalAlignment="Center" />
                         <TextBlock Text="{Binding StatusLabel}"
-                                   Foreground="#888899"
+                                   Foreground="{StaticResource TextBrushSecondary}"
                                    FontSize="11"
                                    LetterSpacing="1"
                                    VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <!-- Separator -->
-                    <Rectangle Width="1" Height="16" Fill="#2A2A44" />
+                    <Rectangle Width="1" Height="16" Fill="{StaticResource BoxBorderDefault}" />
 
-                    <!-- BPM readout -->
                     <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
                         <TextBlock Text="BPM"
-                                   Foreground="#444466"
+                                   Foreground="{StaticResource TextBrushDisabled}"
                                    FontSize="10"
                                    LetterSpacing="1"
                                    VerticalAlignment="Center" />
                         <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
-                                   Foreground="#AAAACC"
+                                   Foreground="{StaticResource TextBrushPrimary}"
                                    FontSize="13"
                                    FontWeight="Medium"
                                    VerticalAlignment="Center" />
                     </StackPanel>
 
-                    <!-- Separator -->
-                    <Rectangle Width="1" Height="16" Fill="#2A2A44" />
+                    <Rectangle Width="1" Height="16" Fill="{StaticResource BoxBorderDefault}" />
 
-                    <!-- Collection name -->
                     <TextBlock Text="{Binding CollectionName}"
-                               Foreground="#666688"
+                               Foreground="{StaticResource TextBrushSecondary}"
                                FontSize="12"
                                VerticalAlignment="Center" />
 
                 </StackPanel>
 
-                <!-- Right: action buttons -->
                 <StackPanel Grid.Column="2"
                             Orientation="Horizontal"
                             VerticalAlignment="Center"
@@ -127,40 +117,33 @@
         <!-- ── ROW 1: Main area ──────────────────────────────────────────── -->
         <Grid Grid.Row="1" ColumnDefinitions="*,340">
 
-            <!-- LEFT: Video area (placeholder) -->
             <views:LiveVideoView Grid.Column="0" />
 
-            <!-- RIGHT: Control panel -->
             <Border Grid.Column="1"
-                    Background="#0A0A14"
-                    BorderBrush="#1E1E30"
+                    Background="{StaticResource MainBackgroundBrush}"
+                    BorderBrush="{StaticResource BoxBorderDefault}"
                     BorderThickness="1,0,0,0">
                 <Grid RowDefinitions="140,*,120">
 
-                    <!-- RIGHT-TOP: BPM + collection + level bars -->
                     <Border Grid.Row="0"
-                            Background="#0D0D1A"
-                            BorderBrush="#1E1E30"
+                            Background="{StaticResource PanelBackgroundBrush}"
+                            BorderBrush="{StaticResource BoxBorderDefault}"
                             BorderThickness="0,0,0,1"
                             Padding="20,16">
                         <Grid ColumnDefinitions="*,Auto">
 
-                            <!-- BPM number + genre -->
-                            <StackPanel Grid.Column="0"
-                                        VerticalAlignment="Center"
-                                        Spacing="4">
+                            <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="4">
                                 <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
-                                           Foreground="White"
+                                           Foreground="{StaticResource TextBrushPrimary}"
                                            FontSize="64"
                                            FontWeight="Light"
                                            LineHeight="64" />
                                 <TextBlock Text="{Binding CollectionName}"
-                                           Foreground="#555566"
+                                           Foreground="{StaticResource TextBrushDisabled}"
                                            FontSize="12"
                                            LetterSpacing="1" />
                             </StackPanel>
 
-                            <!-- Decorative level bars -->
                             <StackPanel Grid.Column="1"
                                         Orientation="Horizontal"
                                         VerticalAlignment="Bottom"
@@ -168,17 +151,14 @@
                                 <Rectangle Width="8" Height="60" Fill="#FF4499" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
                                 <Rectangle Width="8" Height="88" Fill="#CC44FF" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
                                 <Rectangle Width="8" Height="48" Fill="#9955FF" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                                <Rectangle Width="8" Height="74" Fill="#FFCC00" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
+                                <Rectangle Width="8" Height="74" Fill="{StaticResource TextBrushAccent}" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
                                 <Rectangle Width="8" Height="38" Fill="#FF8800" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
                             </StackPanel>
 
                         </Grid>
                     </Border>
 
-                    <!-- RIGHT-MID: Clip info (placeholder) -->
                     <views:LiveClipInfoView Grid.Row="1" />
-
-                    <!-- RIGHT-BOTTOM: Schedule controls (placeholder) -->
                     <views:LiveScheduleView Grid.Row="2" />
 
                 </Grid>

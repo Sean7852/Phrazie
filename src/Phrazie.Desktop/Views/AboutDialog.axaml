@@ -6,66 +6,59 @@
         Height="320"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Background="#080810"
+        Background="{StaticResource MainBackgroundBrush}"
         Icon="/Assets/icon.png"
         WindowDecorations="None">
 
-    <Border Background="#0E0E1A"
-            BorderBrush="#1E1E30"
+    <Border Background="{StaticResource PanelBackgroundBrush}"
+            BorderBrush="{StaticResource BoxBorderDefault}"
             BorderThickness="1"
             CornerRadius="12"
             Margin="1">
 
-        <!-- Panel lets the X button float over the content -->
         <Panel>
 
-            <!-- ── Content ── -->
             <StackPanel Spacing="20" Margin="36,32,36,32">
 
-                <!-- Brand -->
                 <StackPanel Spacing="6">
                     <TextBlock Text="PHRAZIE"
-                               Foreground="#444466"
+                               Foreground="{StaticResource TextBrushDisabled}"
                                FontSize="11"
                                LetterSpacing="4" />
                     <TextBlock Text="Visual performance toolkit"
-                               Foreground="White"
+                               Foreground="{StaticResource TextBrushPrimary}"
                                FontSize="22"
                                FontWeight="Light" />
                 </StackPanel>
 
-                <!-- Version info -->
                 <StackPanel Spacing="4">
                     <TextBlock Text="Version 0.1.0 — Early Preview"
-                               Foreground="#888899"
+                               Foreground="{StaticResource TextBrushSecondary}"
                                FontSize="13" />
                     <TextBlock Text="Built with .NET 9 · Avalonia 12 · LibVLC · Supabase"
-                               Foreground="#555566"
+                               Foreground="{StaticResource TextBrushDisabled}"
                                FontSize="12" />
                 </StackPanel>
 
-                <!-- Divider -->
-                <Border Height="1" Background="#1E1E30" />
+                <Border Height="1" Background="{StaticResource BoxBorderDefault}" />
 
-                <!-- Credits -->
                 <StackPanel Spacing="4">
                     <TextBlock Text="© 2026 Sean Liu. All rights reserved."
-                               Foreground="#555566"
+                               Foreground="{StaticResource TextBrushDisabled}"
                                FontSize="12" />
                     <TextBlock Text="Video decoding powered by VideoLAN / LibVLC."
-                               Foreground="#444455"
+                               Foreground="{StaticResource TextBrushDisabled}"
                                FontSize="11" />
                 </StackPanel>
 
             </StackPanel>
 
-            <!-- ── X close button (top-right) ── -->
             <Button Click="OnCloseClick"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     Margin="0,10,10,0"
                     Background="Transparent"
-                    Foreground="#555566"
+                    Foreground="{StaticResource TextBrushDisabled}"
                     BorderThickness="0"
                     Width="28" Height="28"
                     FontSize="13"
