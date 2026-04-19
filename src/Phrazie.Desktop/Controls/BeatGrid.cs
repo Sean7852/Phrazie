@@ -116,9 +116,9 @@ public sealed class BeatGrid : Control
             var cellLeft   = barX + BarPad;
 
             // Height tiers — all cells reach the same activeH when on the current beat
-            var kickH   = cellH * 0.45;
-            var normalH = cellH * 0.30;
-            var activeH = cellH * 0.62;
+            var kickH   = cellH * 0.63;
+            var normalH = cellH * 0.42;
+            var activeH = cellH * 0.87;
 
             for (int c = 0; c < BeatsPerBar; c++)
             {
