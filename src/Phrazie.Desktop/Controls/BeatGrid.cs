@@ -22,7 +22,7 @@ public sealed class BeatGrid : Control
         AvaloniaProperty.Register<BeatGrid, int>(nameof(TotalPhrases), 8);
 
     public static readonly StyledProperty<bool> AnimateProperty =
-        AvaloniaProperty.Register<BeatGrid, bool>(nameof(Animate), false);
+        AvaloniaProperty.Register<BeatGrid, bool>(nameof(Animate), true);
 
     public double Phase        { get => GetValue(PhaseProperty);        set => SetValue(PhaseProperty,        value); }
     public int    PhraseNumber { get => GetValue(PhraseNumberProperty); set => SetValue(PhraseNumberProperty, value); }
@@ -74,7 +74,8 @@ public sealed class BeatGrid : Control
         var beatIdx       = (int)beatF % TotalBeats;
         var beatPhase     = beatF - Math.Floor(beatF);          // 0→1 within current slot
         var currentBar    = beatIdx / BeatsPerBar;
-        var pulseT        = Math.Max(0.0, 1.0 - beatPhase / 0.35);  // sharp decay
+        var prevBeatIdx   = (beatIdx - 1 + TotalBeats) % TotalBeats;
+        var pulseT        = Math.Max(0.0, 1.0 - beatPhase / 0.175);  // sharp decay at beat start
 
         // ── Header ─────────────────────────────────────────────────────────
 
@@ -126,8 +127,11 @@ public sealed class BeatGrid : Control
                 bool current = gbeat == beatIdx;
 
                 var baseH     = c == 0 ? kickH : normalH;
-                var targetH   = current ? activeH : baseH;
-                var thisCellH = current && Animate ? baseH + (activeH - baseH) * pulseT : targetH;
+                bool isPrev   = gbeat == prevBeatIdx;
+                // Current cell holds full height; previous cell shrinks as the new beat starts
+                var thisCellH = current ? activeH
+                              : isPrev && Animate ? baseH + (activeH - baseH) * pulseT
+                              : baseH;
                 var cellX     = cellLeft + c * (cellW + CellGap);
                 var cellY     = cellBottom - thisCellH;
                 var cellRect  = new Rect(cellX, cellY, cellW, thisCellH);
@@ -141,7 +145,9 @@ public sealed class BeatGrid : Control
                 {
                     if (Animate)
                     {
-                        var expand   = pulseT * 4.0;
+                        // Glow pulses in at beat start then holds steady
+                        var glowT    = Math.Max(0.3, pulseT);
+                        var expand   = glowT * 4.0;
                         var glowRect = new RoundedRect(cellRect.Inflate(expand), CellRadius + expand * 0.4);
                         ctx.DrawRectangle(GlowMid, null, glowRect);
                     }
