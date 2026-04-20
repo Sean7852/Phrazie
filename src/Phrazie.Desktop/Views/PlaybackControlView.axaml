@@ -5,18 +5,107 @@
              x:DataType="vm:LivePerformanceViewModel">
 
   <UserControl.Styles>
+
+    <!-- ── Transport base ── -->
+    <Style Selector="Button.transport">
+      <Setter Property="Background"                 Value="Transparent" />
+      <Setter Property="Foreground"                 Value="{StaticResource TextBrushSecondary}" />
+      <Setter Property="BorderBrush"                Value="{StaticResource BoxBorderDefault}" />
+      <Setter Property="BorderThickness"            Value="1" />
+      <Setter Property="CornerRadius"               Value="6" />
+      <Setter Property="Padding"                    Value="10,6" />
+      <Setter Property="FontSize"                   Value="13" />
+      <Setter Property="VerticalAlignment"          Value="Center" />
+    </Style>
+    <Style Selector="Button.transport:pointerover /template/ ContentPresenter">
+      <Setter Property="Background"             Value="{StaticResource ControlBackgroundBrush}" />
+      <Setter Property="TextElement.Foreground" Value="{StaticResource TextBrushPrimary}" />
+    </Style>
+
+    <!-- ── Play/Pause: amber fill, rounded rect ── -->
+    <Style Selector="Button.transport.playpause">
+      <Setter Property="Background"      Value="{StaticResource AccentBrush}" />
+      <Setter Property="Foreground"      Value="#0A0A0B" />
+      <Setter Property="BorderBrush"     Value="{StaticResource AccentBrush}" />
+      <Setter Property="FontWeight"      Value="Bold" />
+      <Setter Property="Width"           Value="52" />
+      <Setter Property="Height"          Value="36" />
+      <Setter Property="CornerRadius"    Value="8" />
+      <Setter Property="Padding"         Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment"   Value="Center" />
+    </Style>
+    <Style Selector="Button.transport.playpause:pointerover /template/ ContentPresenter">
+      <Setter Property="Background"             Value="#F7AB2E" />
+      <Setter Property="TextElement.Foreground" Value="#0A0A0B" />
+    </Style>
+
+    <!-- ── Skip nav buttons ── -->
+    <Style Selector="Button.transport.nav">
+      <Setter Property="Width"                      Value="32" />
+      <Setter Property="Height"                     Value="32" />
+      <Setter Property="Padding"                    Value="0" />
+      <Setter Property="CornerRadius"               Value="4" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment"   Value="Center" />
+    </Style>
+
+    <!-- ── BPM +/- step ── -->
+    <Style Selector="Button.transport.bpmstep">
+      <Setter Property="Width"        Value="28" />
+      <Setter Property="Height"       Value="28" />
+      <Setter Property="Padding"      Value="0" />
+      <Setter Property="FontSize"     Value="16" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- ── TAP tempo ── -->
+    <Style Selector="Button.transport.tap">
+      <Setter Property="Foreground"   Value="{StaticResource AccentBrush}" />
+      <Setter Property="BorderBrush"  Value="{StaticResource AccentBrush}" />
+      <Setter Property="FontSize"     Value="11" />
+      <Setter Property="FontWeight"   Value="Bold" />
+      <Setter Property="LetterSpacing" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding"      Value="10,6" />
+    </Style>
+    <Style Selector="Button.transport.tap:pointerover /template/ ContentPresenter">
+      <Setter Property="Background"             Value="#1AF59E0B" />
+      <Setter Property="TextElement.Foreground" Value="{StaticResource AccentBrush}" />
+    </Style>
+
+    <!-- ── REC button ── -->
+    <Style Selector="Button.transport.rec">
+      <Setter Property="Foreground"   Value="{StaticResource TextBrushSecondary}" />
+      <Setter Property="BorderBrush"  Value="{StaticResource BoxBorderDefault}" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding"      Value="12,6" />
+      <Setter Property="FontSize"     Value="12" />
+      <Setter Property="FontWeight"   Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.transport.rec.active /template/ ContentPresenter">
+      <Setter Property="Background"             Value="#1AEF4444" />
+    </Style>
+    <Style Selector="Button.transport.rec.active">
+      <Setter Property="BorderBrush" Value="{StaticResource DangerBrush}" />
+      <Setter Property="Foreground"  Value="{StaticResource DangerBrush}" />
+    </Style>
+
   </UserControl.Styles>
 
   <Grid Height="100" VerticalAlignment="Bottom" Background="Transparent">
 
+    <!-- Footer bar -->
     <Border Height="64"
             VerticalAlignment="Bottom"
-            Background="#0D0D12"
+            Background="{StaticResource PanelBackgroundBrush}"
             BorderBrush="{StaticResource BoxBorderDefault}"
             BorderThickness="0,1,0,0" />
 
     <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,0">
 
+      <!-- ── Transport controls ── -->
       <StackPanel Grid.Column="0"
                   Orientation="Horizontal"
                   VerticalAlignment="Bottom"
@@ -24,17 +113,25 @@
                   Spacing="6">
         <Button Classes="transport nav" Content="◄" />
         <Button Classes="transport playpause"
-                Content="{Binding PlayPauseIcon}"
-                Command="{Binding TogglePlayCommand}" />
+                Command="{Binding TogglePlayCommand}">
+          <TextBlock Text="{Binding PlayPauseIcon}"
+                     FontFamily="Segoe UI Symbol,Segoe MDL2 Assets"
+                     FontSize="13"
+                     FontWeight="Regular"
+                     Width="18"
+                     TextAlignment="Center"
+                     VerticalAlignment="Center" />
+        </Button>
         <Button Classes="transport nav" Content="►" />
       </StackPanel>
 
+      <!-- ── BPM panel ── -->
       <Border Grid.Column="1"
               Width="440"
               Height="80"
               VerticalAlignment="Bottom"
-              Background="#161622"
-              BorderBrush="#2A2A44"
+              Background="{StaticResource PanelBackgroundBrush}"
+              BorderBrush="{StaticResource BoxBorderDefault}"
               BorderThickness="1,1,1,0"
               CornerRadius="8,8,0,0"
               Padding="20,8"
@@ -43,7 +140,7 @@
         <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
           <TextBlock Grid.Column="0"
                      Text="BPM"
-                     Foreground="{StaticResource TextBrushDisabled}"
+                     Foreground="{StaticResource TextBrushSecondary}"
                      FontSize="10"
                      FontWeight="Bold"
                      LetterSpacing="2"
@@ -59,7 +156,7 @@
             <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
                        FontSize="28"
                        FontWeight="Bold"
-                       Foreground="White"
+                       Foreground="{StaticResource TextBrushPrimary}"
                        HorizontalAlignment="Center" />
             <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,0">
               <TextBlock Grid.Column="0"
@@ -93,6 +190,7 @@
         </Grid>
       </Border>
 
+      <!-- ── REC + timecode ── -->
       <StackPanel Grid.Column="2"
                   Orientation="Horizontal"
                   VerticalAlignment="Bottom"
@@ -103,18 +201,20 @@
           <Border CornerRadius="5"
                   Margin="-4"
                   IsVisible="{Binding IsRecording}"
-                  BoxShadow="0 0 14 4 #80CC2222" />
+                  BoxShadow="0 0 14 4 #80EF4444" />
           <Button Classes="transport rec"
                   Classes.active="{Binding IsRecording}"
                   Command="{Binding ToggleRecordCommand}">
             <StackPanel Orientation="Horizontal" Spacing="6">
-              <Ellipse Width="8" Height="8" Fill="#DD3333" />
+              <Ellipse Width="8" Height="8" Fill="{StaticResource DangerBrush}" />
               <TextBlock Text="REC" FontWeight="Bold" />
             </StackPanel>
           </Button>
         </Panel>
 
-        <Border Background="#13141A"
+        <Border Background="{StaticResource PanelBackgroundBrush}"
+                BorderBrush="{StaticResource BoxBorderDefault}"
+                BorderThickness="1"
                 CornerRadius="4"
                 Padding="12,8"
                 VerticalAlignment="Center">
@@ -122,10 +222,11 @@
             <TextBlock Text="00:00:00"
                        FontFamily="Consolas"
                        FontSize="15"
-                       FontWeight="Bold" />
+                       FontWeight="Bold"
+                       Foreground="{StaticResource TextBrushPrimary}" />
             <TextBlock Text="1080p60 · 0.0 MB"
                        FontSize="9"
-                       Foreground="#7A8FA6" />
+                       Foreground="{StaticResource TextBrushSecondary}" />
           </StackPanel>
         </Border>
       </StackPanel>

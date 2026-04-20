@@ -46,7 +46,7 @@
         </Style>
         <Style Selector="Button.clip-card.active /template/ ContentPresenter">
             <Setter Property="Background"             Value="#0E1E0E" />
-            <Setter Property="TextElement.Foreground" Value="#66CC66" />
+            <Setter Property="TextElement.Foreground" Value="{StaticResource LiveBrush}" />
         </Style>
         <Style Selector="Button.clip-card.active">
             <Setter Property="BorderBrush" Value="#2A5A2A" />
