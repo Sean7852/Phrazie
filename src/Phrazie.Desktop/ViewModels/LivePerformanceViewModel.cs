@@ -61,7 +61,18 @@ public partial class LivePerformanceViewModel : ViewModelBase
     partial void OnIsPlayingChanged(bool value)
     {
         OnPropertyChanged(nameof(PlayPauseIcon));
-        if (value) _beatClock.Start(); else _beatClock.Stop();
+        if (value)
+        {
+            _beatClock.Start();
+            var first = _session.Current.CurrentState?.Clips.FirstOrDefault(c => c.IsEnabled);
+            if (first is not null && _playback.CurrentClip is null)
+                _ = _playback.PlayAsync(first);
+        }
+        else
+        {
+            _beatClock.Stop();
+            _ = _playback.StopAsync();
+        }
     }
 
     [RelayCommand] private void TogglePlay()   => IsPlaying   = !IsPlaying;
