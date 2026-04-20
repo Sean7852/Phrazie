@@ -5,6 +5,14 @@
     <Color x:Key="AccentYellow">#FFB800</Color>
     <Color x:Key="AccentYellowDim">#4DFFB800</Color>
 
+    <!-- Secondary Accent: Orange -->
+    <Color x:Key="AccentOrange">#FF9900</Color>
+    <Color x:Key="AccentOrangeDim">#33FF9900</Color>
+
+    <!-- Status Colors -->
+    <Color x:Key="StatusPurple">#8855CC</Color>
+    <Color x:Key="StatusPurpleBg">#443366</Color>
+
     <!-- Neutral Palette -->
     <Color x:Key="SurfaceBlack">#0A0A0B</Color>
     <Color x:Key="SurfaceDark">#141416</Color>
@@ -34,5 +42,11 @@
     <SolidColorBrush x:Key="TextBrushSecondary" Color="{StaticResource TextMuted}" />
     <SolidColorBrush x:Key="TextBrushDisabled"  Color="{StaticResource TextDisabled}" />
     <SolidColorBrush x:Key="TextBrushAccent"    Color="{StaticResource AccentYellow}" />
+
+    <!-- Accent Brushes -->
+    <SolidColorBrush x:Key="AccentOrangeBrush"    Color="{StaticResource AccentOrange}" />
+    <SolidColorBrush x:Key="AccentOrangeDimBrush" Color="{StaticResource AccentOrangeDim}" />
+    <SolidColorBrush x:Key="StatusPurpleBrush"    Color="{StaticResource StatusPurple}" />
+    <SolidColorBrush x:Key="StatusPurpleBgBrush"  Color="{StaticResource StatusPurpleBg}" />
 
 </ResourceDictionary>

@@ -1,29 +1,34 @@
-I need to implement a bottom control bar for Phrazie consisting of three distinct functional groups: Play Controls, BPM Controls, and Record Controls. Use a horizontal Grid or StackPanel with a deep charcoal background (#0D0D12).
+I need to implement the 'UP NEXT' preview card for the right panel of Phrazie. This should be a standalone section wrapped in a rounded-corner Border (#0D0D12).
 
-Group 1: Play Controls (Left)
+1. Header Row:
 
-Layout: A small horizontal group of three buttons.
+Title: 'UP NEXT' in small, mono-spaced gray text (#7A8FA6) with wide letter spacing.
 
-Previous/Next: Smaller, dark buttons with arrow icons.
+CUE Button: A pill-shaped button on the right with an orange border (#FF9900), orange text 'CUE →', and a dark background.
 
-Play/Pause Button: A large, prominent Vibrant Orange (#FF9900) button. When playing, show a 'Pause' (||) icon. When stopped, show a 'Play' (▶) icon. Use rounded corners (4px).
+2. Content Area (Below Header):
 
-Group 2: BPM Controls (Center)
+Thumbnail: A rounded-corner Image (16:9 aspect ratio) on the left.
 
-BPM Display: Large white numeric text (e.g., '128') centered at the top.
+Metadata Group (Right of Thumbnail):
 
-Slider: Below the number, implement a custom-styled Slider. The 'Thumb' (the handle) should be a glowing orange circle. The 'Track' should be orange to the left of the thumb and dark gray to the right.
+Tag Row: Two small pill-shaped badges.
 
-Range Labels: Small gray text for '60' and '200' at the ends of the slider.
+GEOMETRY(What collection is this curent video from): A dark gray badge with a white diamond icon.
 
-Buttons: Include a '-' button on the left, and a '+' button followed by a 'TAP' button on the right. The 'TAP' button should have an orange border and orange text.
+BUILD(The State name, what collection/state is this curent video from): A purple-tinted badge (#443366) with a purple dot.
 
-Group 3: Record Controls (Right)
+Clip Info: Large white title 'Violet Grid' followed by a smaller, dimmed ID string 'CLP-128-C'.
 
-REC Button: A button with a red 'Record' dot and the text 'REC'. When active, it should have a subtle red outer glow.
+3. Action Button:
 
-Status Panel: A dark container to the right of the REC button showing:
+Change Clip: A wide, dark button at the bottom of the card with the text 'Change clip' and a small '>' chevron on the far right. Use a very subtle border (#1C1C2C).
 
-Timer: Large mono-spaced white text (e.g., '00:00:00').
+Technical Requirements:
 
-Metadata: Smaller blue-gray text below the timer showing resolution and size (e.g., '1080p60 · 0.0 MB').
+
+Styling: Use CornerRadius on all borders to maintain the smooth industrial aesthetic. The badges should have a CornerRadius of at least 10 to create the pill shape.
+
+Layout: Use a Grid for the main card structure and StackPanels for the small tag rows.
+
+Please also make all color read from the color file, so all title use the same color.

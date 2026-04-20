@@ -55,7 +55,7 @@
     </UserControl.Styles>
 
     <!-- ── ROW 1: Main area ──────────────────────────────────────────── -->
-    <Grid ColumnDefinitions="*,340">
+    <Grid Grid.Row="1" ColumnDefinitions="*,340">
 
         <views:LiveVideoView Grid.Column="0" />
 
@@ -63,41 +63,9 @@
                 Background="{StaticResource MainBackgroundBrush}"
                 BorderBrush="{StaticResource BoxBorderDefault}"
                 BorderThickness="1,0,0,0">
-            <Grid RowDefinitions="140,*,120">
+            <Grid RowDefinitions="180,*,120">
 
-                <Border Grid.Row="0"
-                        Background="{StaticResource PanelBackgroundBrush}"
-                        BorderBrush="{StaticResource BoxBorderDefault}"
-                        BorderThickness="0,0,0,1"
-                        Padding="20,16">
-                    <Grid ColumnDefinitions="*,Auto">
-
-                        <StackPanel Grid.Column="0" VerticalAlignment="Center" Spacing="4">
-                            <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
-                                        Foreground="{StaticResource TextBrushPrimary}"
-                                        FontSize="64"
-                                        FontWeight="Light"
-                                        LineHeight="64" />
-                            <TextBlock Text="{Binding CollectionName}"
-                                        Foreground="{StaticResource TextBrushDisabled}"
-                                        FontSize="12"
-                                        LetterSpacing="1" />
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="1"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Bottom"
-                                    Spacing="5">
-                            <Rectangle Width="8" Height="60" Fill="#FF4499" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                            <Rectangle Width="8" Height="88" Fill="#CC44FF" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                            <Rectangle Width="8" Height="48" Fill="#9955FF" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                            <Rectangle Width="8" Height="74" Fill="{StaticResource TextBrushAccent}" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                            <Rectangle Width="8" Height="38" Fill="#FF8800" RadiusX="2" RadiusY="2" VerticalAlignment="Bottom" />
-                        </StackPanel>
-
-                    </Grid>
-                </Border>
-
+                <views:NextClipView Grid.Row="0" />
                 <views:LiveClipInfoView Grid.Row="1" />
                 <views:LiveScheduleView Grid.Row="2" />
 
