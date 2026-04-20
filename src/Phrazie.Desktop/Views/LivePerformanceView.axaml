@@ -63,7 +63,7 @@
                 Background="{StaticResource MainBackgroundBrush}"
                 BorderBrush="{StaticResource BoxBorderDefault}"
                 BorderThickness="1,0,0,0">
-            <Grid RowDefinitions="180,*,120">
+            <Grid RowDefinitions="140,*,120">
 
                 <views:NextClipView Grid.Row="0" />
                 <views:LiveClipInfoView Grid.Row="1" />

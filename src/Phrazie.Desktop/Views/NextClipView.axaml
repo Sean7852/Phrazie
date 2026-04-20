@@ -124,14 +124,16 @@
 
           <!-- Change clip button -->
           <Button Classes="change-clip"
-                  Padding="8,8,8,8"
-                  HorizontalAlignment="Stretch">
+        HorizontalAlignment="Stretch"
+        Padding="10,4"
+        MinHeight="28">
             <Grid ColumnDefinitions="*,Auto">
-              <TextBlock Grid.Column="0" Text="Change clip " />
+              <TextBlock Grid.Column="0" Text="Change clip" FontSize="11" VerticalAlignment="Center"/>
               <TextBlock Grid.Column="1"
                          Text="›"
                          Foreground="{StaticResource TextBrushDisabled}"
-                         FontSize="14" />
+                         FontSize="12"
+                         VerticalAlignment="Center"/>
             </Grid>
           </Button>
 
