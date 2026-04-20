@@ -82,7 +82,7 @@
                             Classes="nav"
                             Classes.active="{Binding IsClipQueueActive}"
                             ToolTip.Tip="View and manage the clip queue">
-                        Clip Queue
+                        Queue
                     </Button>
                 </StackPanel>
 
@@ -136,6 +136,11 @@
         </Border>
 
     </Grid>
+
+    <!-- ── Clip browser modal overlay ─────────────────────────────────────── -->
+    <Panel IsVisible="{Binding ActiveBrowser, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <views:ClipBrowserView DataContext="{Binding ActiveBrowser}" />
+    </Panel>
 
     </Panel>
 

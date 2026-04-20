@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Phrazie.Core.Enums;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
@@ -23,7 +24,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IFilePickerService    _filePicker;
     private readonly IHotkeyService        _hotkeys;
 
-    [ObservableProperty] private ViewModelBase _currentPage;
+    [ObservableProperty] private ViewModelBase          _currentPage;
+    [ObservableProperty] private ClipBrowserViewModel? _activeBrowser;
     [ObservableProperty] private bool _isCollectionsActive  = true;
     [ObservableProperty] private bool _isLiveActive         = false;
     [ObservableProperty] private bool _isClipQueueActive    = false;
@@ -55,6 +57,14 @@ public partial class MainWindowViewModel : ViewModelBase
         _currentPage  = BuildCollectionsPage();
 
         _isAuthenticated = sessionStore.IsAuthenticated;
+
+        WeakReferenceMessenger.Default.Register<OpenClipBrowserMessage>(this, (_, msg) =>
+        {
+            ActiveBrowser = new ClipBrowserViewModel(
+                _collections,
+                clip  => { msg.Value(clip); ActiveBrowser = null; },
+                ()    => ActiveBrowser = null);
+        });
 
         loginPage.LoginSucceeded += () =>
         {

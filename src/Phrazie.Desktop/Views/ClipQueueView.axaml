@@ -7,50 +7,77 @@
 
   <UserControl.Styles>
 
-    <!-- Row container -->
+    <!-- ── Row: default ── -->
     <Style Selector="Border.clip-row">
-      <Setter Property="Background"    Value="#0F0F14" />
-      <Setter Property="CornerRadius"  Value="8" />
-      <Setter Property="Margin"        Value="0,0,0,6" />
-      <Setter Property="Padding"       Value="10,8" />
+      <Setter Property="Background"      Value="#0F0F14" />
+      <Setter Property="CornerRadius"    Value="8" />
+      <Setter Property="Margin"          Value="0,0,0,6" />
+      <Setter Property="Padding"         Value="10,8" />
     </Style>
     <Style Selector="Border.clip-row:pointerover">
       <Setter Property="Background" Value="#161620" />
     </Style>
 
-    <!-- Active glow border (sits behind content via Panel) -->
+    <!-- ── Row: active ── -->
+    <Style Selector="Border.clip-row.active">
+      <Setter Property="Background"       Value="#121220" />
+      <Setter Property="BorderBrush"      Value="#33DD33" />
+      <Setter Property="BorderThickness"  Value="1,0,0,0" />
+      <Setter Property="Padding"          Value="12,12" />
+    </Style>
+
+    <!-- ── Active clip name: larger ── -->
+    <Style Selector="Border.clip-row.active TextBlock.clip-name">
+      <Setter Property="FontSize"   Value="14" />
+      <Setter Property="Foreground" Value="{StaticResource TextBrushPrimary}" />
+    </Style>
+    <Style Selector="Border.clip-row TextBlock.clip-name">
+      <Setter Property="FontSize"   Value="12" />
+      <Setter Property="Foreground" Value="{StaticResource TextBrushSecondary}" />
+    </Style>
+
+    <!-- ── Glow border behind row ── -->
     <Style Selector="Border.active-glow">
-      <Setter Property="IsVisible"    Value="False" />
-      <Setter Property="CornerRadius" Value="8" />
-      <Setter Property="BorderBrush"  Value="#44DD44" />
+      <Setter Property="IsVisible"       Value="False" />
+      <Setter Property="CornerRadius"    Value="8" />
+      <Setter Property="BorderBrush"     Value="#44DD44" />
       <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="BoxShadow"    Value="0 0 10 2 #4044DD44" />
+      <Setter Property="BoxShadow"       Value="0 0 10 2 #4044DD44" />
     </Style>
     <Style Selector="Border.active-glow.on">
       <Setter Property="IsVisible" Value="True" />
       <Style.Animations>
         <Animation Duration="0:0:1.6" IterationCount="Infinite" Easing="SineEaseInOut">
-          <KeyFrame Cue="0%">
-            <Setter Property="Opacity" Value="0.35" />
-          </KeyFrame>
-          <KeyFrame Cue="50%">
-            <Setter Property="Opacity" Value="1.0" />
-          </KeyFrame>
-          <KeyFrame Cue="100%">
-            <Setter Property="Opacity" Value="0.35" />
-          </KeyFrame>
+          <KeyFrame Cue="0%">  <Setter Property="Opacity" Value="0.3" /></KeyFrame>
+          <KeyFrame Cue="50%"> <Setter Property="Opacity" Value="1.0" /></KeyFrame>
+          <KeyFrame Cue="100%"><Setter Property="Opacity" Value="0.3" /></KeyFrame>
         </Animation>
       </Style.Animations>
     </Style>
 
-    <!-- Remove button -->
+    <!-- ── Add clip button ── -->
+    <Style Selector="Button.add-clip">
+      <Setter Property="Background"      Value="Transparent" />
+      <Setter Property="Foreground"      Value="{StaticResource AccentOrangeBrush}" />
+      <Setter Property="BorderBrush"     Value="{StaticResource AccentOrangeBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius"    Value="6" />
+      <Setter Property="Padding"         Value="12,5" />
+      <Setter Property="FontSize"        Value="11" />
+      <Setter Property="FontWeight"      Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.add-clip:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource AccentOrangeDimBrush}" />
+    </Style>
+
+    <!-- ── Remove button ── -->
     <Style Selector="Button.remove">
-      <Setter Property="Background"    Value="Transparent" />
-      <Setter Property="Foreground"    Value="{StaticResource TextBrushDisabled}" />
+      <Setter Property="Background"      Value="Transparent" />
+      <Setter Property="Foreground"      Value="{StaticResource TextBrushDisabled}" />
       <Setter Property="BorderThickness" Value="0" />
-      <Setter Property="Padding"       Value="6,4" />
-      <Setter Property="FontSize"      Value="12" />
-      <Setter Property="CornerRadius"  Value="4" />
+      <Setter Property="Padding"         Value="6,4" />
+      <Setter Property="FontSize"        Value="12" />
+      <Setter Property="CornerRadius"    Value="4" />
     </Style>
     <Style Selector="Button.remove:pointerover /template/ ContentPresenter">
       <Setter Property="Background"             Value="#331A1A" />
@@ -62,22 +89,25 @@
   <Grid RowDefinitions="Auto,*" Margin="16,16,16,8">
 
     <!-- ── Header ── -->
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
-      <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="2">
-        <TextBlock Text="CLIP QUEUE"
-                   Foreground="{StaticResource TextBrushDisabled}"
-                   FontSize="10"
-                   FontWeight="Bold"
-                   LetterSpacing="3" />
-        <TextBlock Text="{Binding StateName}"
-                   Foreground="{StaticResource TextBrushSecondary}"
-                   FontSize="12" />
-      </StackPanel>
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,14">
+      <TextBlock Grid.Column="0"
+                 Text="QUEUE"
+                 Foreground="{StaticResource TextBrushDisabled}"
+                 FontSize="10"
+                 FontWeight="Bold"
+                 LetterSpacing="3"
+                 VerticalAlignment="Center" />
       <TextBlock Grid.Column="1"
                  Text="{Binding Clips.Count, StringFormat='{}{0} clips'}"
                  Foreground="{StaticResource TextBrushDisabled}"
                  FontSize="11"
-                 VerticalAlignment="Bottom" />
+                 VerticalAlignment="Center"
+                 Margin="0,0,12,0" />
+      <Button Grid.Column="2"
+              Classes="add-clip"
+              Content="+ Add Clip"
+              Command="{Binding AddClipCommand}"
+              VerticalAlignment="Center" />
     </Grid>
 
     <!-- ── Clip list ── -->
@@ -86,34 +116,30 @@
         <ItemsControl.ItemTemplate>
           <DataTemplate x:DataType="vm:LiveClipItemViewModel">
 
-            <!-- Opacity transition for removal -->
-            <Panel>
+            <Panel Opacity="{Binding Opacity}">
               <Panel.Transitions>
                 <Transitions>
                   <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
                 </Transitions>
               </Panel.Transitions>
-              <Panel.Opacity>
-                <Binding Path="Opacity" />
-              </Panel.Opacity>
 
-              <!-- Glow layer (behind content) -->
+              <!-- Glow (behind row) -->
               <Border Classes="active-glow"
                       Classes.on="{Binding IsActive}"
                       Margin="0,0,0,6" />
 
-              <!-- Row content -->
-              <Border Classes="clip-row">
+              <!-- Row -->
+              <Border Classes="clip-row"
+                      Classes.active="{Binding IsActive}">
                 <Grid ColumnDefinitions="Auto,*,Auto,Auto">
 
-                  <!-- Thumbnail placeholder -->
+                  <!-- Thumbnail -->
                   <Border Grid.Column="0"
-                          Width="48"
-                          Height="27"
+                          Width="56"
+                          Height="32"
                           CornerRadius="4"
                           ClipToBounds="True"
-                          Margin="0,0,10,0"
-                          Background="#1A1A2E">
+                          Margin="0,0,12,0">
                     <Border.Background>
                       <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
                         <GradientStop Color="#2A1A3A" Offset="0.0" />
@@ -122,22 +148,59 @@
                     </Border.Background>
                   </Border>
 
-                  <!-- Name + duration -->
-                  <StackPanel Grid.Column="1"
-                              VerticalAlignment="Center"
-                              Spacing="2">
-                    <TextBlock Text="{Binding Name}"
-                               Foreground="{StaticResource TextBrushPrimary}"
-                               FontSize="12"
+                  <!-- Info column -->
+                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+
+                    <!-- NOW PLAYING badge (active only) -->
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="5"
+                                IsVisible="{Binding IsActive}">
+                      <Ellipse Width="6" Height="6"
+                               Fill="#44DD44"
+                               VerticalAlignment="Center" />
+                      <TextBlock Text="NOW PLAYING"
+                                 Foreground="#44DD44"
+                                 FontSize="9"
+                                 FontWeight="Bold"
+                                 LetterSpacing="1.5"
+                                 VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Clip name -->
+                    <TextBlock Classes="clip-name"
+                               Text="{Binding Name}"
                                FontWeight="SemiBold"
                                TextTrimming="CharacterEllipsis" />
-                    <TextBlock Text="{Binding Duration}"
-                               Foreground="{StaticResource TextBrushDisabled}"
-                               FontFamily="Consolas,monospace"
-                               FontSize="10" />
+
+                    <!-- Collection + State badges -->
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                      <Border Background="#1E1E26"
+                              CornerRadius="4"
+                              Padding="6,2">
+                        <TextBlock Text="{Binding CollectionName}"
+                                   Foreground="{StaticResource TextBrushDisabled}"
+                                   FontSize="9"
+                                   LetterSpacing="0.5" />
+                      </Border>
+                      <Border Background="{StaticResource StatusPurpleBgBrush}"
+                              CornerRadius="4"
+                              Padding="6,2">
+                        <TextBlock Text="{Binding StateName}"
+                                   Foreground="{StaticResource StatusPurpleBrush}"
+                                   FontSize="9"
+                                   FontWeight="SemiBold"
+                                   LetterSpacing="0.5" />
+                      </Border>
+                      <TextBlock Text="{Binding Duration}"
+                                 Foreground="{StaticResource TextBrushDisabled}"
+                                 FontFamily="Consolas,monospace"
+                                 FontSize="9"
+                                 VerticalAlignment="Center" />
+                    </StackPanel>
+
                   </StackPanel>
 
-                  <!-- Remove button -->
+                  <!-- Remove -->
                   <Button Grid.Column="2"
                           Classes="remove"
                           Content="✕"
