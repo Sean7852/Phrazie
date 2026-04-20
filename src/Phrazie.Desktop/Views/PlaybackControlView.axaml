@@ -1,0 +1,135 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Phrazie.Desktop.ViewModels"
+             x:Class="Phrazie.Desktop.Views.PlaybackControlView"
+             x:DataType="vm:LivePerformanceViewModel">
+
+  <UserControl.Styles>
+  </UserControl.Styles>
+
+  <Grid Height="100" VerticalAlignment="Bottom" Background="Transparent">
+
+    <Border Height="64"
+            VerticalAlignment="Bottom"
+            Background="#0D0D12"
+            BorderBrush="{StaticResource BoxBorderDefault}"
+            BorderThickness="0,1,0,0" />
+
+    <Grid ColumnDefinitions="Auto,*,Auto" Margin="20,0">
+
+      <StackPanel Grid.Column="0"
+                  Orientation="Horizontal"
+                  VerticalAlignment="Bottom"
+                  Height="64"
+                  Spacing="6">
+        <Button Classes="transport nav" Content="◄" />
+        <Button Classes="transport playpause"
+                Content="{Binding PlayPauseIcon}"
+                Command="{Binding TogglePlayCommand}" />
+        <Button Classes="transport nav" Content="►" />
+      </StackPanel>
+
+      <Border Grid.Column="1"
+              Width="440"
+              Height="80"
+              VerticalAlignment="Bottom"
+              Background="#161622"
+              BorderBrush="#2A2A44"
+              BorderThickness="1,1,1,0"
+              CornerRadius="8,8,0,0"
+              Padding="20,8"
+              ZIndex="10">
+
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+          <TextBlock Grid.Column="0"
+                     Text="BPM"
+                     Foreground="{StaticResource TextBrushDisabled}"
+                     FontSize="10"
+                     FontWeight="Bold"
+                     LetterSpacing="2"
+                     VerticalAlignment="Center"
+                     Margin="0,0,12,0" />
+
+          <Button Grid.Column="1"
+                  Classes="transport bpmstep"
+                  Content="−"
+                  Command="{Binding DecreaseBpmCommand}" />
+
+          <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="12,0">
+            <TextBlock Text="{Binding Bpm, StringFormat=\{0:0\}}"
+                       FontSize="28"
+                       FontWeight="Bold"
+                       Foreground="White"
+                       HorizontalAlignment="Center" />
+            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,0">
+              <TextBlock Grid.Column="0"
+                         Text="60"
+                         FontSize="9"
+                         Foreground="{StaticResource TextBrushDisabled}"
+                         Margin="0,0,6,0" />
+              <Slider Grid.Column="1"
+                      Classes="bpm"
+                      Minimum="60"
+                      Maximum="200"
+                      Value="{Binding Bpm}"
+                      Height="40" />
+              <TextBlock Grid.Column="2"
+                         Text="200"
+                         FontSize="9"
+                         Foreground="{StaticResource TextBrushDisabled}"
+                         Margin="6,0,0,0" />
+            </Grid>
+          </StackPanel>
+
+          <Button Grid.Column="3"
+                  Classes="transport bpmstep"
+                  Content="+"
+                  Command="{Binding IncreaseBpmCommand}" />
+
+          <Button Grid.Column="4"
+                  Classes="transport tap"
+                  Content="TAP"
+                  Margin="12,0,0,0" />
+        </Grid>
+      </Border>
+
+      <StackPanel Grid.Column="2"
+                  Orientation="Horizontal"
+                  VerticalAlignment="Bottom"
+                  Height="64"
+                  Spacing="12">
+
+        <Panel VerticalAlignment="Center">
+          <Border CornerRadius="5"
+                  Margin="-4"
+                  IsVisible="{Binding IsRecording}"
+                  BoxShadow="0 0 14 4 #80CC2222" />
+          <Button Classes="transport rec"
+                  Classes.active="{Binding IsRecording}"
+                  Command="{Binding ToggleRecordCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <Ellipse Width="8" Height="8" Fill="#DD3333" />
+              <TextBlock Text="REC" FontWeight="Bold" />
+            </StackPanel>
+          </Button>
+        </Panel>
+
+        <Border Background="#13141A"
+                CornerRadius="4"
+                Padding="12,8"
+                VerticalAlignment="Center">
+          <StackPanel Spacing="2">
+            <TextBlock Text="00:00:00"
+                       FontFamily="Consolas"
+                       FontSize="15"
+                       FontWeight="Bold" />
+            <TextBlock Text="1080p60 · 0.0 MB"
+                       FontSize="9"
+                       Foreground="#7A8FA6" />
+          </StackPanel>
+        </Border>
+      </StackPanel>
+
+    </Grid>
+  </Grid>
+</UserControl>

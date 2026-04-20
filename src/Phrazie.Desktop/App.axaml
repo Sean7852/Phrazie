@@ -2,20 +2,73 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Phrazie.Desktop.App"
              xmlns:local="using:Phrazie.Desktop"
-             RequestedThemeVariant="Default">
-             <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+             RequestedThemeVariant="Dark">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://Phrazie.Desktop/Resources/Colors.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!-- Override Fluent accent to Phrazie Yellow -->
+            <Color x:Key="SystemAccentColor">#FFB800</Color>
+            <Color x:Key="SystemAccentColorLight1">#FFC233</Color>
+            <Color x:Key="SystemAccentColorLight2">#FFCC66</Color>
+            <Color x:Key="SystemAccentColorLight3">#FFD999</Color>
+            <Color x:Key="SystemAccentColorDark1">#CC9200</Color>
+            <Color x:Key="SystemAccentColorDark2">#996D00</Color>
+            <Color x:Key="SystemAccentColorDark3">#664900</Color>
+
+            <!-- TextBox dark theme overrides -->
+            <SolidColorBrush x:Key="TextControlBackground"               Color="{StaticResource SurfaceLight}" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver"    Color="{StaticResource SurfaceLight}" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused"        Color="{StaticResource SurfaceLight}" />
+            <SolidColorBrush x:Key="TextControlBorderBrush"              Color="{StaticResource BorderMuted}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver"   Color="{StaticResource BorderMuted}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused"       Color="{StaticResource AccentYellow}" />
+            <SolidColorBrush x:Key="TextControlForeground"               Color="{StaticResource TextEnabled}" />
+            <SolidColorBrush x:Key="TextControlForegroundPointerOver"    Color="{StaticResource TextEnabled}" />
+            <SolidColorBrush x:Key="TextControlForegroundFocused"        Color="{StaticResource TextEnabled}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground"    Color="{StaticResource TextDisabled}" />
+
+            <!-- Button dark theme overrides -->
+            <SolidColorBrush x:Key="ButtonBackground"                    Color="{StaticResource SurfaceLight}" />
+            <SolidColorBrush x:Key="ButtonBackgroundPointerOver"         Color="{StaticResource BorderMuted}" />
+            <SolidColorBrush x:Key="ButtonBackgroundPressed"             Color="{StaticResource SurfaceDark}" />
+            <SolidColorBrush x:Key="ButtonForeground"                    Color="{StaticResource TextEnabled}" />
+            <SolidColorBrush x:Key="ButtonForegroundPointerOver"         Color="{StaticResource TextEnabled}" />
+            <SolidColorBrush x:Key="ButtonForegroundPressed"             Color="{StaticResource TextEnabled}" />
+            <SolidColorBrush x:Key="ButtonBorderBrush"                   Color="{StaticResource BorderMuted}" />
+            <SolidColorBrush x:Key="ButtonBorderBrushPointerOver"        Color="{StaticResource BorderMuted}" />
+            <SolidColorBrush x:Key="ButtonBorderBrushPressed"            Color="{StaticResource AccentYellow}" />
+
+            <!-- ListBox / selection highlight -->
+            <SolidColorBrush x:Key="ListBoxBackground"                   Color="{StaticResource SurfaceBlack}" />
+            <SolidColorBrush x:Key="ListBoxItemBackgroundSelected"       Color="{StaticResource SurfaceLight}" />
+            <SolidColorBrush x:Key="ListBoxItemBackgroundSelectedPointerOver" Color="{StaticResource BorderMuted}" />
+            <SolidColorBrush x:Key="ListBoxItemForegroundSelected"       Color="{StaticResource TextEnabled}" />
+
+        </ResourceDictionary>
+    </Application.Resources>
 
     <Application.DataTemplates>
         <local:ViewLocator/>
     </Application.DataTemplates>
-  
+
     <Application.Styles>
         <FluentTheme />
         <Style Selector="TextBox">
-            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="Foreground"   Value="{StaticResource TextBrushPrimary}" />
+            <Setter Property="Background"   Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="BorderBrush"  Value="{StaticResource BoxBorderDefault}" />
+        </Style>
+        <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="{StaticResource BoxBorderFocused}" />
         </Style>
         <Style Selector="NumericUpDown">
-            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="Foreground"  Value="{StaticResource TextBrushPrimary}" />
+            <Setter Property="Background"  Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource BoxBorderDefault}" />
         </Style>
     </Application.Styles>
 </Application>

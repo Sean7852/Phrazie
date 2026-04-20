@@ -1,0 +1,146 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Phrazie.Desktop.ViewModels"
+             x:Class="Phrazie.Desktop.Views.NextClipView"
+             x:DataType="vm:LivePerformanceViewModel"
+             Background="Transparent">
+
+  <UserControl.Styles>
+
+    <Style Selector="Button.cue">
+      <Setter Property="Background"      Value="Transparent" />
+      <Setter Property="Foreground"      Value="{StaticResource AccentOrangeBrush}" />
+      <Setter Property="BorderBrush"     Value="{StaticResource AccentOrangeBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius"    Value="12" />
+      <Setter Property="Padding"         Value="14,5" />
+      <Setter Property="FontSize"        Value="11" />
+      <Setter Property="FontWeight"      Value="SemiBold" />
+      <Setter Property="LetterSpacing"   Value="1" />
+    </Style>
+    <Style Selector="Button.cue:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource AccentOrangeDimBrush}" />
+    </Style>
+
+    <Style Selector="Button.change-clip">
+      <Setter Property="Background"      Value="#13141A" />
+      <Setter Property="Foreground"      Value="{StaticResource TextBrushSecondary}" />
+      <Setter Property="BorderBrush"     Value="#1C1C2C" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius"    Value="6" />
+      <Setter Property="Padding"         Value="14,10" />
+      <Setter Property="FontSize"        Value="12" />
+      <Setter Property="HorizontalContentAlignment" Value="Left" />
+    </Style>
+    <Style Selector="Button.change-clip:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
+    </Style>
+
+  </UserControl.Styles>
+
+  <!-- Card wrapper -->
+  <Border Background="#0D0D12"
+          CornerRadius="10"
+          Margin="12,10">
+
+    <Grid RowDefinitions="Auto,*" Margin="14,12">
+
+      <!-- ── Header row ── -->
+      <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+        <TextBlock Grid.Column="0"
+                   Text="UP NEXT"
+                   Foreground="#7A8FA6"
+                   FontFamily="Consolas,monospace"
+                   FontSize="10"
+                   FontWeight="Bold"
+                   LetterSpacing="3"
+                   VerticalAlignment="Center" />
+        <Button Grid.Column="1"
+                Classes="cue"
+                Content="CUE  →" />
+      </Grid>
+
+      <!-- ── Content row: thumbnail + metadata ── -->
+      <Grid Grid.Row="1" ColumnDefinitions="Auto,*">
+
+        <!-- Thumbnail -->
+        <Border Grid.Column="0"
+                Width="96"
+                Height="54"
+                CornerRadius="6"
+                ClipToBounds="True"
+                Margin="0,0,12,0">
+          <Border.Background>
+            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+              <GradientStop Color="#CC44FF" Offset="0.0" />
+              <GradientStop Color="#FF2266" Offset="0.5" />
+              <GradientStop Color="#1A1A2E" Offset="1.0" />
+            </LinearGradientBrush>
+          </Border.Background>
+        </Border>
+
+        <!-- Metadata -->
+        <StackPanel Grid.Column="1" Spacing="8" VerticalAlignment="Center">
+
+          <!-- Tag row -->
+          <StackPanel Orientation="Horizontal" Spacing="6">
+
+            <!-- Collection badge -->
+            <Border Background="#222228"
+                    CornerRadius="10"
+                    Padding="8,3">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Text="◇"
+                           Foreground="{StaticResource TextBrushPrimary}"
+                           FontSize="9"
+                           VerticalAlignment="Center" />
+                <TextBlock Text="{Binding CollectionName}"
+                           Foreground="{StaticResource TextBrushPrimary}"
+                           FontSize="9"
+                           FontWeight="SemiBold"
+                           LetterSpacing="1"
+                           VerticalAlignment="Center" />
+              </StackPanel>
+            </Border>
+
+            <!-- State badge -->
+            <Border Background="{StaticResource StatusPurpleBgBrush}"
+                    CornerRadius="10"
+                    Padding="8,3">
+              <StackPanel Orientation="Horizontal" Spacing="4">
+                <Ellipse Width="6" Height="6"
+                         Fill="{StaticResource StatusPurpleBrush}"
+                         VerticalAlignment="Center" />
+                <TextBlock Text="{Binding CurrentStateName}"
+                           Foreground="{StaticResource StatusPurpleBrush}"
+                           FontSize="9"
+                           FontWeight="SemiBold"
+                           LetterSpacing="1"
+                           VerticalAlignment="Center" />
+              </StackPanel>
+            </Border>
+
+          </StackPanel>
+
+          <!-- Change clip button -->
+          <Button Classes="change-clip"
+        HorizontalAlignment="Stretch"
+        Padding="10,4"
+        MinHeight="28">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Text="Change clip" FontSize="11" VerticalAlignment="Center"/>
+              <TextBlock Grid.Column="1"
+                         Text="›"
+                         Foreground="{StaticResource TextBrushDisabled}"
+                         FontSize="12"
+                         VerticalAlignment="Center"/>
+            </Grid>
+          </Button>
+
+        </StackPanel>
+      </Grid>
+
+    </Grid>
+  </Border>
+
+</UserControl>

@@ -59,6 +59,7 @@ public partial class App : Application
         services.AddSingleton<ICollectionRepository, SqliteCollectionRepository>();
         services.AddSingleton<IClipRepository,        SqliteClipRepository>();
         services.AddSingleton<IPlaybackService,       VideoPlaybackService>();
+        services.AddSingleton<IBeatClock,             BeatClock>();
         services.AddSingleton<ITriggerService,         MockTriggerService>();
         services.AddSingleton<ISessionService,         MockSessionService>();
         services.AddSingleton<IHotkeyService,          MockHotkeyService>();

@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Phrazie.Desktop.ViewModels"
+             xmlns:controls="using:Phrazie.Desktop.Controls"
+             xmlns:views="using:Phrazie.Desktop.Views"
+             x:Class="Phrazie.Desktop.Views.LiveVideoView"
+             x:DataType="vm:LivePerformanceViewModel"
+             Background="{StaticResource MainBackgroundBrush}">
+
+    <Grid RowDefinitions="*, 108, 84">
+
+        <!-- ── Row 0: Video output ───────────────────────────────────── -->
+        <Grid Grid.Row="0">
+
+            <controls:VideoView x:Name="VideoOutput" />
+
+            <!-- NOW PLAYING (top-left) -->
+            <StackPanel Orientation="Horizontal" Spacing="6"
+                        VerticalAlignment="Top" HorizontalAlignment="Left"
+                        Margin="14,10">
+                <Ellipse Width="6" Height="6" Fill="#44DD44" VerticalAlignment="Center" />
+                <TextBlock Text="NOW PLAYING"
+                           Foreground="{StaticResource TextBrushDisabled}"
+                           FontSize="10"
+                           LetterSpacing="2"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+
+            <!-- Clip name + state (bottom-left) -->
+            <StackPanel Orientation="Vertical" Spacing="2"
+                        VerticalAlignment="Bottom" HorizontalAlignment="Left"
+                        Margin="14,0,0,10">
+                <TextBlock Text="{Binding CurrentClipName}"
+                           Foreground="{StaticResource TextBrushPrimary}"
+                           FontSize="13"
+                           FontWeight="SemiBold" />
+                <TextBlock Text="{Binding CurrentStateName}"
+                           Foreground="{StaticResource TextBrushDisabled}"
+                           FontSize="11" />
+            </StackPanel>
+
+            <!-- Position (bottom-right) -->
+            <TextBlock Text="0:00"
+                       VerticalAlignment="Bottom" HorizontalAlignment="Right"
+                       Margin="0,0,14,10"
+                       Foreground="{StaticResource TextBrushDisabled}"
+                       FontSize="12"
+                       FontFamily="Consolas,monospace" />
+
+        </Grid>
+
+        <!-- ── Row 1: Beat grid ──────────────────────────────────────── -->
+        <Border Grid.Row="1"
+                Background="{StaticResource MainBackgroundBrush}"
+                BorderBrush="{StaticResource BoxBorderDefault}"
+                BorderThickness="0,1">
+            <controls:BeatGrid Phase="{Binding CurrentPhase}"
+                               PhraseNumber="{Binding PhraseNumber}"
+                               TotalPhrases="{Binding TotalPhrases}"
+                               Margin="12,6,12,6" />
+        </Border>
+
+        <!-- ── Row 2: Transport controls ─────────────────────────────── -->
+        <views:PlaybackControlView Grid.Row="2" />
+
+    </Grid>
+
+</UserControl>

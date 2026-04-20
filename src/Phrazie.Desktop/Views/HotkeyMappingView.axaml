@@ -8,31 +8,27 @@
     <ScrollViewer Padding="36,28,36,36">
         <StackPanel Spacing="24" MaxWidth="680">
 
-            <!-- ── Header ── -->
             <StackPanel Spacing="6">
                 <TextBlock Text="Hotkey Mapping"
-                           Foreground="White"
+                           Foreground="{StaticResource TextBrushPrimary}"
                            FontSize="22"
                            FontWeight="Light" />
                 <TextBlock Text="Assign keyboard shortcuts to live performance controls. Click Change next to any action, then press the key you want to use."
-                           Foreground="#666688"
+                           Foreground="{StaticResource TextBrushSecondary}"
                            FontSize="13"
                            TextWrapping="Wrap" />
             </StackPanel>
 
-            <!-- ── Bindings table ── -->
-            <Border Background="#12121E"
-                    BorderBrush="#1E1E30"
+            <Border Background="{StaticResource ControlBackgroundBrush}"
+                    BorderBrush="{StaticResource BoxBorderDefault}"
                     BorderThickness="1"
                     CornerRadius="8">
                 <StackPanel>
 
-                    <!-- Table header -->
-                    <Grid ColumnDefinitions="*,120,80"
-                          Margin="20,14,20,10">
+                    <Grid ColumnDefinitions="*,120,80" Margin="20,14,20,10">
                         <Grid.Styles>
                             <Style Selector="TextBlock.th">
-                                <Setter Property="Foreground"    Value="#444466" />
+                                <Setter Property="Foreground"    Value="{StaticResource TextBrushDisabled}" />
                                 <Setter Property="FontSize"      Value="10" />
                                 <Setter Property="LetterSpacing" Value="2" />
                                 <Setter Property="FontWeight"    Value="Medium" />
@@ -43,10 +39,8 @@
                         <TextBlock Grid.Column="2" Classes="th" Text="" />
                     </Grid>
 
-                    <!-- Divider -->
-                    <Border Height="1" Background="#1A1A2E" Margin="0,0,0,4" />
+                    <Border Height="1" Background="{StaticResource BoxBorderDefault}" Margin="0,0,0,4" />
 
-                    <!-- Binding rows -->
                     <ItemsControl ItemsSource="{Binding Bindings}" Margin="0,4,0,8">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="vm:HotkeyBindingItemViewModel">
@@ -54,46 +48,42 @@
                                       Margin="20,6,20,6"
                                       MinHeight="36">
 
-                                    <!-- Action label -->
                                     <TextBlock Grid.Column="0"
                                                Text="{Binding ActionLabel}"
-                                               Foreground="#CCCCEE"
+                                               Foreground="{StaticResource TextBrushPrimary}"
                                                FontSize="13"
                                                VerticalAlignment="Center" />
 
-                                    <!-- Key badge (normal mode) -->
                                     <Border Grid.Column="1"
                                             IsVisible="{Binding IsNotRebinding}"
-                                            Background="#0E0E1E"
-                                            BorderBrush="#2A2A44"
+                                            Background="{StaticResource MainBackgroundBrush}"
+                                            BorderBrush="{StaticResource BoxBorderDefault}"
                                             BorderThickness="1"
                                             CornerRadius="4"
                                             Padding="10,4"
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Center">
                                         <TextBlock Text="{Binding KeyDisplayName}"
-                                                   Foreground="#8888CC"
+                                                   Foreground="{StaticResource TextBrushSecondary}"
                                                    FontSize="12"
                                                    FontFamily="Cascadia Mono, Consolas, monospace" />
                                     </Border>
 
-                                    <!-- "Press any key…" prompt (rebinding mode) -->
                                     <TextBlock Grid.Column="1"
                                                IsVisible="{Binding IsRebinding}"
                                                Text="Press any key…"
-                                               Foreground="#556655"
+                                               Foreground="{StaticResource TextBrushDisabled}"
                                                FontSize="12"
                                                FontStyle="Italic"
                                                VerticalAlignment="Center" />
 
-                                    <!-- Change button (normal mode) -->
                                     <Button Grid.Column="2"
                                             IsVisible="{Binding IsNotRebinding}"
                                             Command="{Binding StartRebindCommand}"
                                             Content="Change"
                                             Background="Transparent"
-                                            Foreground="#555577"
-                                            BorderBrush="#2A2A44"
+                                            Foreground="{StaticResource TextBrushDisabled}"
+                                            BorderBrush="{StaticResource BoxBorderDefault}"
                                             BorderThickness="1"
                                             Padding="10,5"
                                             CornerRadius="4"
@@ -102,7 +92,6 @@
                                             VerticalAlignment="Center"
                                             ToolTip.Tip="Click then press a new key to reassign" />
 
-                                    <!-- Cancel button (rebinding mode) -->
                                     <Button Grid.Column="2"
                                             IsVisible="{Binding IsRebinding}"
                                             Command="{Binding CancelRebindCommand}"
@@ -126,8 +115,7 @@
                 </StackPanel>
             </Border>
 
-            <!-- ── Footer note ── -->
-            <TextBlock Foreground="#333355"
+            <TextBlock Foreground="{StaticResource TextBrushDisabled}"
                        FontSize="12"
                        TextWrapping="Wrap"
                        Text="Changes take effect immediately. Hotkeys are suppressed while typing in text fields." />

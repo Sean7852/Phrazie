@@ -13,6 +13,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ISessionService       _session;
     private readonly ITriggerService       _trigger;
     private readonly IPlaybackService      _playback;
+    private readonly IBeatClock            _beatClock;
     private readonly ISessionStore         _sessionStore;
     private readonly IAuthService          _auth;
 
@@ -33,6 +34,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ISessionService       session,
         ITriggerService       trigger,
         IPlaybackService      playback,
+        IBeatClock            beatClock,
         IFilePickerService    filePicker,
         IHotkeyService        hotkeys,
         ISessionStore         sessionStore,
@@ -43,6 +45,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _session      = session;
         _trigger      = trigger;
         _playback     = playback;
+        _beatClock    = beatClock;
         _filePicker   = filePicker;
         _hotkeys      = hotkeys;
         _sessionStore = sessionStore;
@@ -86,7 +89,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void GoToLive()
     {
-        CurrentPage         = new LivePerformanceViewModel(_session, _trigger, _playback);
+        CurrentPage         = new LivePerformanceViewModel(_session, _trigger, _playback, _beatClock);
         IsCollectionsActive = false;
         IsLiveActive        = true;
         IsSettingsActive    = false;
