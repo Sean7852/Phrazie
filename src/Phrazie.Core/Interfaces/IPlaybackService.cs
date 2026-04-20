@@ -8,6 +8,7 @@ public interface IPlaybackService
     Clip? CurrentClip { get; }
 
     event Action<Clip?>? ClipChanged;
+    event Action?        ClipEnded;
 
     Task PlayAsync(Clip clip);
     Task StopAsync();

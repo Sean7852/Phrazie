@@ -78,6 +78,12 @@
                             ToolTip.Tip="Open the live performance screen">
                         Live
                     </Button>
+                    <Button Command="{Binding GoToClipQueueCommand}"
+                            Classes="nav"
+                            Classes.active="{Binding IsClipQueueActive}"
+                            ToolTip.Tip="View and manage the clip queue">
+                        Queue
+                    </Button>
                 </StackPanel>
 
                 <StackPanel Grid.Row="2" Spacing="0" Margin="0,0,0,8">
@@ -130,6 +136,11 @@
         </Border>
 
     </Grid>
+
+    <!-- ── Clip browser modal overlay ─────────────────────────────────────── -->
+    <Panel IsVisible="{Binding ActiveBrowser, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <views:ClipBrowserView DataContext="{Binding ActiveBrowser}" />
+    </Panel>
 
     </Panel>
 

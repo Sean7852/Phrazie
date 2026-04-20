@@ -61,7 +61,18 @@ public partial class LivePerformanceViewModel : ViewModelBase
     partial void OnIsPlayingChanged(bool value)
     {
         OnPropertyChanged(nameof(PlayPauseIcon));
-        if (value) _beatClock.Start(); else _beatClock.Stop();
+        if (value)
+        {
+            _beatClock.Start();
+            var first = _session.Current.CurrentState?.Clips.FirstOrDefault(c => c.IsEnabled);
+            if (first is not null && _playback.CurrentClip is null)
+                _ = _playback.PlayAsync(first);
+        }
+        else
+        {
+            _beatClock.Stop();
+            _ = _playback.StopAsync();
+        }
     }
 
     [RelayCommand] private void TogglePlay()   => IsPlaying   = !IsPlaying;
@@ -117,6 +128,9 @@ public partial class LivePerformanceViewModel : ViewModelBase
         _playback.ClipChanged += clip =>
             Dispatcher.UIThread.Post(() =>
                 CurrentClipName = clip?.DisplayName ?? string.Empty);
+
+        _playback.ClipEnded += () =>
+            Dispatcher.UIThread.Post(AdvanceToNextClip);
 
         _beatClock.Bpm = Bpm;
         _beatClock.PhaseChanged += phase =>
@@ -262,6 +276,29 @@ public partial class LivePerformanceViewModel : ViewModelBase
             BuildStateOptions(s);
             OnPropertyChanged(nameof(NextStateName));
         }
+    }
+
+    private void AdvanceToNextClip()
+    {
+        if (!IsPlaying) return;
+
+        var clips = _session.Current.CurrentState?.Clips
+                        .Where(c => c.IsEnabled)
+                        .ToList() ?? [];
+
+        if (clips.Count == 0) return;
+
+        var currentIdx = clips.FindIndex(c => c.Id == _playback.CurrentClip?.Id);
+        var nextIdx    = currentIdx + 1;
+
+        // Past the end — loop the last clip
+        if (nextIdx >= clips.Count)
+        {
+            _ = _playback.PlayAsync(clips[^1]);
+            return;
+        }
+
+        _ = _playback.PlayAsync(clips[nextIdx]);
     }
 
     private string BuildTriggerDescription(string stateName) => DelayType switch

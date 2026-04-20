@@ -1,0 +1,244 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Phrazie.Desktop.ViewModels"
+             xmlns:model="using:Phrazie.Core.Models"
+             x:Class="Phrazie.Desktop.Views.ClipBrowserView"
+             x:DataType="vm:ClipBrowserViewModel">
+
+  <UserControl.Resources>
+
+    <!-- ── Collections level ── -->
+    <DataTemplate x:Key="CollectionsTpl" x:DataType="vm:BrowserCollectionsContent">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding Items}" Margin="4">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Background="Transparent" BorderThickness="0" Padding="0"
+                      Margin="0,0,12,12" Cursor="Hand"
+                      Command="{Binding $parent[ItemsControl].((vm:BrowserCollectionsContent)DataContext).DrillIn}"
+                      CommandParameter="{Binding}">
+                <Border Width="140" Height="120"
+                        Background="#13141A"
+                        BorderBrush="#1C1C2C"
+                        BorderThickness="1"
+                        CornerRadius="10">
+                  <Border.Styles>
+                    <Style Selector="Button:pointerover Border">
+                      <Setter Property="BorderBrush" Value="{StaticResource AccentOrangeBrush}" />
+                      <Setter Property="Background"  Value="#1A1A26" />
+                    </Style>
+                  </Border.Styles>
+                  <Grid RowDefinitions="*,Auto">
+                    <Border Grid.Row="0" CornerRadius="9,9,0,0" ClipToBounds="True">
+                      <Border.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                          <GradientStop Color="#1A1230" Offset="0.0" />
+                          <GradientStop Color="#0D1535" Offset="1.0" />
+                        </LinearGradientBrush>
+                      </Border.Background>
+                      <TextBlock Text="◈" Foreground="#2A2A44" FontSize="36"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Row="1" Margin="10,8,10,10" Spacing="2">
+                      <TextBlock Text="{Binding Name}"
+                                 Foreground="{StaticResource TextBrushPrimary}"
+                                 FontSize="12" FontWeight="SemiBold"
+                                 TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding States.Count, StringFormat='{}{0} states'}"
+                                 Foreground="{StaticResource TextBrushDisabled}" FontSize="10" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </DataTemplate>
+
+    <!-- ── States level ── -->
+    <DataTemplate x:Key="StatesTpl" x:DataType="vm:BrowserStatesContent">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding Items}" Margin="4">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Background="Transparent" BorderThickness="0" Padding="0"
+                      Margin="0,0,12,12" Cursor="Hand"
+                      Command="{Binding $parent[ItemsControl].((vm:BrowserStatesContent)DataContext).DrillIn}"
+                      CommandParameter="{Binding}">
+                <Border Width="140" Height="110"
+                        Background="#13141A"
+                        BorderBrush="#1C1C2C"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        ClipToBounds="True">
+                  <Border.Styles>
+                    <Style Selector="Button:pointerover Border">
+                      <Setter Property="BorderBrush" Value="{StaticResource AccentOrangeBrush}" />
+                      <Setter Property="Background"  Value="#1A1A26" />
+                    </Style>
+                  </Border.Styles>
+                  <Grid RowDefinitions="6,*,Auto">
+                    <Border Grid.Row="0" Background="{Binding Color}" />
+                    <TextBlock Grid.Row="1" Text="▶" Foreground="#2A2A44" FontSize="28"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    <StackPanel Grid.Row="2" Margin="10,6,10,10" Spacing="2">
+                      <TextBlock Text="{Binding Name}"
+                                 Foreground="{StaticResource TextBrushPrimary}"
+                                 FontSize="12" FontWeight="SemiBold"
+                                 TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Clips.Count, StringFormat='{}{0} clips'}"
+                                 Foreground="{StaticResource TextBrushDisabled}" FontSize="10" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </DataTemplate>
+
+    <!-- ── Clips level ── -->
+    <DataTemplate x:Key="ClipsTpl" x:DataType="vm:BrowserClipsContent">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ItemsControl ItemsSource="{Binding Items}" Margin="4">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel Orientation="Horizontal" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Button Background="Transparent" BorderThickness="0" Padding="0"
+                      Margin="0,0,12,12" Cursor="Hand"
+                      Command="{Binding $parent[ItemsControl].((vm:BrowserClipsContent)DataContext).Select}"
+                      CommandParameter="{Binding}">
+                <Border Width="140" Height="110"
+                        Background="#13141A"
+                        BorderBrush="#1C1C2C"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        ClipToBounds="True">
+                  <Border.Styles>
+                    <Style Selector="Button:pointerover Border">
+                      <Setter Property="BorderBrush" Value="{StaticResource AccentOrangeBrush}" />
+                      <Setter Property="Background"  Value="#1F1F2C" />
+                    </Style>
+                  </Border.Styles>
+                  <Grid RowDefinitions="*,Auto">
+                    <Border Grid.Row="0" CornerRadius="9,9,0,0" ClipToBounds="True">
+                      <Border.Background>
+                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                          <GradientStop Color="#2A1A3A" Offset="0.0" />
+                          <GradientStop Color="#1A2A3A" Offset="1.0" />
+                        </LinearGradientBrush>
+                      </Border.Background>
+                      <TextBlock Text="▶" Foreground="#3A3A56" FontSize="28"
+                                 HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel Grid.Row="1" Margin="10,6,10,10" Spacing="2">
+                      <TextBlock Text="{Binding DisplayName}"
+                                 Foreground="{StaticResource TextBrushPrimary}"
+                                 FontSize="11" FontWeight="SemiBold"
+                                 TextTrimming="CharacterEllipsis" />
+                      <TextBlock Text="{Binding Duration, StringFormat='{}{0:m\\:ss}'}"
+                                 Foreground="{StaticResource TextBrushDisabled}"
+                                 FontFamily="Consolas,monospace" FontSize="10" />
+                    </StackPanel>
+                  </Grid>
+                </Border>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </DataTemplate>
+
+  </UserControl.Resources>
+
+  <!-- ── Dark overlay backdrop ── -->
+  <Border Background="#CC000000">
+
+    <Border Background="#0D0D12"
+            BorderBrush="#1C1C2C"
+            BorderThickness="1"
+            CornerRadius="12"
+            Width="720" Height="520"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center">
+
+      <Grid RowDefinitions="Auto,1,*,1,Auto">
+
+        <!-- ── Header ── -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto" Margin="20,16,20,14">
+          <Button Grid.Column="0"
+                  Background="Transparent"
+                  Foreground="{StaticResource TextBrushSecondary}"
+                  BorderThickness="0" Padding="4,4,8,4" FontSize="16"
+                  IsVisible="{Binding CanGoBack}"
+                  Command="{Binding BackCommand}"
+                  ToolTip.Tip="Go back">←</Button>
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+            <TextBlock Text="CLIP BROWSER"
+                       Foreground="{StaticResource TextBrushDisabled}"
+                       FontSize="9" FontWeight="Bold" LetterSpacing="3" />
+            <TextBlock Text="{Binding Breadcrumb}"
+                       Foreground="{StaticResource TextBrushSecondary}"
+                       FontSize="12" FontFamily="Consolas,monospace" />
+          </StackPanel>
+          <Button Grid.Column="2"
+                  Background="Transparent"
+                  Foreground="{StaticResource TextBrushDisabled}"
+                  BorderThickness="0" Width="28" Height="28" Padding="0"
+                  FontSize="13" CornerRadius="4"
+                  HorizontalContentAlignment="Center"
+                  Command="{Binding CloseCommand}"
+                  ToolTip.Tip="Close">✕</Button>
+        </Grid>
+
+        <Border Grid.Row="1" Background="#1C1C2C" />
+
+        <!-- ── Content with cross-fade transition ── -->
+        <TransitioningContentControl Grid.Row="2"
+                                     Margin="20,16,20,16"
+                                     Content="{Binding CurrentContent}">
+          <TransitioningContentControl.PageTransition>
+            <CrossFade Duration="0:0:0.18" />
+          </TransitioningContentControl.PageTransition>
+          <TransitioningContentControl.DataTemplates>
+            <DataTemplate DataType="vm:BrowserCollectionsContent">
+              <ContentControl Content="{Binding}" ContentTemplate="{StaticResource CollectionsTpl}" />
+            </DataTemplate>
+            <DataTemplate DataType="vm:BrowserStatesContent">
+              <ContentControl Content="{Binding}" ContentTemplate="{StaticResource StatesTpl}" />
+            </DataTemplate>
+            <DataTemplate DataType="vm:BrowserClipsContent">
+              <ContentControl Content="{Binding}" ContentTemplate="{StaticResource ClipsTpl}" />
+            </DataTemplate>
+          </TransitioningContentControl.DataTemplates>
+        </TransitioningContentControl>
+
+        <Border Grid.Row="3" Background="#1C1C2C" />
+
+        <TextBlock Grid.Row="4"
+                   Text="Click a clip to select it"
+                   Foreground="{StaticResource TextBrushDisabled}"
+                   FontSize="11" HorizontalAlignment="Center"
+                   Margin="0,10,0,14" />
+
+      </Grid>
+    </Border>
+  </Border>
+
+</UserControl>

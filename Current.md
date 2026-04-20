@@ -1,34 +1,31 @@
-I need to implement the 'UP NEXT' preview card for the right panel of Phrazie. This should be a standalone section wrapped in a rounded-corner Border (#0D0D12).
+I want to replace the standard Windows file browser for 'Add/Change Clip' with a custom Internal Browser View. This view should only navigate data from our SQLite database.
 
-1. Header Row:
+1. Navigation Logic (Drill-Down):
 
-Title: 'UP NEXT' in small, mono-spaced gray text (#7A8FA6) with wide letter spacing.
+Level 1 (Collections): Display all available Collections as large icons or cards.
 
-CUE Button: A pill-shaped button on the right with an orange border (#FF9900), orange text 'CUE →', and a dark background.
+Level 2 (States): Clicking a Collection icon navigates 'into' it, displaying all States associated with that collection.
 
-2. Content Area (Below Header):
+Level 3 (Clips): Clicking a State displays all enabled Clips within that state.
 
-Thumbnail: A rounded-corner Image (16:9 aspect ratio) on the left.
+Selection: Clicking a Clip selects it and closes the browser, returning the clip data to the LivePerformanceViewModel.
 
-Metadata Group (Right of Thumbnail):
+2. The Header & Path Tracking:
 
-Tag Row: Two small pill-shaped badges.
+Breadcrumb Path: In the browser title area, implement a dynamic path display (e.g., Library > Techno Set > Build Up).
 
-GEOMETRY(What collection is this curent video from): A dark gray badge with a white diamond icon.
+Back Button: Provide a 'Back' arrow next to the path to navigate up one level.
 
-BUILD(The State name, what collection/state is this curent video from): A purple-tinted badge (#443366) with a purple dot.
+3. UI & Aesthetic:
 
-Clip Info: Large white title 'Violet Grid' followed by a smaller, dimmed ID string 'CLP-128-C'.
+Use a Grid with a sidebar for categories and a WrapPanel for the main content area to show icons.
 
-3. Action Button:
+Match the Phrazie industrial dark theme: #0D0D12 background and #1C1C2C borders.
 
-Change Clip: A wide, dark button at the bottom of the card with the text 'Change clip' and a small '>' chevron on the far right. Use a very subtle border (#1C1C2C).
+Add a 'cool animation' for navigation: Use a Cross-Fade or Slide transition when moving between levels (Collection → State) so it feels like a modern media browser.
 
-Technical Requirements:
+4. Technical Requirements:
 
+MVVM: Create a ClipBrowserViewModel that uses SqliteCollectionRepository and SqliteClipRepository to fetch data.
 
-Styling: Use CornerRadius on all borders to maintain the smooth industrial aesthetic. The badges should have a CornerRadius of at least 10 to create the pill shape.
-
-Layout: Use a Grid for the main card structure and StackPanels for the small tag rows.
-
-Please also make all color read from the color file, so all title use the same color.
+Dialog Host: Implement this as a ContentControl or a modal overlay within the MainWindow.

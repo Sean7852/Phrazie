@@ -6,6 +6,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Phrazie.Core.Enums;
 using Phrazie.Core.Interfaces;
@@ -117,6 +118,7 @@ public partial class StateItemViewModel : ObservableObject
             AssignedClips.Add(new ClipItemViewModel(clip, Unassign));
         }
         await _onSaveRename(this);
+        WeakReferenceMessenger.Default.Send(new ClipsChangedMessage(Model));
     }
 
     // ── helpers ────────────────────────────────────────────────────────────
@@ -126,6 +128,7 @@ public partial class StateItemViewModel : ObservableObject
         Model.Clips.Remove(item.Model);
         AssignedClips.Remove(item);
         _ = _onSaveRename(this);
+        WeakReferenceMessenger.Default.Send(new ClipsChangedMessage(Model));
     }
 
     public void ApplyEdit(string newName, string newColor)
