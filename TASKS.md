@@ -31,6 +31,7 @@
 - [x] Drag & drop video files into clip manager window to add clips
 - [x] Rubber-band / marquee multi-select in clip manager
 - [x] Multi-select context menu — delete all selected clips at once
+- [x] Clip browser modal — 3-level drill-down (Collections → States → Clips) with CrossFade transition
 
 ### 4. Live Performance Screen
 - [x] Current state display
@@ -40,7 +41,9 @@
 - [x] Emergency switch (immediate cut)
 - [x] Video output area (LibVLC via custom NativeControlHost)
 - [x] Clip name overlay on video
-- [ ] Play / pause controls
+- [x] Play / pause controls
+- [x] Auto-advance to next clip on clip end (loops last clip)
+- [x] Auto-play first clip on unpause
 - [ ] Manual clip advance
 
 ### 5. Trigger System
@@ -115,6 +118,7 @@
 - [x] Video thumbnail extraction (Windows Shell)
 - [x] Video playback (LibVLC)
 - [x] State-based clip switching
+- [x] Auto-advance queue (next clip on end, loop last)
 - [x] Auth service (Supabase sign-up / sign-in / sign-out)
 - [x] Auth gate UI (login screen before app)
 - [x] Local database persistence (SQLite — collections, states, clips)
@@ -151,6 +155,7 @@
 
 ## UI / UX Improvements (Done)
 
+- [x] Queue page — live clip list with active clip highlight (green glow + NOW PLAYING badge), per-item collection/state color badges, video thumbnails, add/remove clips
 - [x] Remove gear icon from collection cards — settings moved to management page
 - [x] Single-click collection card opens management page
 - [x] Collection detail rich header — cover image, name, description inline editing
