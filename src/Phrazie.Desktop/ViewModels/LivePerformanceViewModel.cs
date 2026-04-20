@@ -129,6 +129,9 @@ public partial class LivePerformanceViewModel : ViewModelBase
             Dispatcher.UIThread.Post(() =>
                 CurrentClipName = clip?.DisplayName ?? string.Empty);
 
+        _playback.ClipEnded += () =>
+            Dispatcher.UIThread.Post(AdvanceToNextClip);
+
         _beatClock.Bpm = Bpm;
         _beatClock.PhaseChanged += phase =>
             Dispatcher.UIThread.Post(() =>
@@ -273,6 +276,29 @@ public partial class LivePerformanceViewModel : ViewModelBase
             BuildStateOptions(s);
             OnPropertyChanged(nameof(NextStateName));
         }
+    }
+
+    private void AdvanceToNextClip()
+    {
+        if (!IsPlaying) return;
+
+        var clips = _session.Current.CurrentState?.Clips
+                        .Where(c => c.IsEnabled)
+                        .ToList() ?? [];
+
+        if (clips.Count == 0) return;
+
+        var currentIdx = clips.FindIndex(c => c.Id == _playback.CurrentClip?.Id);
+        var nextIdx    = currentIdx + 1;
+
+        // Past the end — loop the last clip
+        if (nextIdx >= clips.Count)
+        {
+            _ = _playback.PlayAsync(clips[^1]);
+            return;
+        }
+
+        _ = _playback.PlayAsync(clips[nextIdx]);
     }
 
     private string BuildTriggerDescription(string stateName) => DelayType switch
