@@ -26,6 +26,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] private ViewModelBase          _currentPage;
     [ObservableProperty] private ClipBrowserViewModel? _activeBrowser;
+
+    private readonly ClipQueueViewModel _clipQueuePage;
     [ObservableProperty] private bool _isCollectionsActive  = true;
     [ObservableProperty] private bool _isLiveActive         = false;
     [ObservableProperty] private bool _isClipQueueActive    = false;
@@ -56,14 +58,15 @@ public partial class MainWindowViewModel : ViewModelBase
         _loginPage    = loginPage;
         _currentPage  = BuildCollectionsPage();
 
+        _clipQueuePage   = new ClipQueueViewModel(_session, _playback);
         _isAuthenticated = sessionStore.IsAuthenticated;
 
         WeakReferenceMessenger.Default.Register<OpenClipBrowserMessage>(this, (_, msg) =>
         {
             ActiveBrowser = new ClipBrowserViewModel(
                 _collections,
-                clip  => { msg.Value(clip); ActiveBrowser = null; },
-                ()    => ActiveBrowser = null);
+                (clip, col, state, color) => { msg.Value(clip, col, state, color); ActiveBrowser = null; },
+                ()                        => ActiveBrowser = null);
         });
 
         loginPage.LoginSucceeded += () =>
@@ -112,7 +115,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void GoToClipQueue()
     {
-        CurrentPage         = new ClipQueueViewModel(_session, _playback);
+        CurrentPage         = _clipQueuePage;
         IsCollectionsActive = false;
         IsLiveActive        = false;
         IsClipQueueActive   = true;

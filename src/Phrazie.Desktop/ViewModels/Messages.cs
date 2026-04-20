@@ -10,7 +10,7 @@ public sealed class ClipsChangedMessage : ValueChangedMessage<State>
 }
 
 /// <summary>Sent to ask MainWindowViewModel to show the clip browser modal.</summary>
-public sealed class OpenClipBrowserMessage : ValueChangedMessage<Action<Clip>>
+public sealed class OpenClipBrowserMessage : ValueChangedMessage<Action<Clip, string, string, string>>
 {
-    public OpenClipBrowserMessage(Action<Clip> onSelected) : base(onSelected) { }
+    public OpenClipBrowserMessage(Action<Clip, string, string, string> onSelected) : base(onSelected) { }
 }

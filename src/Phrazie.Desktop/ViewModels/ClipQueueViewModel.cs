@@ -14,6 +14,9 @@ public partial class ClipQueueViewModel : ViewModelBase,
     private readonly ISessionService  _session;
     private readonly IPlaybackService _playback;
 
+    // Preserves source collection/state names + color across LoadClips rebuilds
+    private readonly Dictionary<Guid, (string Collection, string State, string Color)> _clipMeta = new();
+
     public ObservableCollection<LiveClipItemViewModel> Clips { get; } = new();
 
     public ClipQueueViewModel(ISessionService session, IPlaybackService playback)
@@ -49,12 +52,12 @@ public partial class ClipQueueViewModel : ViewModelBase,
     {
         var state = _session.Current.CurrentState;
 
-        WeakReferenceMessenger.Default.Send(new OpenClipBrowserMessage(clip =>
+        WeakReferenceMessenger.Default.Send(new OpenClipBrowserMessage((clip, collectionName, stateName, stateColor) =>
         {
             if (state is null) return;
-            var collectionName = _session.Current.ActiveCollection?.Name ?? "—";
+            _clipMeta[clip.Id] = (collectionName, stateName, stateColor);
             state.Clips.Add(clip);
-            Clips.Add(new LiveClipItemViewModel(clip, RequestRemove, collectionName, state.Name));
+            Clips.Add(new LiveClipItemViewModel(clip, RequestRemove, collectionName, stateName, stateColor));
             WeakReferenceMessenger.Default.Send(new ClipsChangedMessage(state));
         }));
     }
@@ -65,40 +68,20 @@ public partial class ClipQueueViewModel : ViewModelBase,
     {
         Clips.Clear();
 
-        var collectionName = _session.Current.ActiveCollection?.Name ?? "—";
-        var stateName      = _session.Current.CurrentState?.Name ?? "—";
+        var defaultCollection = _session.Current.ActiveCollection?.Name ?? "—";
+        var defaultState      = _session.Current.CurrentState?.Name      ?? "—";
+
+        var defaultColor = _session.Current.CurrentState?.Color ?? "#443366";
 
         var clips = _session.Current.CurrentState?.Clips ?? [];
         foreach (var clip in clips)
-            Clips.Add(new LiveClipItemViewModel(clip, RequestRemove, collectionName, stateName));
-
-        if (Clips.Count == 0)
-            SeedFakeClips();
-    }
-
-    private void SeedFakeClips()
-    {
-        var fakes = new[]
         {
-            ("Violet Grid",   "2:14", "Geometry Pack", "DROP"),
-            ("Neon Tunnel",   "1:48", "Geometry Pack", "BUILD"),
-            ("Pulse Wave",    "3:02", "Synthwave Vol2", "DROP"),
-            ("Fractal Storm", "2:33", "Synthwave Vol2", "BREAK"),
-            ("Mirror City",   "1:55", "Urban Textures", "BUILD"),
-        };
-
-        foreach (var (name, dur, col, state) in fakes)
-        {
-            var clip = new Clip
-            {
-                DisplayName = name,
-                Duration    = TimeSpan.ParseExact(dur, @"m\:ss", null),
-            };
-            Clips.Add(new LiveClipItemViewModel(clip, RequestRemove, col, state));
+            var (col, st, color) = _clipMeta.TryGetValue(clip.Id, out var meta)
+                ? meta
+                : (defaultCollection, defaultState, defaultColor);
+            Clips.Add(new LiveClipItemViewModel(clip, RequestRemove, col, st, color));
         }
 
-        if (Clips.Count > 0)
-            Clips[0].IsActive = true;
     }
 
     private void UpdateActiveClip(Clip? clip)
@@ -111,6 +94,7 @@ public partial class ClipQueueViewModel : ViewModelBase,
     {
         item.Opacity = 0;
         await Task.Delay(220);
+        _clipMeta.Remove(item.Model.Id);
         _session.Current.CurrentState?.Clips.Remove(item.Model);
         Clips.Remove(item);
         WeakReferenceMessenger.Default.Send(

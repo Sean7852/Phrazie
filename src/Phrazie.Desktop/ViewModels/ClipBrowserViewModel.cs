@@ -34,9 +34,9 @@ public sealed class BrowserClipsContent
 
 public partial class ClipBrowserViewModel : ViewModelBase
 {
-    private readonly ICollectionRepository _collections;
-    private readonly Action<Clip>          _onSelect;
-    private readonly Action                _onClose;
+    private readonly ICollectionRepository               _collections;
+    private readonly Action<Clip, string, string, string> _onSelect;
+    private readonly Action                               _onClose;
 
     private readonly Stack<object> _history = new();
 
@@ -47,7 +47,7 @@ public partial class ClipBrowserViewModel : ViewModelBase
 
     public ClipBrowserViewModel(
         ICollectionRepository collections,
-        Action<Clip> onSelect,
+        Action<Clip, string, string, string> onSelect,
         Action onClose)
     {
         _collections = collections;
@@ -105,7 +105,11 @@ public partial class ClipBrowserViewModel : ViewModelBase
     [RelayCommand]
     private void SelectClip(Clip clip)
     {
-        _onSelect(clip);
+        var content        = CurrentContent as BrowserClipsContent;
+        var collectionName = content?.Collection.Name ?? "—";
+        var stateName      = content?.State.Name      ?? "—";
+        var stateColor     = content?.State.Color      ?? "#443366";
+        _onSelect(clip, collectionName, stateName, stateColor);
         _onClose();
     }
 
