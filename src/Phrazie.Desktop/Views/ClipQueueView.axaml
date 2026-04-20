@@ -1,0 +1,167 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Phrazie.Desktop.ViewModels"
+             x:Class="Phrazie.Desktop.Views.ClipQueueView"
+             x:DataType="vm:ClipQueueViewModel"
+             Background="{StaticResource MainBackgroundBrush}">
+
+  <UserControl.Styles>
+
+    <!-- Row container -->
+    <Style Selector="Border.clip-row">
+      <Setter Property="Background"    Value="#0F0F14" />
+      <Setter Property="CornerRadius"  Value="8" />
+      <Setter Property="Margin"        Value="0,0,0,6" />
+      <Setter Property="Padding"       Value="10,8" />
+    </Style>
+    <Style Selector="Border.clip-row:pointerover">
+      <Setter Property="Background" Value="#161620" />
+    </Style>
+
+    <!-- Active glow border (sits behind content via Panel) -->
+    <Style Selector="Border.active-glow">
+      <Setter Property="IsVisible"    Value="False" />
+      <Setter Property="CornerRadius" Value="8" />
+      <Setter Property="BorderBrush"  Value="#44DD44" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="BoxShadow"    Value="0 0 10 2 #4044DD44" />
+    </Style>
+    <Style Selector="Border.active-glow.on">
+      <Setter Property="IsVisible" Value="True" />
+      <Style.Animations>
+        <Animation Duration="0:0:1.6" IterationCount="Infinite" Easing="SineEaseInOut">
+          <KeyFrame Cue="0%">
+            <Setter Property="Opacity" Value="0.35" />
+          </KeyFrame>
+          <KeyFrame Cue="50%">
+            <Setter Property="Opacity" Value="1.0" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="Opacity" Value="0.35" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+
+    <!-- Remove button -->
+    <Style Selector="Button.remove">
+      <Setter Property="Background"    Value="Transparent" />
+      <Setter Property="Foreground"    Value="{StaticResource TextBrushDisabled}" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Padding"       Value="6,4" />
+      <Setter Property="FontSize"      Value="12" />
+      <Setter Property="CornerRadius"  Value="4" />
+    </Style>
+    <Style Selector="Button.remove:pointerover /template/ ContentPresenter">
+      <Setter Property="Background"             Value="#331A1A" />
+      <Setter Property="TextElement.Foreground" Value="#EE4444" />
+    </Style>
+
+  </UserControl.Styles>
+
+  <Grid RowDefinitions="Auto,*" Margin="16,16,16,8">
+
+    <!-- ── Header ── -->
+    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+      <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="2">
+        <TextBlock Text="CLIP QUEUE"
+                   Foreground="{StaticResource TextBrushDisabled}"
+                   FontSize="10"
+                   FontWeight="Bold"
+                   LetterSpacing="3" />
+        <TextBlock Text="{Binding StateName}"
+                   Foreground="{StaticResource TextBrushSecondary}"
+                   FontSize="12" />
+      </StackPanel>
+      <TextBlock Grid.Column="1"
+                 Text="{Binding Clips.Count, StringFormat='{}{0} clips'}"
+                 Foreground="{StaticResource TextBrushDisabled}"
+                 FontSize="11"
+                 VerticalAlignment="Bottom" />
+    </Grid>
+
+    <!-- ── Clip list ── -->
+    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+      <ItemsControl x:Name="ClipList" ItemsSource="{Binding Clips}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:LiveClipItemViewModel">
+
+            <!-- Opacity transition for removal -->
+            <Panel>
+              <Panel.Transitions>
+                <Transitions>
+                  <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+                </Transitions>
+              </Panel.Transitions>
+              <Panel.Opacity>
+                <Binding Path="Opacity" />
+              </Panel.Opacity>
+
+              <!-- Glow layer (behind content) -->
+              <Border Classes="active-glow"
+                      Classes.on="{Binding IsActive}"
+                      Margin="0,0,0,6" />
+
+              <!-- Row content -->
+              <Border Classes="clip-row">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+
+                  <!-- Thumbnail placeholder -->
+                  <Border Grid.Column="0"
+                          Width="48"
+                          Height="27"
+                          CornerRadius="4"
+                          ClipToBounds="True"
+                          Margin="0,0,10,0"
+                          Background="#1A1A2E">
+                    <Border.Background>
+                      <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                        <GradientStop Color="#2A1A3A" Offset="0.0" />
+                        <GradientStop Color="#1A2A3A" Offset="1.0" />
+                      </LinearGradientBrush>
+                    </Border.Background>
+                  </Border>
+
+                  <!-- Name + duration -->
+                  <StackPanel Grid.Column="1"
+                              VerticalAlignment="Center"
+                              Spacing="2">
+                    <TextBlock Text="{Binding Name}"
+                               Foreground="{StaticResource TextBrushPrimary}"
+                               FontSize="12"
+                               FontWeight="SemiBold"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding Duration}"
+                               Foreground="{StaticResource TextBrushDisabled}"
+                               FontFamily="Consolas,monospace"
+                               FontSize="10" />
+                  </StackPanel>
+
+                  <!-- Remove button -->
+                  <Button Grid.Column="2"
+                          Classes="remove"
+                          Content="✕"
+                          Command="{Binding RemoveCommand}"
+                          VerticalAlignment="Center"
+                          Margin="6,0,2,0" />
+
+                  <!-- Drag handle -->
+                  <TextBlock Grid.Column="3"
+                             Text="≡"
+                             Foreground="{StaticResource TextBrushDisabled}"
+                             FontSize="14"
+                             VerticalAlignment="Center"
+                             Margin="2,0,0,0" />
+
+                </Grid>
+              </Border>
+            </Panel>
+
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+  </Grid>
+
+</UserControl>

@@ -24,10 +24,11 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IHotkeyService        _hotkeys;
 
     [ObservableProperty] private ViewModelBase _currentPage;
-    [ObservableProperty] private bool _isCollectionsActive = true;
-    [ObservableProperty] private bool _isLiveActive        = false;
-    [ObservableProperty] private bool _isSettingsActive    = false;
-    [ObservableProperty] private bool _isHelpActive        = false;
+    [ObservableProperty] private bool _isCollectionsActive  = true;
+    [ObservableProperty] private bool _isLiveActive         = false;
+    [ObservableProperty] private bool _isClipQueueActive    = false;
+    [ObservableProperty] private bool _isSettingsActive     = false;
+    [ObservableProperty] private bool _isHelpActive         = false;
 
     public MainWindowViewModel(
         ICollectionRepository collections,
@@ -82,6 +83,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = BuildCollectionsPage();
         IsCollectionsActive = true;
         IsLiveActive        = false;
+        IsClipQueueActive   = false;
         IsSettingsActive    = false;
         IsHelpActive        = false;
     }
@@ -92,6 +94,18 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = new LivePerformanceViewModel(_session, _trigger, _playback, _beatClock);
         IsCollectionsActive = false;
         IsLiveActive        = true;
+        IsClipQueueActive   = false;
+        IsSettingsActive    = false;
+        IsHelpActive        = false;
+    }
+
+    [RelayCommand]
+    private void GoToClipQueue()
+    {
+        CurrentPage         = new ClipQueueViewModel(_session, _playback);
+        IsCollectionsActive = false;
+        IsLiveActive        = false;
+        IsClipQueueActive   = true;
         IsSettingsActive    = false;
         IsHelpActive        = false;
     }
@@ -102,6 +116,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = new SettingsViewModel(_hotkeys, _sessionStore, SignOutAsync);
         IsCollectionsActive = false;
         IsLiveActive        = false;
+        IsClipQueueActive   = false;
         IsSettingsActive    = true;
         IsHelpActive        = false;
     }
@@ -112,6 +127,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = new HelpViewModel();
         IsCollectionsActive = false;
         IsLiveActive        = false;
+        IsClipQueueActive   = false;
         IsSettingsActive    = false;
         IsHelpActive        = true;
     }
