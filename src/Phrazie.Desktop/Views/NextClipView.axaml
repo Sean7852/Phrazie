@@ -9,8 +9,8 @@
 
     <Style Selector="Button.cue">
       <Setter Property="Background"      Value="Transparent" />
-      <Setter Property="Foreground"      Value="{StaticResource AccentOrangeBrush}" />
-      <Setter Property="BorderBrush"     Value="{StaticResource AccentOrangeBrush}" />
+      <Setter Property="Foreground"      Value="{StaticResource AccentBrush}" />
+      <Setter Property="BorderBrush"     Value="{StaticResource AccentBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius"    Value="12" />
       <Setter Property="Padding"         Value="14,5" />
@@ -19,13 +19,13 @@
       <Setter Property="LetterSpacing"   Value="1" />
     </Style>
     <Style Selector="Button.cue:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="{StaticResource AccentOrangeDimBrush}" />
+      <Setter Property="Background" Value="#1AF59E0B" />
     </Style>
 
     <Style Selector="Button.change-clip">
-      <Setter Property="Background"      Value="#13141A" />
+      <Setter Property="Background"      Value="{StaticResource PanelBackgroundBrush}" />
       <Setter Property="Foreground"      Value="{StaticResource TextBrushSecondary}" />
-      <Setter Property="BorderBrush"     Value="#1C1C2C" />
+      <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius"    Value="6" />
       <Setter Property="Padding"         Value="14,10" />
@@ -39,7 +39,7 @@
   </UserControl.Styles>
 
   <!-- Card wrapper -->
-  <Border Background="#0D0D12"
+  <Border Background="{StaticResource PanelBackgroundBrush}"
           CornerRadius="10"
           Margin="12,10">
 
@@ -49,7 +49,7 @@
       <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
         <TextBlock Grid.Column="0"
                    Text="UP NEXT"
-                   Foreground="#7A8FA6"
+                   Foreground="{StaticResource TextBrushSecondary}"
                    FontFamily="Consolas,monospace"
                    FontSize="10"
                    FontWeight="Bold"
@@ -86,7 +86,7 @@
           <StackPanel Orientation="Horizontal" Spacing="6">
 
             <!-- Collection badge -->
-            <Border Background="#222228"
+            <Border Background="{StaticResource ControlBackgroundBrush}"
                     CornerRadius="10"
                     Padding="8,3">
               <StackPanel Orientation="Horizontal" Spacing="4">

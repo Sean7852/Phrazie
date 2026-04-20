@@ -10,14 +10,14 @@
                 <ResourceInclude Source="avares://Phrazie.Desktop/Resources/Colors.axaml" />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Override Fluent accent to Phrazie Yellow -->
-            <Color x:Key="SystemAccentColor">#FFB800</Color>
-            <Color x:Key="SystemAccentColorLight1">#FFC233</Color>
-            <Color x:Key="SystemAccentColorLight2">#FFCC66</Color>
-            <Color x:Key="SystemAccentColorLight3">#FFD999</Color>
-            <Color x:Key="SystemAccentColorDark1">#CC9200</Color>
-            <Color x:Key="SystemAccentColorDark2">#996D00</Color>
-            <Color x:Key="SystemAccentColorDark3">#664900</Color>
+            <!-- Override Fluent accent to Phrazie Amber -->
+            <Color x:Key="SystemAccentColor">#F59E0B</Color>
+            <Color x:Key="SystemAccentColorLight1">#F7AB2E</Color>
+            <Color x:Key="SystemAccentColorLight2">#F9BF63</Color>
+            <Color x:Key="SystemAccentColorLight3">#FBD499</Color>
+            <Color x:Key="SystemAccentColorDark1">#C47E08</Color>
+            <Color x:Key="SystemAccentColorDark2">#935E06</Color>
+            <Color x:Key="SystemAccentColorDark3">#623F04</Color>
 
             <!-- TextBox dark theme overrides -->
             <SolidColorBrush x:Key="TextControlBackground"               Color="{StaticResource SurfaceLight}" />

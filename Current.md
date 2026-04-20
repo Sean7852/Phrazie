@@ -1,31 +1,6 @@
-I want to replace the standard Windows file browser for 'Add/Change Clip' with a custom Internal Browser View. This view should only navigate data from our SQLite database.
-
-1. Navigation Logic (Drill-Down):
-
-Level 1 (Collections): Display all available Collections as large icons or cards.
-
-Level 2 (States): Clicking a Collection icon navigates 'into' it, displaying all States associated with that collection.
-
-Level 3 (Clips): Clicking a State displays all enabled Clips within that state.
-
-Selection: Clicking a Clip selects it and closes the browser, returning the clip data to the LivePerformanceViewModel.
-
-2. The Header & Path Tracking:
-
-Breadcrumb Path: In the browser title area, implement a dynamic path display (e.g., Library > Techno Set > Build Up).
-
-Back Button: Provide a 'Back' arrow next to the path to navigate up one level.
-
-3. UI & Aesthetic:
-
-Use a Grid with a sidebar for categories and a WrapPanel for the main content area to show icons.
-
-Match the Phrazie industrial dark theme: #0D0D12 background and #1C1C2C borders.
-
-Add a 'cool animation' for navigation: Use a Cross-Fade or Slide transition when moving between levels (Collection → State) so it feels like a modern media browser.
-
-4. Technical Requirements:
-
-MVVM: Create a ClipBrowserViewModel that uses SqliteCollectionRepository and SqliteClipRepository to fetch data.
-
-Dialog Host: Implement this as a ContentControl or a modal overlay within the MainWindow.
+I need to perform a global theme migration for Phrazie. I want to replace the current Colors.axaml logic with the design tokens from the provided phrazie-colors.css and then enforce these colors across the app views.1. Update Colors.axaml:
+* Map the CSS tokens to Avalonia Color resources (e.g., --phz-bg becomes PhzBg). Use the specific hex values from the CSS:
+* Surfaces: Background #0a0a0b, Surface-1 #111114, Surface-2 #17171c. * Accent: Use the Amber primary accent #f59e0b. * Status: Use the Green #22c55e for Live and Red #ef4444 for Danger/REC. * Define SolidColorBrush resources for: MainBackgroundBrush, PanelBackgroundBrush, TextBrushPrimary, TextBrushSecondary, AccentBrush, and DangerBrush. 2. Global View Refactoring:Search through LivePerformanceView.axaml, PlaybackControlView.axaml, and any custom controls.
+* Remove all hardcoded hex colors (e.g., #0D0D12, #FF9900, #141422). Replace them with the new StaticResource keys from Colors.axaml.Rules:
+* Use PanelBackgroundBrush for all secondary containers and footers. * Use AccentBrush for the BPM slider, Play button, and CUE buttons. * Use TextBrushSecondary for all sub-labels like 'BPM', 'PHRASE', and 'NEXT'. 3. Cleanup:Ensure all Styles that previously used hardcoded colors now point to the semantic resources.
+* Check that the BoxBorderDefault now uses the --phz-border value of #26262e. Please provide the updated Colors.axaml file and the key refactored sections of the views.
