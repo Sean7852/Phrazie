@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Phrazie.Core.Enums;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
@@ -23,11 +24,15 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IFilePickerService    _filePicker;
     private readonly IHotkeyService        _hotkeys;
 
-    [ObservableProperty] private ViewModelBase _currentPage;
-    [ObservableProperty] private bool _isCollectionsActive = true;
-    [ObservableProperty] private bool _isLiveActive        = false;
-    [ObservableProperty] private bool _isSettingsActive    = false;
-    [ObservableProperty] private bool _isHelpActive        = false;
+    [ObservableProperty] private ViewModelBase          _currentPage;
+    [ObservableProperty] private ClipBrowserViewModel? _activeBrowser;
+
+    private readonly ClipQueueViewModel _clipQueuePage;
+    [ObservableProperty] private bool _isCollectionsActive  = true;
+    [ObservableProperty] private bool _isLiveActive         = false;
+    [ObservableProperty] private bool _isClipQueueActive    = false;
+    [ObservableProperty] private bool _isSettingsActive     = false;
+    [ObservableProperty] private bool _isHelpActive         = false;
 
     public MainWindowViewModel(
         ICollectionRepository    collections,
@@ -45,6 +50,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _session      = session;
         _trigger      = trigger;
         _playback     = playback;
+        _beatClock    = beatClock;
         _filePicker   = filePicker;
         _hotkeys      = hotkeys;
         _sessionStore = sessionStore;
@@ -53,7 +59,16 @@ public partial class MainWindowViewModel : ViewModelBase
         _liveVm       = liveVm;
         _currentPage  = BuildCollectionsPage();
 
+        _clipQueuePage   = new ClipQueueViewModel(_session, _playback);
         _isAuthenticated = sessionStore.IsAuthenticated;
+
+        WeakReferenceMessenger.Default.Register<OpenClipBrowserMessage>(this, (_, msg) =>
+        {
+            ActiveBrowser = new ClipBrowserViewModel(
+                _collections,
+                (clip, col, state, color) => { msg.Value(clip, col, state, color); ActiveBrowser = null; },
+                ()                        => ActiveBrowser = null);
+        });
 
         loginPage.LoginSucceeded += () =>
         {
@@ -82,6 +97,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = BuildCollectionsPage();
         IsCollectionsActive = true;
         IsLiveActive        = false;
+        IsClipQueueActive   = false;
         IsSettingsActive    = false;
         IsHelpActive        = false;
     }
@@ -92,6 +108,18 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = _liveVm;
         IsCollectionsActive = false;
         IsLiveActive        = true;
+        IsClipQueueActive   = false;
+        IsSettingsActive    = false;
+        IsHelpActive        = false;
+    }
+
+    [RelayCommand]
+    private void GoToClipQueue()
+    {
+        CurrentPage         = _clipQueuePage;
+        IsCollectionsActive = false;
+        IsLiveActive        = false;
+        IsClipQueueActive   = true;
         IsSettingsActive    = false;
         IsHelpActive        = false;
     }
@@ -102,6 +130,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = new SettingsViewModel(_hotkeys, _sessionStore, SignOutAsync);
         IsCollectionsActive = false;
         IsLiveActive        = false;
+        IsClipQueueActive   = false;
         IsSettingsActive    = true;
         IsHelpActive        = false;
     }
@@ -112,6 +141,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPage         = new HelpViewModel();
         IsCollectionsActive = false;
         IsLiveActive        = false;
+        IsClipQueueActive   = false;
         IsSettingsActive    = false;
         IsHelpActive        = true;
     }

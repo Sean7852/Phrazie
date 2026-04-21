@@ -12,6 +12,7 @@ public sealed class MockPlaybackService : IPlaybackService
     public Clip? CurrentClip { get; private set; }
 
     public event Action<Clip?>? ClipChanged;
+    public event Action?        ClipEnded;
 
     public Task PlayAsync(Clip clip)
     {

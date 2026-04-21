@@ -6,50 +6,45 @@
              Background="Transparent">
 
     <Grid>
-        <!-- Background gradient -->
         <Border>
             <Border.Background>
                 <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                    <GradientStop Color="#070710" Offset="0" />
+                    <GradientStop Color="{StaticResource SurfaceBlack}" Offset="0" />
                     <GradientStop Color="#0D1035" Offset="1" />
                 </LinearGradientBrush>
             </Border.Background>
         </Border>
 
-        <!-- Centered card -->
         <Border HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 Width="380"
-                Background="#0E0E1A"
-                BorderBrush="#1E1E30"
+                Background="{StaticResource PanelBackgroundBrush}"
+                BorderBrush="{StaticResource BoxBorderDefault}"
                 BorderThickness="1"
                 CornerRadius="12"
                 Padding="36,32">
             <StackPanel Spacing="24">
 
-                <!-- Brand -->
                 <StackPanel Spacing="4">
                     <TextBlock Text="PHRAZIE"
-                               Foreground="#444466"
+                               Foreground="{StaticResource TextBrushDisabled}"
                                FontSize="11"
                                LetterSpacing="3" />
                     <TextBlock Text="{Binding HeadingLabel}"
-                               Foreground="White"
+                               Foreground="{StaticResource TextBrushPrimary}"
                                FontSize="24"
                                FontWeight="Light" />
                 </StackPanel>
 
-                <!-- Fields -->
                 <StackPanel Spacing="12">
-
                     <StackPanel Spacing="5">
                         <TextBlock Text="Email"
-                                   Foreground="#666688"
+                                   Foreground="{StaticResource TextBrushSecondary}"
                                    FontSize="12" />
                         <TextBox Text="{Binding Email}"
                                  PlaceholderText="you@example.com"
-                                 Background="#12121E"
-                                 BorderBrush="#2A2A44"
+                                 Background="{StaticResource ControlBackgroundBrush}"
+                                 BorderBrush="{StaticResource BoxBorderDefault}"
                                  CornerRadius="6"
                                  Padding="12,9"
                                  FontSize="14" />
@@ -57,21 +52,19 @@
 
                     <StackPanel Spacing="5">
                         <TextBlock Text="Password"
-                                   Foreground="#666688"
+                                   Foreground="{StaticResource TextBrushSecondary}"
                                    FontSize="12" />
                         <TextBox Text="{Binding Password}"
                                  PasswordChar="•"
                                  PlaceholderText="Min. 6 characters"
-                                 Background="#12121E"
-                                 BorderBrush="#2A2A44"
+                                 Background="{StaticResource ControlBackgroundBrush}"
+                                 BorderBrush="{StaticResource BoxBorderDefault}"
                                  CornerRadius="6"
                                  Padding="12,9"
                                  FontSize="14" />
                     </StackPanel>
-
                 </StackPanel>
 
-                <!-- Error message -->
                 <Border IsVisible="{Binding ErrorMessage,
                             Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
                         Background="#1A0A0A"
@@ -85,12 +78,11 @@
                                TextWrapping="Wrap" />
                 </Border>
 
-                <!-- Submit button -->
                 <Button Command="{Binding SubmitCommand}"
                         HorizontalAlignment="Stretch"
                         HorizontalContentAlignment="Center"
                         Background="#1E3A5F"
-                        Foreground="White"
+                        Foreground="{StaticResource TextBrushPrimary}"
                         BorderThickness="0"
                         Padding="0,13"
                         CornerRadius="6"
@@ -102,18 +94,17 @@
                                    HorizontalAlignment="Center" />
                         <TextBlock Text="Please wait…"
                                    IsVisible="{Binding IsBusy}"
-                                   Foreground="#8899BB"
+                                   Foreground="{StaticResource TextBrushSecondary}"
                                    HorizontalAlignment="Center" />
                     </Panel>
                 </Button>
 
-                <!-- Toggle sign-in / sign-up -->
                 <Button Command="{Binding ToggleModeCommand}"
                         HorizontalAlignment="Center"
                         Background="Transparent"
                         BorderThickness="0"
                         Padding="0"
-                        Foreground="#555577"
+                        Foreground="{StaticResource TextBrushDisabled}"
                         FontSize="13">
                     <TextBlock Text="{Binding ToggleLabel}" TextDecorations="Underline" />
                 </Button>

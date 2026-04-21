@@ -29,7 +29,11 @@
       "Bash(dotnet tool *)",
       "Bash(tasklist)",
       "Bash(echo \"exit: $?\")",
-      "Bash(grep -v \"obj\\\\\\\\\")"
+      "Bash(grep -v \"obj\\\\\\\\\")",
+      "Bash(xargs grep *)",
+      "Bash(git add *)",
+      "Bash(git merge *)",
+      "Bash(git stash *)"
     ]
   }
 }

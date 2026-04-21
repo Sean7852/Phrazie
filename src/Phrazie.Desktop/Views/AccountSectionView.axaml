@@ -8,31 +8,29 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="32,28,32,32" Spacing="28" MaxWidth="560">
 
-            <!-- Section heading -->
             <StackPanel Spacing="4">
                 <TextBlock Text="Account"
-                           Foreground="White"
+                           Foreground="{StaticResource TextBrushPrimary}"
                            FontSize="20"
                            FontWeight="Light" />
                 <TextBlock Text="Manage your session and app info."
-                           Foreground="#444466"
+                           Foreground="{StaticResource TextBrushDisabled}"
                            FontSize="12" />
             </StackPanel>
 
-            <!-- Signed-in card -->
-            <Border Background="#0E0E1A"
-                    BorderBrush="#1E1E30"
+            <Border Background="{StaticResource PanelBackgroundBrush}"
+                    BorderBrush="{StaticResource BoxBorderDefault}"
                     BorderThickness="1"
                     CornerRadius="8"
                     Padding="20,16">
                 <StackPanel Spacing="16">
                     <StackPanel Spacing="4">
                         <TextBlock Text="SIGNED IN AS"
-                                   Foreground="#444466"
+                                   Foreground="{StaticResource TextBrushDisabled}"
                                    FontSize="10"
                                    LetterSpacing="2" />
                         <TextBlock Text="{Binding UserEmail}"
-                                   Foreground="White"
+                                   Foreground="{StaticResource TextBrushPrimary}"
                                    FontSize="15"
                                    FontWeight="Medium" />
                     </StackPanel>
@@ -51,28 +49,27 @@
                 </StackPanel>
             </Border>
 
-            <!-- About card -->
-            <Border Background="#0E0E1A"
-                    BorderBrush="#1E1E30"
+            <Border Background="{StaticResource PanelBackgroundBrush}"
+                    BorderBrush="{StaticResource BoxBorderDefault}"
                     BorderThickness="1"
                     CornerRadius="8"
                     Padding="20,16">
                 <StackPanel Spacing="16">
                     <StackPanel Spacing="4">
                         <TextBlock Text="ABOUT"
-                                   Foreground="#444466"
+                                   Foreground="{StaticResource TextBrushDisabled}"
                                    FontSize="10"
                                    LetterSpacing="2" />
                         <TextBlock Text="Phrazie — version info, credits, and licenses."
-                                   Foreground="#888899"
+                                   Foreground="{StaticResource TextBrushSecondary}"
                                    FontSize="12" />
                     </StackPanel>
 
                     <Button Command="{Binding ShowAboutCommand}"
                             HorizontalAlignment="Left"
-                            Background="#12121E"
-                            Foreground="#AAAACC"
-                            BorderBrush="#2A2A44"
+                            Background="{StaticResource ControlBackgroundBrush}"
+                            Foreground="{StaticResource TextBrushPrimary}"
+                            BorderBrush="{StaticResource BoxBorderDefault}"
                             BorderThickness="1"
                             Padding="18,8"
                             CornerRadius="6"

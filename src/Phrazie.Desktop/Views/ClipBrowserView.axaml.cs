@@ -2,9 +2,9 @@ using Avalonia.Controls;
 
 namespace Phrazie.Desktop.Views;
 
-public partial class LivePerformanceView : UserControl
+public partial class ClipBrowserView : UserControl
 {
-    public LivePerformanceView()
+    public ClipBrowserView()
     {
         InitializeComponent();
     }

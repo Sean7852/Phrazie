@@ -8,6 +8,7 @@ using Phrazie.Core.Enums;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
 using Phrazie.Desktop.Services;
+using Avalonia.Threading;
 using QRCoder;
 
 namespace Phrazie.Desktop.ViewModels;
@@ -17,7 +18,8 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private readonly ISessionService  _session;
     private readonly ITriggerService  _trigger;
     private readonly IPlaybackService _playback;
-    private readonly IRemoteServer    _remote;
+    private readonly IBeatClock        _beatClock;
+    private readonly IRemoteServer     _remote;
 
     /// <summary>Exposed so LivePerformanceView.axaml.cs can wire it to VideoView.</summary>
     public MediaPlayer? MediaPlayer => (_playback as VideoPlaybackService)?.MediaPlayer;
@@ -30,6 +32,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     [ObservableProperty] private string _currentStateName  = "—";
     [ObservableProperty] private string _currentClipName   = string.Empty;
+    [ObservableProperty] private string _collectionName    = "—";
 
     /// <summary>Phrazie UI language: Waiting · Locked · Triggered</summary>
     [ObservableProperty] private string _statusLabel       = "Waiting";
@@ -52,12 +55,53 @@ public partial class LivePerformanceViewModel : ViewModelBase
     public IReadOnlyList<TriggerDelayType> DelayTypes { get; } =
         Enum.GetValues<TriggerDelayType>();
 
+    // ── Transport ─────────────────────────────────────────────────────────
+
+    [ObservableProperty] private bool _isPlaying   = true;
+    [ObservableProperty] private bool _isRecording = false;
+
+    public string PlayPauseIcon => IsPlaying ? "⏸" : "▶";
+
+    partial void OnIsPlayingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(PlayPauseIcon));
+        if (value)
+        {
+            _beatClock.Start();
+            var first = _session.Current.CurrentState?.Clips.FirstOrDefault(c => c.IsEnabled);
+            if (first is not null && _playback.CurrentClip is null)
+                _ = _playback.PlayAsync(first);
+        }
+        else
+        {
+            _beatClock.Stop();
+            _ = _playback.StopAsync();
+        }
+    }
+
+    [RelayCommand] private void TogglePlay()   => IsPlaying   = !IsPlaying;
+    [RelayCommand] private void ToggleRecord() => IsRecording = !IsRecording;
+
     // ── BPM ───────────────────────────────────────────────────────────────
 
     [ObservableProperty] private double _bpm = 128;
 
-    partial void OnBpmChanged(double value) =>
+    partial void OnBpmChanged(double value)
+    {
         _ = _session.SetBpmAsync(value);
+        _beatClock.Bpm = value;
+    }
+
+    [RelayCommand] private void IncreaseBpm() => Bpm = Math.Min(200, Bpm + 1);
+    [RelayCommand] private void DecreaseBpm() => Bpm = Math.Max(60,  Bpm - 1);
+
+    // ── Phrase tracker ────────────────────────────────────────────────────
+
+    [ObservableProperty] private double _currentPhase  = 0.0;
+    [ObservableProperty] private int    _phraseNumber  = 1;
+    public int TotalPhrases { get; } = 8;
+
+    private double _lastPhase = -1.0;
 
     // ── remote QR overlay ─────────────────────────────────────────────────
 
@@ -75,18 +119,20 @@ public partial class LivePerformanceViewModel : ViewModelBase
         ISessionService  session,
         ITriggerService  trigger,
         IPlaybackService playback,
+        IBeatClock       beatClock,
         IRemoteServer    remote)
     {
-        _session  = session;
-        _trigger  = trigger;
-        _playback = playback;
-        _remote   = remote;
+        _session   = session;
+        _trigger   = trigger;
+        _playback  = playback;
+        _beatClock = beatClock;
+        _remote    = remote;
 
         BuildStateOptions(_session.Current);
         SyncFromSession(_session.Current);
 
         _session.SessionChanged += s =>
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            Dispatcher.UIThread.Post(() =>
             {
                 RebuildOptionsIfCollectionChanged(s);
                 SyncFromSession(s);
@@ -96,12 +142,26 @@ public partial class LivePerformanceViewModel : ViewModelBase
         _trigger.CountdownTick += OnCountdownTick;
 
         _playback.ClipChanged += clip =>
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            Dispatcher.UIThread.Post(() =>
                 CurrentClipName = clip?.DisplayName ?? string.Empty);
+
+        _playback.ClipEnded += () =>
+            Dispatcher.UIThread.Post(AdvanceToNextClip);
+
+        _beatClock.Bpm = Bpm;
+        _beatClock.PhaseChanged += phase =>
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_lastPhase > 0.9 && phase < 0.1)
+                    PhraseNumber = (PhraseNumber % TotalPhrases) + 1;
+                _lastPhase   = phase;
+                CurrentPhase = phase;
+            }, DispatcherPriority.Render);
+        _beatClock.Start();
 
         // Remote: when a phone selects a next state, apply it in the UI
         _remote.NextStateRequested += stateId =>
-            Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+            Dispatcher.UIThread.Post(() =>
             {
                 var opt = StateOptions.FirstOrDefault(o => o.Model.Id == stateId);
                 if (opt is not null) SelectNextState(opt);
@@ -189,7 +249,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     private void OnTriggerFired(Trigger trigger)
     {
-        Avalonia.Threading.Dispatcher.UIThread.Post(async () =>
+        Dispatcher.UIThread.Post(async () =>
         {
             var opt = StateOptions.FirstOrDefault(o => o.Model.Id == trigger.TargetStateId);
             if (opt is not null)
@@ -206,7 +266,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     private void OnCountdownTick(TimeSpan remaining)
     {
-        Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+        Dispatcher.UIThread.Post(() =>
         {
             StatusLabel      = "Locked";
             CountdownDisplay = remaining.TotalSeconds < 60
@@ -227,6 +287,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private void SyncFromSession(Session s)
     {
         CurrentStateName = s.CurrentState?.Name ?? "—";
+        CollectionName   = s.ActiveCollection?.Name ?? "—";
         Bpm              = s.Bpm;
 
         foreach (var opt in StateOptions)
@@ -243,6 +304,29 @@ public partial class LivePerformanceViewModel : ViewModelBase
             BuildStateOptions(s);
             OnPropertyChanged(nameof(NextStateName));
         }
+    }
+
+    private void AdvanceToNextClip()
+    {
+        if (!IsPlaying) return;
+
+        var clips = _session.Current.CurrentState?.Clips
+                        .Where(c => c.IsEnabled)
+                        .ToList() ?? [];
+
+        if (clips.Count == 0) return;
+
+        var currentIdx = clips.FindIndex(c => c.Id == _playback.CurrentClip?.Id);
+        var nextIdx    = currentIdx + 1;
+
+        // Past the end — loop the last clip
+        if (nextIdx >= clips.Count)
+        {
+            _ = _playback.PlayAsync(clips[^1]);
+            return;
+        }
+
+        _ = _playback.PlayAsync(clips[nextIdx]);
     }
 
     private string BuildTriggerDescription(string stateName) => DelayType switch

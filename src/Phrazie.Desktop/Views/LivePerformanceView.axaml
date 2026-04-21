@@ -1,41 +1,55 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Phrazie.Desktop.ViewModels"
-             xmlns:ctrl="using:Phrazie.Desktop.Controls"
+             xmlns:views="using:Phrazie.Desktop.Views"
              x:Class="Phrazie.Desktop.Views.LivePerformanceView"
              x:DataType="vm:LivePerformanceViewModel"
-             Background="Transparent">
+             Background="{StaticResource MainBackgroundBrush}">
 
     <UserControl.Styles>
-        <Style Selector="Button.state">
-            <Setter Property="Background"                 Value="#12121E" />
-            <Setter Property="Foreground"                 Value="#555566" />
-            <Setter Property="BorderBrush"                Value="#1E1E30" />
-            <Setter Property="BorderThickness"            Value="1" />
-            <Setter Property="CornerRadius"               Value="6" />
-            <Setter Property="Padding"                    Value="20,10" />
-            <Setter Property="MinWidth"                   Value="90" />
-            <Setter Property="HorizontalContentAlignment" Value="Center" />
-            <Setter Property="FontSize"                   Value="14" />
-            <Setter Property="FontWeight"                 Value="Medium" />
+
+        <Style Selector="Button.hdr">
+            <Setter Property="Background"        Value="Transparent" />
+            <Setter Property="Foreground"        Value="{StaticResource TextBrushSecondary}" />
+            <Setter Property="BorderBrush"       Value="{StaticResource BoxBorderDefault}" />
+            <Setter Property="BorderThickness"   Value="1" />
+            <Setter Property="CornerRadius"      Value="5" />
+            <Setter Property="Padding"           Value="14,5" />
+            <Setter Property="FontSize"          Value="12" />
+            <Setter Property="VerticalAlignment" Value="Center" />
         </Style>
-        <Style Selector="Button.state:pointerover /template/ ContentPresenter">
-            <Setter Property="Background"             Value="#1A1A2E" />
-            <Setter Property="TextElement.Foreground" Value="#AAAACC" />
+        <Style Selector="Button.hdr:pointerover /template/ ContentPresenter">
+            <Setter Property="Background"             Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="TextElement.Foreground" Value="{StaticResource TextBrushPrimary}" />
         </Style>
-        <Style Selector="Button.state.active /template/ ContentPresenter">
+
+        <Style Selector="Button.hdr.primary">
+            <Setter Property="Background"  Value="{StaticResource TextBrushPrimary}" />
+            <Setter Property="Foreground"  Value="{StaticResource MainBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource TextBrushPrimary}" />
+            <Setter Property="FontWeight"  Value="SemiBold" />
+        </Style>
+        <Style Selector="Button.hdr.primary:pointerover /template/ ContentPresenter">
+            <Setter Property="Background"             Value="#DDDDEE" />
+            <Setter Property="TextElement.Foreground" Value="{StaticResource MainBackgroundBrush}" />
+        </Style>
+
+        <Style Selector="Button.clip-card">
+            <Setter Property="Background"      Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="Foreground"      Value="{StaticResource TextBrushSecondary}" />
+            <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius"    Value="6" />
+            <Setter Property="Padding"         Value="12,8" />
+            <Setter Property="MinWidth"        Value="100" />
+            <Setter Property="FontSize"        Value="12" />
+        </Style>
+        <Style Selector="Button.clip-card.active /template/ ContentPresenter">
             <Setter Property="Background"             Value="#0E1E0E" />
-            <Setter Property="TextElement.Foreground" Value="#66CC66" />
+            <Setter Property="TextElement.Foreground" Value="{StaticResource LiveBrush}" />
         </Style>
-        <Style Selector="Button.state.active">
+        <Style Selector="Button.clip-card.active">
             <Setter Property="BorderBrush" Value="#2A5A2A" />
-        </Style>
-        <Style Selector="Button.state.next /template/ ContentPresenter">
-            <Setter Property="Background"             Value="#1E3A5F" />
-            <Setter Property="TextElement.Foreground" Value="White" />
-        </Style>
-        <Style Selector="Button.state.next">
-            <Setter Property="BorderBrush" Value="#3A6A9F" />
         </Style>
     </UserControl.Styles>
 

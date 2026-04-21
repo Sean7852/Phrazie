@@ -21,6 +21,7 @@ public sealed class VideoPlaybackService : IPlaybackService, IDisposable
     public Clip? CurrentClip { get; private set; }
 
     public event Action<Clip?>? ClipChanged;
+    public event Action?        ClipEnded;
 
     public VideoPlaybackService()
     {
@@ -31,15 +32,8 @@ public sealed class VideoPlaybackService : IPlaybackService, IDisposable
         _libVlc     = new LibVLC("--no-keyboard-events", "--no-mouse-events");
         MediaPlayer = new MediaPlayer(_libVlc);
 
-        // Loop: when the clip finishes, restart it
         MediaPlayer.EndReached += (_, _) =>
-            Task.Run(() =>
-            {
-                Thread.Sleep(50);
-                MediaPlayer.Stop();
-                if (_currentMedia is not null)
-                    MediaPlayer.Play(_currentMedia);
-            });
+            Task.Run(() => { Thread.Sleep(50); ClipEnded?.Invoke(); });
     }
 
     public Task PlayAsync(Clip clip)

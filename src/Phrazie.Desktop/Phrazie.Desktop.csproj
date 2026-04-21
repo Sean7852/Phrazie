@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets\**" />
+    <AvaloniaResource Include="Resources\**" />
     <None Remove="Assets\icon.ico" />
   </ItemGroup>
 

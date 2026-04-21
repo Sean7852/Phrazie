@@ -1,0 +1,223 @@
+/* =========================================================================
+   PHRAZIE · Global Color Tokens
+   Single source of truth for colors across the whole app.
+   Import this file FIRST (before any other stylesheet) so every rule that
+   references `var(--phz-*)` resolves against the canonical palette.
+
+   Usage in HTML:
+     <link rel="stylesheet" href="styles/phrazie-colors.css" />
+     <link rel="stylesheet" href="styles.css" />
+
+   Usage in CSS:
+     color: var(--phz-text);
+     background: var(--phz-btn-primary-bg);
+
+   Naming convention:
+     --phz-<role>              semantic role (bg, text, border, accent…)
+     --phz-<role>-<variant>    variant (hover, active, muted, on-accent…)
+     --phz-<component>-<part>  component-scoped (btn-primary-bg, rec-btn-…)
+
+   Organized in sections. Every hex is commented with the intended role.
+   ========================================================================= */
+
+:root {
+  /* ----- Surfaces -------------------------------------------------------- */
+  --phz-bg:            #0a0a0b;   /* app background / outermost canvas    */
+  --phz-surface-1:     #111114;   /* primary panel (rail, inspector, transport) */
+  --phz-surface-2:     #17171c;   /* raised panel (cards, bodies)         */
+  --phz-surface-3:     #1d1d24;   /* highest surface (segment, chrome)    */
+  --phz-surface-video: #000000;   /* video canvas / thumbnail background  */
+
+  /* Overlays drawn on top of imagery or video */
+  --phz-overlay-strong: rgba(0, 0, 0, 0.75);
+  --phz-overlay-med:    rgba(0, 0, 0, 0.50);
+  --phz-overlay-soft:   rgba(0, 0, 0, 0.30);
+  --phz-overlay-hair:   rgba(0, 0, 0, 0.18);
+
+  /* Subtle highlights */
+  --phz-sheen:          rgba(255, 255, 255, 0.03); /* top-edge inset highlight on raised elements */
+
+  /* ----- Borders / dividers --------------------------------------------- */
+  --phz-border:         #26262e;  /* default 1px line                     */
+  --phz-border-soft:    #1e1e25;  /* whisper line between rows            */
+  --phz-border-strong:  #3a3a44;  /* emphasized / focused edge            */
+
+  /* On-media borders (over video/dark imagery) */
+  --phz-border-media:        rgba(255, 255, 255, 0.10);
+  --phz-border-media-soft:   rgba(255, 255, 255, 0.08);
+
+  /* ----- Text ------------------------------------------------------------ */
+  --phz-text:           #e7e7ea;  /* primary text, headlines              */
+  --phz-text-dim:       #8b8b94;  /* secondary text, sub-labels           */
+  --phz-text-mute:      #5a5a63;  /* tertiary / placeholder / disabled    */
+  --phz-text-inverse:   #14141a;  /* on light surface                     */
+
+  /* Text drawn on colored accents */
+  --phz-text-on-accent: #1a0f00;  /* dark ink for amber buttons           */
+  --phz-text-on-danger: #ffffff;  /* white ink on red                     */
+  --phz-text-on-live:   #062d10;  /* dark green ink on live badge (rare)  */
+
+  /* Text drawn on media (video overlays) */
+  --phz-text-on-media:         #ffffff;
+  --phz-text-on-media-dim:     rgba(255, 255, 255, 0.85);
+  --phz-text-on-media-mute:    rgba(255, 255, 255, 0.60);
+
+  /* ----- Accent (amber) — primary brand color --------------------------- */
+  --phz-accent:         #f59e0b;   /* amber 500 — primary accent          */
+  --phz-accent-hover:   #fbbf24;   /* amber 400 — hover/brighter          */
+  --phz-accent-press:   #d97706;   /* amber 600 — active/pressed          */
+  --phz-accent-dark:    #7c2d12;   /* amber 900 — deep accent (gradients) */
+  --phz-accent-glow:    rgba(245, 158, 11, 0.35);
+  --phz-accent-wash:    rgba(245, 158, 11, 0.12); /* field tint           */
+  --phz-accent-bg-soft: rgba(245, 158, 11, 0.06); /* selected panel bg    */
+  --phz-accent-ring:    rgba(245, 158, 11, 0.45); /* selected border      */
+  --phz-accent-ring-soft: rgba(245, 158, 11, 0.10);
+
+  /* ----- Status colors -------------------------------------------------- */
+  --phz-live:           #22c55e;  /* On-Air / green                       */
+  --phz-live-wash:      rgba(34, 197, 94, 0.10);
+
+  --phz-danger:         #ef4444;  /* recording / destructive              */
+  --phz-danger-hover:   #f87171;
+  --phz-danger-wash:    rgba(239, 68, 68, 0.15);
+  --phz-danger-glow:    rgba(239, 68, 68, 0.50);
+  --phz-danger-bg-dim:  #2a1214;  /* armed button background              */
+  --phz-danger-bg-dim-hover: #3a1a1e;
+  --phz-danger-border-dim:   #5a1f22;
+  --phz-danger-fg-dim:  #fca5a5;  /* text on armed button                 */
+
+  --phz-warning:        #f59e0b;  /* same as accent — amber doubles as warn */
+  --phz-info:           #60a5fa;
+
+  /* ----- State palette (for clip categories — customizable) ------------- */
+  /* Each state pill picks one of these; `--state` var set per-element.    */
+  --phz-state-intro:    #60a5fa;  /* blue                                 */
+  --phz-state-build:    #8b5cf6;  /* violet                               */
+  --phz-state-peak:     #f59e0b;  /* amber                                */
+  --phz-state-breakdown:#22c55e;  /* green                                */
+  --phz-state-outro:    #f472b6;  /* pink                                 */
+  --phz-state-ambient:  #94a3b8;  /* slate                                */
+
+  /* ----- Component: Buttons --------------------------------------------- */
+  /* Primary (amber CTA) */
+  --phz-btn-primary-bg:         var(--phz-accent);
+  --phz-btn-primary-bg-hover:   var(--phz-accent-hover);
+  --phz-btn-primary-bg-press:   var(--phz-accent-press);
+  --phz-btn-primary-fg:         var(--phz-text-on-accent);
+  --phz-btn-primary-border:     var(--phz-accent);
+
+  /* Secondary (ghost on panel) */
+  --phz-btn-secondary-bg:         var(--phz-surface-2);
+  --phz-btn-secondary-bg-hover:   var(--phz-surface-3);
+  --phz-btn-secondary-fg:         var(--phz-text-dim);
+  --phz-btn-secondary-fg-hover:   var(--phz-text);
+  --phz-btn-secondary-border:     var(--phz-border);
+  --phz-btn-secondary-border-hover: var(--phz-text-mute);
+
+  /* Tertiary (outline-amber) — e.g. TAP, CUE, Nextcard-cue */
+  --phz-btn-outline-accent-fg:      var(--phz-accent);
+  --phz-btn-outline-accent-border:  var(--phz-accent);
+  --phz-btn-outline-accent-bg-hover: var(--phz-accent);
+  --phz-btn-outline-accent-fg-hover: var(--phz-text-on-accent);
+
+  /* Destructive (record) */
+  --phz-btn-rec-bg:             var(--phz-danger-bg-dim);
+  --phz-btn-rec-bg-hover:       var(--phz-danger-bg-dim-hover);
+  --phz-btn-rec-bg-active:      var(--phz-danger);
+  --phz-btn-rec-border:         var(--phz-danger-border-dim);
+  --phz-btn-rec-border-hover:   var(--phz-danger);
+  --phz-btn-rec-fg:             var(--phz-danger-fg-dim);
+  --phz-btn-rec-fg-active:      var(--phz-text-on-danger);
+
+  /* Icon button (small rail / transport) */
+  --phz-btn-icon-fg:            var(--phz-text-dim);
+  --phz-btn-icon-fg-hover:      var(--phz-text);
+  --phz-btn-icon-bg:            var(--phz-surface-2);
+  --phz-btn-icon-border:        var(--phz-border);
+  --phz-btn-icon-border-hover:  var(--phz-text-mute);
+
+  /* ----- Component: Form / segmented controls -------------------------- */
+  --phz-input-bg:          var(--phz-surface-2);
+  --phz-input-border:      var(--phz-border);
+  --phz-input-border-focus: var(--phz-accent);
+  --phz-input-fg:          var(--phz-text);
+  --phz-input-placeholder: var(--phz-text-mute);
+
+  --phz-option-bg:              var(--phz-surface-2);
+  --phz-option-border:          var(--phz-border);
+  --phz-option-fg:              var(--phz-text-dim);
+  --phz-option-fg-hover:        var(--phz-text);
+  --phz-option-selected-bg:     var(--phz-accent-bg-soft);
+  --phz-option-selected-border: var(--phz-accent);
+  --phz-option-selected-fg:     var(--phz-accent);
+
+  /* ----- Component: Chips & badges ------------------------------------- */
+  --phz-chip-bg:      var(--phz-surface-2);
+  --phz-chip-border:  var(--phz-border-soft);
+  --phz-chip-fg:      var(--phz-text-dim);
+
+  /* ----- Shadows -------------------------------------------------------- */
+  --phz-shadow-sm:   0 1px 0 var(--phz-sheen) inset, 0 1px 2px rgba(0,0,0,0.4);
+  --phz-shadow-md:   0 1px 0 var(--phz-sheen) inset, 0 2px 8px rgba(0,0,0,0.3);
+  --phz-shadow-lg:   0 8px 40px rgba(0,0,0,0.5);
+  --phz-shadow-accent: 0 8px 20px -12px var(--phz-accent-glow);
+
+  /* ----- Focus ring ----------------------------------------------------- */
+  --phz-focus-ring:    var(--phz-accent);
+  --phz-focus-offset:  2px;
+}
+
+/* =========================================================================
+   LIGHT THEME — flip tokens that differ; semantic names stay the same
+   ========================================================================= */
+html[data-theme="light"] {
+  --phz-bg:            #f4f4f2;
+  --phz-surface-1:     #fbfbf9;
+  --phz-surface-2:     #f0f0ec;
+  --phz-surface-3:     #e7e7e2;
+
+  --phz-border:        #d7d7d1;
+  --phz-border-soft:   #e4e4de;
+  --phz-border-strong: #b6b6ae;
+
+  --phz-text:          #14141a;
+  --phz-text-dim:      #5a5a63;
+  --phz-text-mute:     #8b8b94;
+  --phz-text-inverse:  #fbfbf9;
+
+  --phz-accent:        #b45309;
+  --phz-accent-hover:  #c2660d;
+  --phz-accent-press:  #92400e;
+  --phz-accent-glow:   rgba(180, 83, 9, 0.25);
+  --phz-accent-wash:   rgba(180, 83, 9, 0.10);
+  --phz-accent-bg-soft: rgba(180, 83, 9, 0.06);
+  --phz-accent-ring:   rgba(180, 83, 9, 0.40);
+  --phz-accent-ring-soft: rgba(180, 83, 9, 0.10);
+
+  --phz-text-on-accent: #ffffff;
+
+  /* Media overlays change subtly */
+  --phz-border-media:      rgba(0, 0, 0, 0.10);
+  --phz-border-media-soft: rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================================================
+   BACKWARDS COMPAT — existing stylesheet uses --bg, --text, --accent, etc.
+   These map the old names to the new canonical tokens so nothing breaks.
+   Remove this block once styles.css is fully migrated to `--phz-*`.
+   ========================================================================= */
+:root {
+  --bg:         var(--phz-bg);
+  --panel:      var(--phz-surface-1);
+  --panel-2:    var(--phz-surface-2);
+  --panel-3:    var(--phz-surface-3);
+  --line:       var(--phz-border);
+  --line-soft:  var(--phz-border-soft);
+  --text:       var(--phz-text);
+  --text-dim:   var(--phz-text-dim);
+  --text-mute:  var(--phz-text-mute);
+  --accent:     var(--phz-accent);
+  --accent-glow:var(--phz-accent-glow);
+  --live:       var(--phz-live);
+  --danger:     var(--phz-danger);
+}
