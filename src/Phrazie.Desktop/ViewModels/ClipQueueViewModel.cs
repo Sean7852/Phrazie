@@ -52,12 +52,16 @@ public partial class ClipQueueViewModel : ViewModelBase,
     {
         var state = _session.Current.CurrentState;
 
-        WeakReferenceMessenger.Default.Send(new OpenClipBrowserMessage((clip, collectionName, stateName, stateColor) =>
+        WeakReferenceMessenger.Default.Send(new OpenClipBrowserMessage(selected =>
         {
             if (state is null) return;
-            _clipMeta[clip.Id] = (collectionName, stateName, stateColor);
-            state.Clips.Add(clip);
-            Clips.Add(new LiveClipItemViewModel(clip, RequestRemove, collectionName, stateName, stateColor));
+            foreach (var info in selected)
+            {
+                _clipMeta[info.Clip.Id] = (info.CollectionName, info.StateName, info.StateColor);
+                state.Clips.Add(info.Clip);
+                Clips.Add(new LiveClipItemViewModel(info.Clip, RequestRemove,
+                              info.CollectionName, info.StateName, info.StateColor));
+            }
             WeakReferenceMessenger.Default.Send(new ClipsChangedMessage(state));
         }));
     }

@@ -18,7 +18,8 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private readonly IBeatClock       _beatClock;
 
     /// <summary>Exposed so LivePerformanceView.axaml.cs can wire it to VideoView.</summary>
-    public MediaPlayer? MediaPlayer => (_playback as VideoPlaybackService)?.MediaPlayer;
+    public MediaPlayer?          MediaPlayer    => (_playback as VideoPlaybackService)?.MediaPlayer;
+    public VideoPlaybackService? VideoService   => _playback as VideoPlaybackService;
 
     // ── state options (the three buttons: Normal / Break / Drop) ──────────
 
@@ -120,6 +121,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
             {
                 RebuildOptionsIfCollectionChanged(s);
                 SyncFromSession(s);
+                AutoPlayIfIdle(s);
             });
 
         _trigger.TriggerFired  += OnTriggerFired;
@@ -248,6 +250,17 @@ public partial class LivePerformanceViewModel : ViewModelBase
     }
 
     // ── helpers ───────────────────────────────────────────────────────────
+
+    /// <summary>Called by LiveVideoView once the native HWND is ready.</summary>
+    public void TriggerAutoPlay() => AutoPlayIfIdle(_session.Current);
+
+    private void AutoPlayIfIdle(Session s)
+    {
+        if (!IsPlaying || _playback.CurrentClip is not null) return;
+        var first = s.CurrentState?.Clips.FirstOrDefault(c => c.IsEnabled);
+        if (first is not null)
+            _ = _playback.PlayAsync(first);
+    }
 
     private void BuildStateOptions(Session s)
     {

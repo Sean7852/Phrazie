@@ -3,6 +3,8 @@ using Phrazie.Core.Models;
 
 namespace Phrazie.Desktop.ViewModels;
 
+public record SelectedClipInfo(Clip Clip, string CollectionName, string StateName, string StateColor);
+
 /// <summary>Broadcast whenever clips are added/removed from any state.</summary>
 public sealed class ClipsChangedMessage : ValueChangedMessage<State>
 {
@@ -10,7 +12,7 @@ public sealed class ClipsChangedMessage : ValueChangedMessage<State>
 }
 
 /// <summary>Sent to ask MainWindowViewModel to show the clip browser modal.</summary>
-public sealed class OpenClipBrowserMessage : ValueChangedMessage<Action<Clip, string, string, string>>
+public sealed class OpenClipBrowserMessage : ValueChangedMessage<Action<IReadOnlyList<SelectedClipInfo>>>
 {
-    public OpenClipBrowserMessage(Action<Clip, string, string, string> onSelected) : base(onSelected) { }
+    public OpenClipBrowserMessage(Action<IReadOnlyList<SelectedClipInfo>> onSelected) : base(onSelected) { }
 }

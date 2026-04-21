@@ -65,8 +65,8 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             ActiveBrowser = new ClipBrowserViewModel(
                 _collections,
-                (clip, col, state, color) => { msg.Value(clip, col, state, color); ActiveBrowser = null; },
-                ()                        => ActiveBrowser = null);
+                selected => { msg.Value(selected); ActiveBrowser = null; },
+                ()       => ActiveBrowser = null);
         });
 
         loginPage.LoginSucceeded += () =>
@@ -101,10 +101,13 @@ public partial class MainWindowViewModel : ViewModelBase
         IsHelpActive        = false;
     }
 
+    private LivePerformanceViewModel? _livePage;
+
     [RelayCommand]
     private void GoToLive()
     {
-        CurrentPage         = new LivePerformanceViewModel(_session, _trigger, _playback, _beatClock);
+        _livePage         ??= new LivePerformanceViewModel(_session, _trigger, _playback, _beatClock);
+        CurrentPage         = _livePage;
         IsCollectionsActive = false;
         IsLiveActive        = true;
         IsClipQueueActive   = false;
