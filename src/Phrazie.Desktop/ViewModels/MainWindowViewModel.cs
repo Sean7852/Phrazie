@@ -65,8 +65,8 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             ActiveBrowser = new ClipBrowserViewModel(
                 _collections,
-                (clip, col, state, color) => { msg.Value(clip, col, state, color); ActiveBrowser = null; },
-                ()                        => ActiveBrowser = null);
+                selected => { msg.Value(selected); ActiveBrowser = null; },
+                ()       => ActiveBrowser = null);
         });
 
         loginPage.LoginSucceeded += () =>

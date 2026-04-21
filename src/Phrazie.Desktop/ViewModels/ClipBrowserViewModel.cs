@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using System.Windows.Input;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -7,47 +6,81 @@ using Phrazie.Core.Models;
 
 namespace Phrazie.Desktop.ViewModels;
 
-// ── Level content wrappers (drive TransitioningContentControl) ────────────
+// ── Clip item wrapper carrying selection state ────────────────────────────────
+
+public partial class BrowserClipItem : ObservableObject
+{
+    public Clip   Model          { get; }
+    public string CollectionName { get; }
+    public string StateName      { get; }
+    public string StateColor     { get; }
+
+    [ObservableProperty] private bool _isSelected;
+
+    public BrowserClipItem(Clip clip, string collectionName, string stateName, string stateColor)
+    {
+        Model          = clip;
+        CollectionName = collectionName;
+        StateName      = stateName;
+        StateColor     = stateColor;
+    }
+}
+
+// ── Level content wrappers (drive TransitioningContentControl) ────────────────
 
 public sealed class BrowserCollectionsContent
 {
-    public IReadOnlyList<Collection> Items      { get; init; } = [];
-    public ICommand                  DrillIn    { get; init; } = null!;
+    public IReadOnlyList<Collection> Items   { get; init; } = [];
+    public ICommand                  DrillIn { get; init; } = null!;
 }
 
 public sealed class BrowserStatesContent
 {
-    public Collection                Collection { get; init; } = null!;
-    public IReadOnlyList<State>      Items      { get; init; } = [];
-    public ICommand                  DrillIn    { get; init; } = null!;
+    public Collection           Collection { get; init; } = null!;
+    public IReadOnlyList<State> Items      { get; init; } = [];
+    public ICommand             DrillIn    { get; init; } = null!;
 }
 
 public sealed class BrowserClipsContent
 {
-    public Collection                Collection { get; init; } = null!;
-    public State                     State      { get; init; } = null!;
-    public IReadOnlyList<Clip>       Items      { get; init; } = [];
-    public ICommand                  Select     { get; init; } = null!;
+    public Collection            Collection { get; init; } = null!;
+    public State                 State      { get; init; } = null!;
+    public List<BrowserClipItem> Items      { get; init; } = [];
 }
 
-// ── Main VM ───────────────────────────────────────────────────────────────
+// ── Main VM ───────────────────────────────────────────────────────────────────
 
 public partial class ClipBrowserViewModel : ViewModelBase
 {
-    private readonly ICollectionRepository               _collections;
-    private readonly Action<Clip, string, string, string> _onSelect;
-    private readonly Action                               _onClose;
+    private readonly ICollectionRepository                   _collections;
+    private readonly Action<IReadOnlyList<SelectedClipInfo>> _onSelect;
+    private readonly Action                                  _onClose;
 
     private readonly Stack<object> _history = new();
+    private int _lastClickedIndex = -1;
 
-    [ObservableProperty] private string  _breadcrumb   = "Library";
-    [ObservableProperty] private bool    _canGoBack    = false;
+    [ObservableProperty] private string  _breadcrumb     = "Library";
+    [ObservableProperty] private bool    _canGoBack      = false;
     [ObservableProperty] private object? _currentContent;
-    [ObservableProperty] private bool    _isLoading    = false;
+    [ObservableProperty] private bool    _isLoading      = false;
+    [ObservableProperty] private int     _selectedCount  = 0;
+    [ObservableProperty] private bool    _isOnClipsLevel = false;
+
+    public bool HasSelection => SelectedCount > 0;
+
+    partial void OnSelectedCountChanged(int value)
+        => OnPropertyChanged(nameof(HasSelection));
+
+    partial void OnCurrentContentChanged(object? value)
+    {
+        IsOnClipsLevel    = value is BrowserClipsContent;
+        SelectedCount     = 0;
+        _lastClickedIndex = -1;
+    }
 
     public ClipBrowserViewModel(
         ICollectionRepository collections,
-        Action<Clip, string, string, string> onSelect,
+        Action<IReadOnlyList<SelectedClipInfo>> onSelect,
         Action onClose)
     {
         _collections = collections;
@@ -57,7 +90,7 @@ public partial class ClipBrowserViewModel : ViewModelBase
         _ = LoadCollectionsAsync();
     }
 
-    // ── Navigation ────────────────────────────────────────────────────────
+    // ── Navigation ────────────────────────────────────────────────────────────
 
     [RelayCommand]
     private void Back()
@@ -91,32 +124,71 @@ public partial class ClipBrowserViewModel : ViewModelBase
         _history.Push(CurrentContent!);
         CanGoBack = true;
 
-        var clips = state.Clips.Where(c => c.IsEnabled).ToList();
+        var clips = state.Clips
+            .Where(c => c.IsEnabled)
+            .Select(c => new BrowserClipItem(c, collection.Name, state.Name, state.Color))
+            .ToList();
+
         CurrentContent = new BrowserClipsContent
         {
             Collection = collection,
             State      = state,
             Items      = clips,
-            Select     = SelectClipCommand,
         };
         RefreshBreadcrumb();
     }
 
-    [RelayCommand]
-    private void SelectClip(Clip clip)
+    // ── Selection ─────────────────────────────────────────────────────────────
+
+    public void HandleClipClick(BrowserClipItem item, bool shift, bool ctrl)
     {
-        var content        = CurrentContent as BrowserClipsContent;
-        var collectionName = content?.Collection.Name ?? "—";
-        var stateName      = content?.State.Name      ?? "—";
-        var stateColor     = content?.State.Color      ?? "#443366";
-        _onSelect(clip, collectionName, stateName, stateColor);
+        var content = CurrentContent as BrowserClipsContent;
+        if (content is null) return;
+
+        int idx = content.Items.IndexOf(item);
+
+        if (shift && _lastClickedIndex >= 0 && idx >= 0)
+        {
+            int from = Math.Min(_lastClickedIndex, idx);
+            int to   = Math.Max(_lastClickedIndex, idx);
+            for (int i = from; i <= to; i++)
+                content.Items[i].IsSelected = true;
+        }
+        else
+        {
+            item.IsSelected   = !item.IsSelected;
+            _lastClickedIndex = idx;
+        }
+
+        NotifySelectionChanged();
+    }
+
+    internal void NotifySelectionChanged()
+    {
+        var content = CurrentContent as BrowserClipsContent;
+        SelectedCount = content?.Items.Count(i => i.IsSelected) ?? 0;
+    }
+
+    [RelayCommand]
+    private void ConfirmSelection()
+    {
+        var content = CurrentContent as BrowserClipsContent;
+        if (content is null) return;
+
+        var selected = content.Items
+            .Where(i => i.IsSelected)
+            .Select(i => new SelectedClipInfo(i.Model, i.CollectionName, i.StateName, i.StateColor))
+            .ToList();
+
+        if (selected.Count == 0) return;
+        _onSelect(selected);
         _onClose();
     }
 
     [RelayCommand]
     private void Close() => _onClose();
 
-    // ── Internal ──────────────────────────────────────────────────────────
+    // ── Internal ──────────────────────────────────────────────────────────────
 
     private async Task LoadCollectionsAsync()
     {
@@ -134,10 +206,10 @@ public partial class ClipBrowserViewModel : ViewModelBase
     {
         Breadcrumb = CurrentContent switch
         {
-            BrowserCollectionsContent                       => "Library",
-            BrowserStatesContent  s                        => $"Library  ›  {s.Collection.Name}",
-            BrowserClipsContent   c                        => $"Library  ›  {c.Collection.Name}  ›  {c.State.Name}",
-            _                                              => "Library",
+            BrowserCollectionsContent               => "Library",
+            BrowserStatesContent  s                 => $"Library  ›  {s.Collection.Name}",
+            BrowserClipsContent   c                 => $"Library  ›  {c.Collection.Name}  ›  {c.State.Name}",
+            _                                       => "Library",
         };
     }
 }

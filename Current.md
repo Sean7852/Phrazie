@@ -1,6 +1,8 @@
-I need to perform a global theme migration for Phrazie. I want to replace the current Colors.axaml logic with the design tokens from the provided phrazie-colors.css and then enforce these colors across the app views.1. Update Colors.axaml:
-* Map the CSS tokens to Avalonia Color resources (e.g., --phz-bg becomes PhzBg). Use the specific hex values from the CSS:
-* Surfaces: Background #0a0a0b, Surface-1 #111114, Surface-2 #17171c. * Accent: Use the Amber primary accent #f59e0b. * Status: Use the Green #22c55e for Live and Red #ef4444 for Danger/REC. * Define SolidColorBrush resources for: MainBackgroundBrush, PanelBackgroundBrush, TextBrushPrimary, TextBrushSecondary, AccentBrush, and DangerBrush. 2. Global View Refactoring:Search through LivePerformanceView.axaml, PlaybackControlView.axaml, and any custom controls.
-* Remove all hardcoded hex colors (e.g., #0D0D12, #FF9900, #141422). Replace them with the new StaticResource keys from Colors.axaml.Rules:
-* Use PanelBackgroundBrush for all secondary containers and footers. * Use AccentBrush for the BPM slider, Play button, and CUE buttons. * Use TextBrushSecondary for all sub-labels like 'BPM', 'PHRASE', and 'NEXT'. 3. Cleanup:Ensure all Styles that previously used hardcoded colors now point to the semantic resources.
-* Check that the BoxBorderDefault now uses the --phz-border value of #26262e. Please provide the updated Colors.axaml file and the key refactored sections of the views.
+We need to implement the rules of playing:
+
+1. There is a default State in each Collection, if no default, just random play any clip in this collection.
+2. a. On the collection page, on each collection card, there is a play button, click to send this collection to live. 
+   b. The live page starts to play the clips in the default state of the selected collection.
+3. Collection page need to preserve the status so that going to other page and coming back doesn't reset anything.
+4. Disable the Queue page for now.
+5. We need to show what collection is live on the LivPerformanceView     
