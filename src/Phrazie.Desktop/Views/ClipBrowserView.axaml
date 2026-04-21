@@ -169,17 +169,8 @@
                               <GradientStop Color="#1A2A3A" Offset="1.0" />
                             </LinearGradientBrush>
                           </Border.Background>
-                          <!-- Styled play-button circle -->
-                          <Border Classes="play-circle"
-                                  Width="44" Height="44" CornerRadius="22"
-                                  Background="#25FFFFFF"
-                                  BorderBrush="#40FFFFFF" BorderThickness="1.5"
-                                  HorizontalAlignment="Center" VerticalAlignment="Center">
-                            <TextBlock Text="▶" Foreground="#DDFFFFFF" FontSize="15"
-                                       FontFamily="Segoe UI Symbol"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"
-                                       Margin="3,0,0,0" />
-                          </Border>
+                          <TextBlock Text="▶" Foreground="#3A3A56" FontSize="28"
+                                     HorizontalAlignment="Center" VerticalAlignment="Center" />
                         </Border>
                         <StackPanel Grid.Row="1" Margin="10,6,10,10" Spacing="2">
                           <TextBlock Text="{Binding Model.DisplayName}"
