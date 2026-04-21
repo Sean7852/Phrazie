@@ -1,5 +1,7 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.VisualTree;
 using Phrazie.Desktop.ViewModels;
 
 namespace Phrazie.Desktop.Views;
@@ -15,7 +17,11 @@ public partial class CollectionsView : UserControl
     {
         base.OnTapped(e);
 
-        // Single-click anywhere on a card opens the collection management page
+        // If the tap landed inside a Button (play or manage), let the button handle it.
+        if (e.Source is Visual src && src.FindAncestorOfType<Button>() is not null)
+            return;
+
+        // Tap on the card body → open collection management
         if (e.Source is Control { DataContext: CollectionCardViewModel card })
             card.ManageCommand.Execute(null);
     }

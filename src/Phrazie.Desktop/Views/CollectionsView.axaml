@@ -5,6 +5,27 @@
              x:DataType="vm:CollectionsViewModel"
              Background="Transparent">
 
+    <UserControl.Styles>
+        <Style Selector="Button.select-btn">
+            <Setter Property="Width"            Value="34" />
+            <Setter Property="Height"           Value="34" />
+            <Setter Property="Padding"          Value="0" />
+            <Setter Property="CornerRadius"     Value="17" />
+            <Setter Property="BorderThickness"  Value="0" />
+            <Setter Property="Background"       Value="{StaticResource BoxBorderDefault}" />
+        </Style>
+        <Style Selector="Button.select-btn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+        </Style>
+        <!-- Active collection: filled amber -->
+        <Style Selector="Button.select-btn.active">
+            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+        </Style>
+        <Style Selector="Button.select-btn.active:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#FFBB44" />
+        </Style>
+    </UserControl.Styles>
+
     <Grid RowDefinitions="Auto,*" Margin="32">
 
         <StackPanel Grid.Row="0" Margin="0,0,0,28">
@@ -73,16 +94,19 @@
                                            FontSize="14"
                                            FontWeight="Medium" />
 
-                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                    <Button Command="{Binding SelectCommand}"
-                                            Content="Select"
-                                            Background="{StaticResource BoxBorderDefault}"
-                                            Foreground="{StaticResource TextBrushPrimary}"
-                                            BorderThickness="0"
-                                            Padding="12,5"
-                                            CornerRadius="4"
-                                            FontSize="12"
-                                            ToolTip.Tip="Set as the active collection for live performance" />
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <Button Classes="select-btn"
+                                            Classes.active="{Binding IsActive}"
+                                            Command="{Binding SelectCommand}"
+                                            ToolTip.Tip="Set as the active collection for live performance">
+                                        <TextBlock Text="▶"
+                                                   FontFamily="Segoe UI Symbol"
+                                                   FontSize="13"
+                                                   Foreground="{StaticResource TextBrushPrimary}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Margin="3,0,0,0" />
+                                    </Button>
                                     <Button Command="{Binding ManageCommand}"
                                             Content="Manage"
                                             Background="Transparent"
