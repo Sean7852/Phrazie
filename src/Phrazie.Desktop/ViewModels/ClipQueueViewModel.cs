@@ -21,9 +21,19 @@ public partial class ClipQueueViewModel : ViewModelBase,
 
     public ObservableCollection<LiveClipItemViewModel> Clips { get; } = new();
 
-    public ObservableCollection<TransitionOptionViewModel> TransitionOptions { get; } = new()
+    public ObservableCollection<TransitionOptionViewModel> OutTransitionOptions { get; } = new()
     {
         new(TransitionType.Fade,   "Fade",   isArmed: true),
+        new(TransitionType.Cut,    "Cut",    isArmed: false),
+        new(TransitionType.Strobe, "Strobe", isArmed: false),
+        new(TransitionType.Glitch, "Glitch", isArmed: false),
+        new(TransitionType.Blur,   "Blur",   isArmed: false),
+        new(TransitionType.Invert, "Invert", isArmed: false),
+    };
+
+    public ObservableCollection<TransitionOptionViewModel> InTransitionOptions { get; } = new()
+    {
+        new(TransitionType.Fade,   "Fade",   isArmed: false),
         new(TransitionType.Cut,    "Cut",    isArmed: true),
         new(TransitionType.Strobe, "Strobe", isArmed: false),
         new(TransitionType.Glitch, "Glitch", isArmed: false),
@@ -60,11 +70,14 @@ public partial class ClipQueueViewModel : ViewModelBase,
         _transitionPool = transitionPool;
 
         // Subscribe to armed-state changes on each toggle
-        foreach (var opt in TransitionOptions)
-            opt.PropertyChanged += (_, _) => PushArmedToService();
+        foreach (var opt in OutTransitionOptions)
+            opt.PropertyChanged += (_, _) => PushOutArmedToService();
+        foreach (var opt in InTransitionOptions)
+            opt.PropertyChanged += (_, _) => PushInArmedToService();
 
         // Push initial state
-        PushArmedToService();
+        PushOutArmedToService();
+        PushInArmedToService();
         PushDurationToService();
 
         WeakReferenceMessenger.Default.Register(this);
@@ -111,8 +124,11 @@ public partial class ClipQueueViewModel : ViewModelBase,
 
     // ── Internals ──────────────────────────────────────────────────────────
 
-    private void PushArmedToService() =>
-        _transitionPool.SetArmed(TransitionOptions.Where(o => o.IsArmed).Select(o => o.Type));
+    private void PushOutArmedToService() =>
+        _transitionPool.SetArmedOut(OutTransitionOptions.Where(o => o.IsArmed).Select(o => o.Type));
+
+    private void PushInArmedToService() =>
+        _transitionPool.SetArmedIn(InTransitionOptions.Where(o => o.IsArmed).Select(o => o.Type));
 
     private void PushDurationToService() =>
         _transitionPool.SetDuration(

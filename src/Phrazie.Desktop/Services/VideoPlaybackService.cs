@@ -46,6 +46,12 @@ public sealed class VideoPlaybackService : IPlaybackService, IDisposable
     public event Action?           FrameReady;
     /// <summary>Fires when the video dimensions change (new clip with different resolution).</summary>
     public event Action<int, int>? VideoFormatChanged;
+    /// <summary>Fires on a background thread when remaining playback time drops below NearEndLookahead.</summary>
+    public event Action?           ClipNearEnd;
+
+    /// <summary>How far before clip end to fire ClipNearEnd. Zero disables the event.</summary>
+    public TimeSpan NearEndLookahead { get; set; } = TimeSpan.Zero;
+    private volatile bool _nearEndFired;
 
     public VideoPlaybackService()
     {
@@ -68,6 +74,21 @@ public sealed class VideoPlaybackService : IPlaybackService, IDisposable
                 Thread.Sleep(50);
                 ClipEnded?.Invoke();
             });
+
+        MediaPlayer.TimeChanged += (_, e) =>
+        {
+            var lookahead = NearEndLookahead;
+            if (lookahead == TimeSpan.Zero || _nearEndFired) return;
+            var length = MediaPlayer.Length;
+            if (length <= 0) return;
+            var currentMs   = e.Time;
+            var remainingMs = length - currentMs;
+            if (currentMs > 500 && remainingMs <= lookahead.TotalMilliseconds)
+            {
+                _nearEndFired = true;
+                Task.Run(() => ClipNearEnd?.Invoke());
+            }
+        };
     }
 
     // ── VLC callbacks ──────────────────────────────────────────────────────
@@ -153,6 +174,7 @@ public sealed class VideoPlaybackService : IPlaybackService, IDisposable
 
     public Task PlayAsync(Clip clip)
     {
+        _nearEndFired = false;
         _currentMedia?.Dispose();
         _currentMedia = new Media(_libVlc, clip.FilePath, FromType.FromPath);
         MediaPlayer.Play(_currentMedia);

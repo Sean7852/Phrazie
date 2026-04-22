@@ -103,7 +103,8 @@ public sealed class VideoView : Control
 
     // ── Transition engine ──────────────────────────────────────────────────
 
-    public async Task PlayTransitionAsync(TransitionType type, double durationSeconds)
+    public async Task PlayTransitionAsync(TransitionType type, double durationSeconds,
+                                          bool outgoing = false)
     {
         _transitionCts?.Cancel();
         _transitionCts?.Dispose();
@@ -118,8 +119,15 @@ public sealed class VideoView : Control
                     break;
 
                 case TransitionType.Fade:
-                    Opacity = 0.0;
-                    await AnimateAsync(v => Opacity = v, 0.0, 1.0, durationSeconds, ct);
+                    if (outgoing)
+                    {
+                        await AnimateAsync(v => Opacity = v, 1.0, 0.0, durationSeconds, ct);
+                    }
+                    else
+                    {
+                        Opacity = 0.0;
+                        await AnimateAsync(v => Opacity = v, 0.0, 1.0, durationSeconds, ct);
+                    }
                     break;
 
                 case TransitionType.Strobe:
@@ -127,9 +135,12 @@ public sealed class VideoView : Control
                     break;
 
                 case TransitionType.Blur:
-                    var blur = new BlurEffect { Radius = 20 };
+                    var blur = new BlurEffect { Radius = outgoing ? 0 : 20 };
                     Effect = blur;
-                    await AnimateAsync(v => blur.Radius = v, 20.0, 0.0, durationSeconds, ct);
+                    await AnimateAsync(v => blur.Radius = v,
+                                       outgoing ? 0.0 : 20.0,
+                                       outgoing ? 20.0 : 0.0,
+                                       durationSeconds, ct);
                     Effect = null;
                     break;
 
@@ -145,7 +156,12 @@ public sealed class VideoView : Control
         catch (OperationCanceledException) { }
         finally
         {
-            Opacity         = 1.0;
+            // For a completed Out transition, preserve opacity so the screen
+            // stays in its end-state until the In transition brings it back.
+            // Always reset on cancellation or when an In transition finishes.
+            if (ct.IsCancellationRequested || !outgoing)
+                Opacity = 1.0;
+
             Effect          = null;
             RenderTransform = null;
             _flashOpacity   = 0.0;

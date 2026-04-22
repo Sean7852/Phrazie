@@ -3,19 +3,20 @@ using Phrazie.Core.Enums;
 namespace Phrazie.Desktop.Services;
 
 /// <summary>
-/// Shared singleton that holds the user's transition pool settings and
-/// vends a randomly-picked transition on demand.
+/// Shared singleton that holds the user's Out/In transition pool settings and
+/// vends a randomly-picked transition for each side on demand.
 /// </summary>
 public sealed class TransitionPoolService
 {
-    private List<TransitionType> _armed        = [TransitionType.Fade, TransitionType.Cut];
+    private List<TransitionType> _armedOut     = [TransitionType.Fade];
+    private List<TransitionType> _armedIn      = [TransitionType.Cut];
     private bool                 _isFixed      = true;
     private double               _fixedSeconds = 1.0;
     private double               _minSeconds   = 0.5;
     private double               _maxSeconds   = 2.0;
 
-    public void SetArmed(IEnumerable<TransitionType> types)
-        => _armed = [.. types];
+    public void SetArmedOut(IEnumerable<TransitionType> types) => _armedOut = [.. types];
+    public void SetArmedIn(IEnumerable<TransitionType> types)  => _armedIn  = [.. types];
 
     public void SetDuration(bool isFixed, double fixedSeconds, double min, double max)
     {
@@ -25,11 +26,16 @@ public sealed class TransitionPoolService
         _maxSeconds   = max;
     }
 
-    /// <summary>Returns a randomly chosen armed transition and its duration in seconds.</summary>
-    public (TransitionType Type, double Duration) Pick()
+    public (TransitionType Type, double Duration) PickOut() => Pick(_armedOut);
+    public (TransitionType Type, double Duration) PickIn()  => Pick(_armedIn);
+
+    /// <summary>Returns the worst-case out-transition duration for lookahead purposes.</summary>
+    public double GetMaxOutDuration() => _isFixed ? _fixedSeconds : _maxSeconds;
+
+    private (TransitionType, double) Pick(List<TransitionType> pool)
     {
-        var type = _armed.Count > 0
-            ? _armed[Random.Shared.Next(_armed.Count)]
+        var type = pool.Count > 0
+            ? pool[Random.Shared.Next(pool.Count)]
             : TransitionType.Cut;
 
         var duration = _isFixed

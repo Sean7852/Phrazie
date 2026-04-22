@@ -17,10 +17,15 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private readonly IBeatClock            _beatClock;
     private readonly TransitionPoolService _transitionPool;
 
+    // Tracks an out-transition that was pre-started at near-end so AdvanceToNextClip can await it
+    private Task? _pendingOutTransition;
+
     public VideoPlaybackService? VideoService => _playback as VideoPlaybackService;
 
-    /// <summary>Fires on the UI thread just before a clip/state transition begins.</summary>
-    public event Action<TransitionType, double>? TransitionStarted;
+    /// <summary>Awaited before the clip/state switches — plays the outgoing effect.</summary>
+    public event Func<TransitionType, double, Task>? OutTransitionRequired;
+    /// <summary>Fired immediately after the clip/state switches — plays the incoming effect.</summary>
+    public event Action<TransitionType, double>? InTransitionStarted;
 
     // ── state options (the three buttons: Normal / Break / Drop) ──────────
 
@@ -68,7 +73,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
             _beatClock.Start();
             var first = _session.Current.CurrentState?.Clips.FirstOrDefault(c => c.IsEnabled);
             if (first is not null && _playback.CurrentClip is null)
-                _ = _playback.PlayAsync(first);
+                PlayClip(first);
         }
         else
         {
@@ -137,6 +142,14 @@ public partial class LivePerformanceViewModel : ViewModelBase
         _playback.ClipEnded += () =>
             Dispatcher.UIThread.Post(AdvanceToNextClip);
 
+        if (_playback is VideoPlaybackService vps)
+            vps.ClipNearEnd += () =>
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (_pendingOutTransition is null)
+                        _pendingOutTransition = FireOutTransitionAsync();
+                });
+
         _beatClock.Bpm = Bpm;
         _beatClock.PhaseChanged += phase =>
             Dispatcher.UIThread.Post(() =>
@@ -187,13 +200,15 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private async Task EmergencySwitchAsync()
     {
         await _trigger.CancelAsync();
+        _pendingOutTransition = null;
 
         var nextOpt = StateOptions.FirstOrDefault(o => o.IsNext);
         if (nextOpt is not null)
         {
-            FireTransition();
+            await FireOutTransitionAsync();
             await _session.TransitionToStateAsync(nextOpt.Model);
             await _playback.TransitionToStateAsync(nextOpt.Model);
+            FireInTransition();
         }
 
         StatusLabel        = "Waiting";
@@ -229,12 +244,14 @@ public partial class LivePerformanceViewModel : ViewModelBase
     {
         Dispatcher.UIThread.Post(async () =>
         {
+            _pendingOutTransition = null;
             var opt = StateOptions.FirstOrDefault(o => o.Model.Id == trigger.TargetStateId);
             if (opt is not null)
             {
-                FireTransition();
+                await FireOutTransitionAsync();
                 await _session.TransitionToStateAsync(opt.Model);
                 await _playback.TransitionToStateAsync(opt.Model);
+                FireInTransition();
             }
 
             StatusLabel        = "Triggered";
@@ -264,7 +281,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
         if (!IsPlaying || _playback.CurrentClip is not null) return;
         var first = s.CurrentState?.Clips.FirstOrDefault(c => c.IsEnabled);
         if (first is not null)
-            _ = _playback.PlayAsync(first);
+            PlayClip(first);
     }
 
     private void BuildStateOptions(Session s)
@@ -296,7 +313,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
         }
     }
 
-    private void AdvanceToNextClip()
+    private async void AdvanceToNextClip()
     {
         if (!IsPlaying) return;
 
@@ -309,22 +326,41 @@ public partial class LivePerformanceViewModel : ViewModelBase
         var currentIdx = clips.FindIndex(c => c.Id == _playback.CurrentClip?.Id);
         var nextIdx    = currentIdx + 1;
 
-        // Past the end — loop the last clip
-        if (nextIdx >= clips.Count)
+        var target = nextIdx >= clips.Count ? clips[^1] : clips[nextIdx];
+
+        // If near-end pre-started the out transition, await it; otherwise start it now
+        if (_pendingOutTransition is not null)
         {
-            FireTransition();
-            _ = _playback.PlayAsync(clips[^1]);
-            return;
+            await _pendingOutTransition;
+            _pendingOutTransition = null;
+        }
+        else
+        {
+            await FireOutTransitionAsync();
         }
 
-        FireTransition();
-        _ = _playback.PlayAsync(clips[nextIdx]);
+        PlayClip(target);
+        FireInTransition();
     }
 
-    private void FireTransition()
+    private void PlayClip(Clip clip)
     {
-        var (type, duration) = _transitionPool.Pick();
-        TransitionStarted?.Invoke(type, duration);
+        if (_playback is VideoPlaybackService vps)
+            vps.NearEndLookahead = TimeSpan.FromSeconds(_transitionPool.GetMaxOutDuration() + 0.2);
+        _ = _playback.PlayAsync(clip);
+    }
+
+    private async Task FireOutTransitionAsync()
+    {
+        var (type, duration) = _transitionPool.PickOut();
+        if (OutTransitionRequired is not null)
+            await OutTransitionRequired(type, duration);
+    }
+
+    private void FireInTransition()
+    {
+        var (type, duration) = _transitionPool.PickIn();
+        InTransitionStarted?.Invoke(type, duration);
     }
 
     private string BuildTriggerDescription(string stateName) => DelayType switch

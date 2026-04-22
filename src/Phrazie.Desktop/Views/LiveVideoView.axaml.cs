@@ -17,15 +17,26 @@ public partial class LiveVideoView : UserControl
     private void WireVideoOutput()
     {
         if (_vm is not null)
-            _vm.TransitionStarted -= OnTransitionStarted;
+        {
+            _vm.OutTransitionRequired -= OnOutTransitionRequired;
+            _vm.InTransitionStarted   -= OnInTransitionStarted;
+        }
 
         _vm = DataContext as LivePerformanceViewModel;
         VideoOutput.Attach(_vm?.VideoService);
 
         if (_vm is not null)
-            _vm.TransitionStarted += OnTransitionStarted;
+        {
+            _vm.OutTransitionRequired += OnOutTransitionRequired;
+            _vm.InTransitionStarted   += OnInTransitionStarted;
+        }
     }
 
-    private void OnTransitionStarted(TransitionType type, double duration)
+    // Awaited by the VM — blocks the clip switch until the out effect finishes
+    private Task OnOutTransitionRequired(TransitionType type, double duration)
+        => VideoOutput.PlayTransitionAsync(type, duration, outgoing: true);
+
+    // Fire-and-forget — plays the in effect as the new clip starts
+    private void OnInTransitionStarted(TransitionType type, double duration)
         => _ = VideoOutput.PlayTransitionAsync(type, duration);
 }

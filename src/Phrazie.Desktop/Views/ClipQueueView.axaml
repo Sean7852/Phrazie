@@ -378,18 +378,39 @@
     <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
       <StackPanel Margin="12,16,16,16">
 
-        <!-- ── TRANSITIONS header ── -->
-        <TextBlock Text="TRANSITIONS"
+        <!-- ── OUT group ── -->
+        <TextBlock Text="OUT TRANSITION"
                    Foreground="{StaticResource TextBrushDisabled}"
                    FontSize="10" FontWeight="Bold" LetterSpacing="3"
                    Margin="0,0,0,10" />
 
-        <!-- ── Transition toggle grid ── -->
-        <ItemsControl ItemsSource="{Binding TransitionOptions}">
+        <ItemsControl ItemsSource="{Binding OutTransitionOptions}">
           <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <WrapPanel />
-            </ItemsPanelTemplate>
+            <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:TransitionOptionViewModel">
+              <Button Classes="transition-toggle"
+                      Classes.armed="{Binding IsArmed}"
+                      Content="{Binding Name}"
+                      Command="{Binding ToggleCommand}"
+                      Margin="0,0,6,6" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <!-- ── Divider ── -->
+        <Border Height="1" Background="{StaticResource BoxBorderDefault}" Margin="0,12" />
+
+        <!-- ── IN group ── -->
+        <TextBlock Text="IN TRANSITION"
+                   Foreground="{StaticResource TextBrushDisabled}"
+                   FontSize="10" FontWeight="Bold" LetterSpacing="3"
+                   Margin="0,0,0,10" />
+
+        <ItemsControl ItemsSource="{Binding InTransitionOptions}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
           </ItemsControl.ItemsPanel>
           <ItemsControl.ItemTemplate>
             <DataTemplate x:DataType="vm:TransitionOptionViewModel">
