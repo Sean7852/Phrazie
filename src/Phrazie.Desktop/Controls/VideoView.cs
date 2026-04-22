@@ -1,132 +1,95 @@
-using System.Diagnostics;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.Platform;
-using LibVLCSharp.Shared;
+using Phrazie.Desktop.Services;
 
 namespace Phrazie.Desktop.Controls;
 
 /// <summary>
-/// NativeControlHost that passes its Win32 HWND directly to a LibVLC MediaPlayer.
-/// Replaces LibVLCSharp.Avalonia which targets Avalonia 11 and crashes on Avalonia 12.
+/// Software-rendered video output control. Subscribes to VideoPlaybackService frame callbacks
+/// and blits decoded BGRA frames into an Avalonia WriteableBitmap on each display tick.
+/// Works regardless of which page is currently active.
 /// </summary>
-public sealed class VideoView : NativeControlHost
+public sealed class VideoView : Control
 {
-    private MediaPlayer?     _mediaPlayer;
-    private IPlatformHandle? _handle;
+    private VideoPlaybackService? _vps;
+    private WriteableBitmap?      _bitmap;
+    private int                   _pendingUpdate; // Interlocked flag — 0 = idle, 1 = queued
 
-    /// <summary>Current native handle — returns Zero if the host hasn't been realised yet.</summary>
-    public IntPtr NativeHandle
+    private Action<int, int>? _formatHandler;
+    private Action?           _frameHandler;
+
+    public void Attach(VideoPlaybackService? vps)
     {
-        get
+        if (_vps is not null)
         {
-            if (_handle is null)
-            {
-                Debug.WriteLine("[VideoView] NativeHandle → 0  (_handle is null)");
-                return IntPtr.Zero;
-            }
-            return _handle.Handle;
+            _vps.VideoFormatChanged -= _formatHandler;
+            _vps.FrameReady         -= _frameHandler;
+            _formatHandler = null;
+            _frameHandler  = null;
         }
+
+        _vps = vps;
+
+        if (_vps is null) return;
+
+        _formatHandler = (w, h) =>
+            Avalonia.Threading.Dispatcher.UIThread.Post(
+                () => EnsureBitmap(w, h),
+                Avalonia.Threading.DispatcherPriority.Loaded);
+
+        _frameHandler = () =>
+        {
+            if (System.Threading.Interlocked.CompareExchange(ref _pendingUpdate, 1, 0) == 0)
+                Avalonia.Threading.Dispatcher.UIThread.Post(
+                    UpdateFrame,
+                    Avalonia.Threading.DispatcherPriority.Render);
+        };
+
+        _vps.VideoFormatChanged += _formatHandler;
+        _vps.FrameReady         += _frameHandler;
+
+        // If the service already has a known size, create the bitmap immediately.
+        int w0 = _vps.FrameWidth, h0 = _vps.FrameHeight;
+        if (w0 > 0 && h0 > 0)
+            EnsureBitmap(w0, h0);
     }
 
-    /// <summary>
-    /// Fires on the UI thread each time the native window is (re-)created and has a valid HWND.
-    /// Subscribe here rather than Loaded to guarantee the HWND exists before starting playback.
-    /// </summary>
-    public event Action<IntPtr>? HandleAvailable;
-
-    public MediaPlayer? MediaPlayer
+    private void EnsureBitmap(int w, int h)
     {
-        get => _mediaPlayer;
-        set
-        {
-            if (_mediaPlayer == value) return;
-
-            if (_mediaPlayer is not null)
-            {
-                _mediaPlayer.Opening    -= OnOpening;
-                _mediaPlayer.EndReached -= OnEndReached;
-                Debug.WriteLine($"[VideoView] Clearing Hwnd (was 0x{_mediaPlayer.Hwnd:X})");
-                _mediaPlayer.Hwnd     = IntPtr.Zero;
-            }
-
-            _mediaPlayer = value;
-
-            if (_mediaPlayer is not null && _handle is not null)
-            {
-                _mediaPlayer.Hwnd        = _handle.Handle;
-                _mediaPlayer.Opening    += OnOpening;
-                _mediaPlayer.EndReached += OnEndReached;
-                Debug.WriteLine($"[VideoView] Set Hwnd = 0x{_mediaPlayer.Hwnd:X}  handle=0x{_handle.Handle:X}");
-            }
-            else
-            {
-                Debug.WriteLine($"[VideoView] MediaPlayer set but _handle is null — Hwnd NOT set");
-            }
-        }
+        if (_bitmap is not null && _bitmap.PixelSize.Width == w && _bitmap.PixelSize.Height == h)
+            return;
+        _bitmap = new WriteableBitmap(
+            new PixelSize(w, h),
+            new Vector(96, 96),
+            PixelFormat.Bgra8888,
+            AlphaFormat.Opaque);
     }
 
-    protected override IPlatformHandle CreateNativeControlCore(IPlatformHandle parent)
+    private void UpdateFrame()
     {
-        _handle = base.CreateNativeControlCore(parent);
-        Debug.WriteLine($"[VideoView] CreateNativeControlCore  handle=0x{_handle.Handle:X}");
+        System.Threading.Interlocked.Exchange(ref _pendingUpdate, 0);
 
-        if (_mediaPlayer is not null)
-        {
-            _mediaPlayer.Hwnd        = _handle.Handle;
-            _mediaPlayer.Opening    += OnOpening;
-            _mediaPlayer.EndReached += OnEndReached;
-            Debug.WriteLine($"[VideoView] (late) Set Hwnd = 0x{_mediaPlayer.Hwnd:X}");
-        }
+        var vps    = _vps;
+        var bitmap = _bitmap;
+        if (vps is null || bitmap is null) return;
 
-        Debug.WriteLine($"[VideoView] Firing HandleAvailable 0x{_handle.Handle:X}");
-        Avalonia.Threading.Dispatcher.UIThread.Post(
-            () => HandleAvailable?.Invoke(_handle?.Handle ?? IntPtr.Zero),
-            Avalonia.Threading.DispatcherPriority.Loaded);
+        using var fb = bitmap.Lock();
+        vps.TryCopyFrame(fb.Address, fb.RowBytes);
 
-        return _handle;
+        InvalidateVisual();
     }
 
-    protected override void DestroyNativeControlCore(IPlatformHandle control)
+    public override void Render(DrawingContext context)
     {
-        var callers = new System.Diagnostics.StackTrace(1, false)
-            .GetFrames()
-            .Take(10)
-            .Select(f => $"{f.GetMethod()?.DeclaringType?.Name}.{f.GetMethod()?.Name}");
-        Debug.WriteLine($"[VideoView] DestroyNativeControlCore — {string.Join(" → ", callers)}");
-        if (_mediaPlayer is not null)
+        var bitmap = _bitmap;
+        if (bitmap is null)
         {
-            _mediaPlayer.Opening    -= OnOpening;
-            _mediaPlayer.EndReached -= OnEndReached;
-            _mediaPlayer.Hwnd        = IntPtr.Zero;
+            context.FillRectangle(Brushes.Black, new Rect(Bounds.Size));
+            return;
         }
-
-        _handle = null;
-        base.DestroyNativeControlCore(control);
-    }
-
-    private void OnOpening(object? sender, EventArgs e)
-    {
-        var handle = _handle;
-        var mp     = _mediaPlayer;
-        Debug.WriteLine($"[VideoView] OnOpening — handle={(handle is null ? "NULL" : $"0x{handle.Handle:X}")}  current Hwnd=0x{mp?.Hwnd:X}");
-        if (handle is not null && mp is not null)
-        {
-            mp.Hwnd = handle.Handle;
-            Debug.WriteLine($"[VideoView] OnOpening — Hwnd set to 0x{mp.Hwnd:X}");
-        }
-    }
-
-    // VLC zeroes Hwnd internally when EndReached fires — re-attach immediately so the
-    // next Play() call finds a valid render target before it opens its own window.
-    private void OnEndReached(object? sender, EventArgs e)
-    {
-        var handle = _handle;
-        var mp     = _mediaPlayer;
-        Debug.WriteLine($"[VideoView] OnEndReached — re-attaching handle={(handle is null ? "NULL" : $"0x{handle.Handle:X}")}");
-        if (handle is not null && mp is not null)
-        {
-            mp.Hwnd = handle.Handle;
-            Debug.WriteLine($"[VideoView] OnEndReached — Hwnd set to 0x{mp.Hwnd:X}");
-        }
+        context.DrawImage(bitmap, new Rect(bitmap.Size), new Rect(Bounds.Size));
     }
 }

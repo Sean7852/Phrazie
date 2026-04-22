@@ -29,7 +29,8 @@
       "Bash(dotnet tool *)",
       "Bash(tasklist)",
       "Bash(echo \"exit: $?\")",
-      "Bash(xargs grep *)"
+      "Bash(xargs grep *)",
+      "Bash(dotnet-decompiler LibVLCSharp.dll)"
     ]
   }
 }
