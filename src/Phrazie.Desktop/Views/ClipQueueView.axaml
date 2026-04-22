@@ -115,13 +115,58 @@
       <Setter Property="FontSize"        Value="11" />
       <Setter Property="FontWeight"      Value="SemiBold" />
       <Setter Property="MinWidth"        Value="68" />
+      <Setter Property="FocusAdorner"    Value="{x:Null}" />
+    </Style>
+    <!-- Neutralise ALL Fluent hover/focus/pressed overrides — only .armed drives the look -->
+    <Style Selector="Button.transition-toggle:pointerover /template/ ContentPresenter">
+      <Setter Property="Background"  Value="{StaticResource BoxBackgroundDefault}" />
+      <Setter Property="BorderBrush" Value="{StaticResource BoxBorderDefault}" />
+    </Style>
+    <Style Selector="Button.transition-toggle:pressed /template/ ContentPresenter">
+      <Setter Property="Background"  Value="{StaticResource BoxBackgroundDefault}" />
+      <Setter Property="BorderBrush" Value="{StaticResource BoxBorderDefault}" />
+    </Style>
+    <Style Selector="Button.transition-toggle:focus-visible /template/ ContentPresenter">
+      <Setter Property="BorderBrush" Value="{StaticResource BoxBorderDefault}" />
     </Style>
     <Style Selector="Button.transition-toggle.armed">
       <Setter Property="BorderBrush" Value="{StaticResource BoxBorderFocused}" />
       <Setter Property="Foreground"  Value="{StaticResource TextBrushPrimary}" />
     </Style>
     <Style Selector="Button.transition-toggle.armed /template/ ContentPresenter">
-      <Setter Property="Background" Value="#1AF59E0B" />
+      <Setter Property="Background"  Value="#1AF59E0B" />
+      <Setter Property="BorderBrush" Value="{StaticResource BoxBorderFocused}" />
+    </Style>
+    <Style Selector="Button.transition-toggle.armed:pointerover /template/ ContentPresenter">
+      <Setter Property="Background"  Value="#1AF59E0B" />
+      <Setter Property="BorderBrush" Value="{StaticResource BoxBorderFocused}" />
+    </Style>
+    <Style Selector="Button.transition-toggle.armed:pressed /template/ ContentPresenter">
+      <Setter Property="Background"  Value="#1AF59E0B" />
+      <Setter Property="BorderBrush" Value="{StaticResource BoxBorderFocused}" />
+    </Style>
+    <Style Selector="Button.transition-toggle.armed:focus-visible /template/ ContentPresenter">
+      <Setter Property="BorderBrush" Value="{StaticResource BoxBorderFocused}" />
+    </Style>
+
+    <!-- ── Scrollbar ── -->
+    <Style Selector="ScrollBar">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ScrollBar:vertical">
+      <Setter Property="Width"    Value="8" />
+      <Setter Property="MinWidth" Value="8" />
+    </Style>
+    <Style Selector="ScrollBar /template/ Thumb">
+      <Setter Property="Background"   Value="#2A2A35" />
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="ScrollBar /template/ Thumb:pointerover">
+      <Setter Property="Background" Value="#3A3A48" />
+    </Style>
+    <Style Selector="ScrollBar:vertical /template/ RepeatButton">
+      <Setter Property="Height"    Value="0" />
+      <Setter Property="IsVisible" Value="False" />
     </Style>
 
     <!-- ── Timing mode toggle ── -->
@@ -194,7 +239,7 @@
 
         <!-- List view -->
         <ScrollViewer IsVisible="{Binding !IsGridView}" VerticalScrollBarVisibility="Auto">
-          <ItemsControl x:Name="ClipList" ItemsSource="{Binding Clips}">
+          <ItemsControl x:Name="ClipList" ItemsSource="{Binding Clips}" Margin="0,0,10,0">
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:LiveClipItemViewModel">
                 <Panel Opacity="{Binding Opacity}">
@@ -360,8 +405,8 @@
         <!-- ── Divider ── -->
         <Border Height="1" Background="{StaticResource BoxBorderDefault}" Margin="0,16" />
 
-        <!-- ── TRANSITION TIMING header ── -->
-        <TextBlock Text="TRANSITION TIMING"
+        <!-- ── TRANSITION DURATION header ── -->
+        <TextBlock Text="TRANSITION DURATION"
                    Foreground="{StaticResource TextBrushDisabled}"
                    FontSize="10" FontWeight="Bold" LetterSpacing="3"
                    Margin="0,0,0,10" />
@@ -376,7 +421,7 @@
           <Button Grid.Column="2"
                   Classes="timing-mode"
                   Classes.active="{Binding !IsFixedDuration}"
-                  Content="Random Range"
+                  Content="Range"
                   Command="{Binding SetRandomDurationCommand}" />
         </Grid>
 
@@ -425,13 +470,6 @@
                        FontSize="10" HorizontalAlignment="Center" />
           </Grid>
         </StackPanel>
-
-        <!-- ── Sync to Beat ── -->
-        <CheckBox IsChecked="{Binding SyncToBeat}"
-                  Foreground="{StaticResource TextBrushPrimary}"
-                  FontSize="12" Margin="0,16,0,0">
-          Sync to Beat
-        </CheckBox>
 
       </StackPanel>
     </ScrollViewer>
