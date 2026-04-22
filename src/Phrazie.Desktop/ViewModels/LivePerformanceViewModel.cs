@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using LibVLCSharp.Shared;
 using Phrazie.Core.Enums;
 using Phrazie.Core.Interfaces;
 using Phrazie.Core.Models;
@@ -17,9 +16,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private readonly IPlaybackService _playback;
     private readonly IBeatClock       _beatClock;
 
-    /// <summary>Exposed so LivePerformanceView.axaml.cs can wire it to VideoView.</summary>
-    public MediaPlayer?          MediaPlayer    => (_playback as VideoPlaybackService)?.MediaPlayer;
-    public VideoPlaybackService? VideoService   => _playback as VideoPlaybackService;
+    public VideoPlaybackService? VideoService => _playback as VideoPlaybackService;
 
     // ── state options (the three buttons: Normal / Break / Drop) ──────────
 
