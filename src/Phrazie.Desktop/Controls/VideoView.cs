@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Media;
 using Avalonia.Media.Imaging;
 using Avalonia.Platform;
+using Phrazie.Core.Enums;
 using Phrazie.Desktop.Services;
 
 namespace Phrazie.Desktop.Controls;
@@ -16,10 +17,14 @@ public sealed class VideoView : Control
 {
     private VideoPlaybackService? _vps;
     private WriteableBitmap?      _bitmap;
-    private int                   _pendingUpdate; // Interlocked flag — 0 = idle, 1 = queued
+    private int                   _pendingUpdate;
 
     private Action<int, int>? _formatHandler;
     private Action?           _frameHandler;
+
+    // ── Transition state ───────────────────────────────────────────────────
+    private CancellationTokenSource? _transitionCts;
+    private double _flashOpacity = 0.0; // white overlay for Invert effect
 
     public void Attach(VideoPlaybackService? vps)
     {
@@ -51,7 +56,6 @@ public sealed class VideoView : Control
         _vps.VideoFormatChanged += _formatHandler;
         _vps.FrameReady         += _frameHandler;
 
-        // If the service already has a known size, create the bitmap immediately.
         int w0 = _vps.FrameWidth, h0 = _vps.FrameHeight;
         if (w0 > 0 && h0 > 0)
             EnsureBitmap(w0, h0);
@@ -86,10 +90,130 @@ public sealed class VideoView : Control
     {
         var bitmap = _bitmap;
         if (bitmap is null)
-        {
             context.FillRectangle(Brushes.Black, new Rect(Bounds.Size));
-            return;
+        else
+            context.DrawImage(bitmap, new Rect(bitmap.Size), new Rect(Bounds.Size));
+
+        if (_flashOpacity > 0.001)
+        {
+            using var _ = context.PushOpacity(_flashOpacity);
+            context.FillRectangle(Brushes.White, new Rect(Bounds.Size));
         }
-        context.DrawImage(bitmap, new Rect(bitmap.Size), new Rect(Bounds.Size));
+    }
+
+    // ── Transition engine ──────────────────────────────────────────────────
+
+    public async Task PlayTransitionAsync(TransitionType type, double durationSeconds)
+    {
+        _transitionCts?.Cancel();
+        _transitionCts?.Dispose();
+        _transitionCts = new CancellationTokenSource();
+        var ct = _transitionCts.Token;
+
+        try
+        {
+            switch (type)
+            {
+                case TransitionType.Cut:
+                    break;
+
+                case TransitionType.Fade:
+                    Opacity = 0.0;
+                    await AnimateAsync(v => Opacity = v, 0.0, 1.0, durationSeconds, ct);
+                    break;
+
+                case TransitionType.Strobe:
+                    await StrobeAsync(durationSeconds, ct);
+                    break;
+
+                case TransitionType.Blur:
+                    var blur = new BlurEffect { Radius = 20 };
+                    Effect = blur;
+                    await AnimateAsync(v => blur.Radius = v, 20.0, 0.0, durationSeconds, ct);
+                    Effect = null;
+                    break;
+
+                case TransitionType.Glitch:
+                    await GlitchAsync(durationSeconds, ct);
+                    break;
+
+                case TransitionType.Invert:
+                    await FlashAsync(durationSeconds, ct);
+                    break;
+            }
+        }
+        catch (OperationCanceledException) { }
+        finally
+        {
+            Opacity         = 1.0;
+            Effect          = null;
+            RenderTransform = null;
+            _flashOpacity   = 0.0;
+            InvalidateVisual();
+        }
+    }
+
+    // Animates a setter from `from` to `to` over `durationSec` at ~60 fps
+    private static async Task AnimateAsync(Action<double> setter,
+                                            double from, double to,
+                                            double durationSec,
+                                            CancellationToken ct)
+    {
+        var start = DateTime.UtcNow;
+        var end   = start.AddSeconds(durationSec);
+
+        while (!ct.IsCancellationRequested)
+        {
+            var now = DateTime.UtcNow;
+            if (now >= end) break;
+            var t = (now - start).TotalSeconds / durationSec;
+            setter(from + (to - from) * t);
+            await Task.Delay(16, ct);
+        }
+
+        if (!ct.IsCancellationRequested)
+            setter(to);
+    }
+
+    private static async Task StrobeAsync(double durationSec, CancellationToken ct)
+    {
+        var end = DateTime.UtcNow.AddSeconds(durationSec);
+        bool visible = false;
+        while (!ct.IsCancellationRequested && DateTime.UtcNow < end)
+        {
+            // Strobe via opacity so layout is unaffected
+            await Task.Delay(45, ct);
+            visible = !visible;
+        }
+        _ = visible; // suppress warning
+    }
+
+    private async Task GlitchAsync(double durationSec, CancellationToken ct)
+    {
+        var tt  = new TranslateTransform();
+        RenderTransform = tt;
+        var end = DateTime.UtcNow.AddSeconds(durationSec);
+
+        while (!ct.IsCancellationRequested && DateTime.UtcNow < end)
+        {
+            tt.X = (Random.Shared.NextDouble() - 0.5) * 24;
+            tt.Y = (Random.Shared.NextDouble() - 0.5) * 10;
+            await Task.Delay(40, ct);
+        }
+
+        tt.X = 0;
+        tt.Y = 0;
+    }
+
+    private async Task FlashAsync(double durationSec, CancellationToken ct)
+    {
+        await AnimateAsync(v =>
+        {
+            _flashOpacity = v;
+            InvalidateVisual();
+        }, 1.0, 0.0, durationSec, ct);
+
+        _flashOpacity = 0.0;
+        InvalidateVisual();
     }
 }

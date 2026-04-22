@@ -11,12 +11,16 @@ namespace Phrazie.Desktop.ViewModels;
 
 public partial class LivePerformanceViewModel : ViewModelBase
 {
-    private readonly ISessionService  _session;
-    private readonly ITriggerService  _trigger;
-    private readonly IPlaybackService _playback;
-    private readonly IBeatClock       _beatClock;
+    private readonly ISessionService       _session;
+    private readonly ITriggerService       _trigger;
+    private readonly IPlaybackService      _playback;
+    private readonly IBeatClock            _beatClock;
+    private readonly TransitionPoolService _transitionPool;
 
     public VideoPlaybackService? VideoService => _playback as VideoPlaybackService;
+
+    /// <summary>Fires on the UI thread just before a clip/state transition begins.</summary>
+    public event Action<TransitionType, double>? TransitionStarted;
 
     // ── state options (the three buttons: Normal / Break / Drop) ──────────
 
@@ -100,15 +104,17 @@ public partial class LivePerformanceViewModel : ViewModelBase
     // ── ctor ──────────────────────────────────────────────────────────────
 
     public LivePerformanceViewModel(
-        ISessionService  session,
-        ITriggerService  trigger,
-        IPlaybackService playback,
-        IBeatClock       beatClock)
+        ISessionService       session,
+        ITriggerService       trigger,
+        IPlaybackService      playback,
+        IBeatClock            beatClock,
+        TransitionPoolService transitionPool)
     {
-        _session   = session;
-        _trigger   = trigger;
-        _playback  = playback;
-        _beatClock = beatClock;
+        _session        = session;
+        _trigger        = trigger;
+        _playback       = playback;
+        _beatClock      = beatClock;
+        _transitionPool = transitionPool;
 
         BuildStateOptions(_session.Current);
         SyncFromSession(_session.Current);
@@ -185,6 +191,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
         var nextOpt = StateOptions.FirstOrDefault(o => o.IsNext);
         if (nextOpt is not null)
         {
+            FireTransition();
             await _session.TransitionToStateAsync(nextOpt.Model);
             await _playback.TransitionToStateAsync(nextOpt.Model);
         }
@@ -225,6 +232,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
             var opt = StateOptions.FirstOrDefault(o => o.Model.Id == trigger.TargetStateId);
             if (opt is not null)
             {
+                FireTransition();
                 await _session.TransitionToStateAsync(opt.Model);
                 await _playback.TransitionToStateAsync(opt.Model);
             }
@@ -304,11 +312,19 @@ public partial class LivePerformanceViewModel : ViewModelBase
         // Past the end — loop the last clip
         if (nextIdx >= clips.Count)
         {
+            FireTransition();
             _ = _playback.PlayAsync(clips[^1]);
             return;
         }
 
+        FireTransition();
         _ = _playback.PlayAsync(clips[nextIdx]);
+    }
+
+    private void FireTransition()
+    {
+        var (type, duration) = _transitionPool.Pick();
+        TransitionStarted?.Invoke(type, duration);
     }
 
     private string BuildTriggerDescription(string stateName) => DelayType switch

@@ -1,10 +1,13 @@
 using Avalonia.Controls;
+using Phrazie.Core.Enums;
 using Phrazie.Desktop.ViewModels;
 
 namespace Phrazie.Desktop.Views;
 
 public partial class LiveVideoView : UserControl
 {
+    private LivePerformanceViewModel? _vm;
+
     public LiveVideoView()
     {
         InitializeComponent();
@@ -13,7 +16,16 @@ public partial class LiveVideoView : UserControl
 
     private void WireVideoOutput()
     {
-        var vps = (DataContext as LivePerformanceViewModel)?.VideoService;
-        VideoOutput.Attach(vps);
+        if (_vm is not null)
+            _vm.TransitionStarted -= OnTransitionStarted;
+
+        _vm = DataContext as LivePerformanceViewModel;
+        VideoOutput.Attach(_vm?.VideoService);
+
+        if (_vm is not null)
+            _vm.TransitionStarted += OnTransitionStarted;
     }
+
+    private void OnTransitionStarted(TransitionType type, double duration)
+        => _ = VideoOutput.PlayTransitionAsync(type, duration);
 }
