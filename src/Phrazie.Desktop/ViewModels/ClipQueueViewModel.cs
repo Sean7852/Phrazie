@@ -17,7 +17,30 @@ public partial class ClipQueueViewModel : ViewModelBase,
     // Preserves source collection/state names + color across LoadClips rebuilds
     private readonly Dictionary<Guid, (string Collection, string State, string Color)> _clipMeta = new();
 
-    public ObservableCollection<LiveClipItemViewModel> Clips { get; } = new();
+    public ObservableCollection<LiveClipItemViewModel>  Clips             { get; } = new();
+    public ObservableCollection<TransitionOptionViewModel> TransitionOptions { get; } = new()
+    {
+        new("Fade",   isArmed: true),
+        new("Cut",    isArmed: true),
+        new("Strobe", isArmed: false),
+        new("Glitch", isArmed: false),
+        new("Blur",   isArmed: false),
+        new("Invert", isArmed: false),
+    };
+
+    // ── Pool state ────────────────────────────────────────────────────────
+    [ObservableProperty] private bool     _isGridView       = false;
+    [ObservableProperty] private bool     _isFixedDuration  = true;
+    [ObservableProperty] private double   _fixedDuration    = 1.0;
+    [ObservableProperty] private decimal? _minDuration      = 0.5m;
+    [ObservableProperty] private decimal? _maxDuration      = 2.0m;
+    [ObservableProperty] private bool     _syncToBeat       = false;
+    [ObservableProperty] private string   _nowPlayingName   = "—";
+
+    [RelayCommand] private void SetListView()        => IsGridView      = false;
+    [RelayCommand] private void SetGridView()        => IsGridView      = true;
+    [RelayCommand] private void SetFixedDuration()   => IsFixedDuration = true;
+    [RelayCommand] private void SetRandomDuration()  => IsFixedDuration = false;
 
     public ClipQueueViewModel(ISessionService session, IPlaybackService playback)
     {
@@ -92,6 +115,7 @@ public partial class ClipQueueViewModel : ViewModelBase,
     {
         foreach (var item in Clips)
             item.IsActive = item.Model.Id == clip?.Id;
+        NowPlayingName = clip?.DisplayName ?? "—";
     }
 
     private async void RequestRemove(LiveClipItemViewModel item)

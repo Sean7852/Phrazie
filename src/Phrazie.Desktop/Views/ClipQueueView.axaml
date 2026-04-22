@@ -7,26 +7,24 @@
 
   <UserControl.Styles>
 
-    <!-- ── Row: default ── -->
+    <!-- ── Clip row: default ── -->
     <Style Selector="Border.clip-row">
-      <Setter Property="Background"      Value="#0F0F14" />
-      <Setter Property="CornerRadius"    Value="8" />
-      <Setter Property="Margin"          Value="0,0,0,6" />
-      <Setter Property="Padding"         Value="10,8" />
+      <Setter Property="Background"     Value="#0F0F14" />
+      <Setter Property="CornerRadius"   Value="8" />
+      <Setter Property="Margin"         Value="0,0,0,6" />
+      <Setter Property="Padding"        Value="10,8" />
     </Style>
     <Style Selector="Border.clip-row:pointerover">
       <Setter Property="Background" Value="#161620" />
     </Style>
 
-    <!-- ── Row: active ── -->
+    <!-- ── Clip row: active ── -->
     <Style Selector="Border.clip-row.active">
-      <Setter Property="Background"       Value="#121220" />
-      <Setter Property="BorderBrush"      Value="#33DD33" />
-      <Setter Property="BorderThickness"  Value="1,0,0,0" />
-      <Setter Property="Padding"          Value="12,12" />
+      <Setter Property="Background"      Value="#121220" />
+      <Setter Property="BorderBrush"     Value="#33DD33" />
+      <Setter Property="BorderThickness" Value="1,0,0,0" />
+      <Setter Property="Padding"         Value="12,12" />
     </Style>
-
-    <!-- ── Active clip name: larger ── -->
     <Style Selector="Border.clip-row.active TextBlock.clip-name">
       <Setter Property="FontSize"   Value="14" />
       <Setter Property="Foreground" Value="{StaticResource TextBrushPrimary}" />
@@ -36,7 +34,7 @@
       <Setter Property="Foreground" Value="{StaticResource TextBrushSecondary}" />
     </Style>
 
-    <!-- ── Glow border behind row ── -->
+    <!-- ── Active glow ── -->
     <Style Selector="Border.active-glow">
       <Setter Property="IsVisible"       Value="False" />
       <Setter Property="CornerRadius"    Value="8" />
@@ -55,11 +53,33 @@
       </Style.Animations>
     </Style>
 
-    <!-- ── Add clip button ── -->
+    <!-- ── View toggle (list / grid) ── -->
+    <Style Selector="Button.view-toggle">
+      <Setter Property="Background"      Value="Transparent" />
+      <Setter Property="Foreground"      Value="{StaticResource TextBrushDisabled}" />
+      <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius"    Value="6" />
+      <Setter Property="Padding"         Value="0" />
+      <Setter Property="FontSize"        Value="14" />
+      <Setter Property="Width"           Value="28" />
+      <Setter Property="Height"          Value="26" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment"   Value="Center" />
+    </Style>
+    <Style Selector="Button.view-toggle.active">
+      <Setter Property="BorderBrush" Value="{StaticResource BoxBorderFocused}" />
+    </Style>
+    <Style Selector="Button.view-toggle.active /template/ ContentPresenter">
+      <Setter Property="Background"             Value="{StaticResource ControlBackgroundBrush}" />
+      <Setter Property="TextElement.Foreground" Value="{StaticResource TextBrushPrimary}" />
+    </Style>
+
+    <!-- ── Add clip button (AccentYellow) ── -->
     <Style Selector="Button.add-clip">
       <Setter Property="Background"      Value="Transparent" />
-      <Setter Property="Foreground"      Value="{StaticResource AccentOrangeBrush}" />
-      <Setter Property="BorderBrush"     Value="{StaticResource AccentOrangeBrush}" />
+      <Setter Property="Foreground"      Value="{StaticResource AccentBrush}" />
+      <Setter Property="BorderBrush"     Value="{StaticResource AccentBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius"    Value="6" />
       <Setter Property="Padding"         Value="12,5" />
@@ -67,7 +87,7 @@
       <Setter Property="FontWeight"      Value="SemiBold" />
     </Style>
     <Style Selector="Button.add-clip:pointerover /template/ ContentPresenter">
-      <Setter Property="Background" Value="{StaticResource AccentOrangeDimBrush}" />
+      <Setter Property="Background" Value="{StaticResource AccentYellowDimBrush}" />
     </Style>
 
     <!-- ── Remove button ── -->
@@ -84,148 +104,336 @@
       <Setter Property="TextElement.Foreground" Value="#EE4444" />
     </Style>
 
+    <!-- ── Transition toggle ── -->
+    <Style Selector="Button.transition-toggle">
+      <Setter Property="Background"      Value="{StaticResource BoxBackgroundDefault}" />
+      <Setter Property="Foreground"      Value="{StaticResource TextBrushSecondary}" />
+      <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius"    Value="8" />
+      <Setter Property="Padding"         Value="10,6" />
+      <Setter Property="FontSize"        Value="11" />
+      <Setter Property="FontWeight"      Value="SemiBold" />
+      <Setter Property="MinWidth"        Value="68" />
+    </Style>
+    <Style Selector="Button.transition-toggle.armed">
+      <Setter Property="BorderBrush" Value="{StaticResource BoxBorderFocused}" />
+      <Setter Property="Foreground"  Value="{StaticResource TextBrushPrimary}" />
+    </Style>
+    <Style Selector="Button.transition-toggle.armed /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1AF59E0B" />
+    </Style>
+
+    <!-- ── Timing mode toggle ── -->
+    <Style Selector="Button.timing-mode">
+      <Setter Property="Background"      Value="{StaticResource BoxBackgroundDefault}" />
+      <Setter Property="Foreground"      Value="{StaticResource TextBrushSecondary}" />
+      <Setter Property="BorderBrush"     Value="{StaticResource BoxBorderDefault}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius"    Value="8" />
+      <Setter Property="Padding"         Value="8,6" />
+      <Setter Property="FontSize"        Value="11" />
+      <Setter Property="HorizontalAlignment"        Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.timing-mode.active">
+      <Setter Property="BorderBrush" Value="{StaticResource BoxBorderFocused}" />
+      <Setter Property="Foreground"  Value="{StaticResource TextBrushPrimary}" />
+    </Style>
+    <Style Selector="Button.timing-mode.active /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1AF59E0B" />
+    </Style>
+
   </UserControl.Styles>
 
-  <Grid RowDefinitions="Auto,*" Margin="16,16,16,8">
+  <Grid ColumnDefinitions="7*,1,3*">
 
-    <!-- ── Header ── -->
-    <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,14">
-      <TextBlock Grid.Column="0"
-                 Text="QUEUE"
-                 Foreground="{StaticResource TextBrushDisabled}"
-                 FontSize="10"
-                 FontWeight="Bold"
-                 LetterSpacing="3"
-                 VerticalAlignment="Center" />
-      <TextBlock Grid.Column="1"
-                 Text="{Binding Clips.Count, StringFormat='{}{0} clips'}"
-                 Foreground="{StaticResource TextBrushDisabled}"
-                 FontSize="11"
-                 VerticalAlignment="Center"
-                 Margin="0,0,12,0" />
-      <Button Grid.Column="2"
-              Classes="add-clip"
-              Content="+ Add Clip"
-              Command="{Binding AddClipCommand}"
-              VerticalAlignment="Center" />
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- LEFT PANE: Clip Pool                                                   -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <Grid Grid.Column="0" RowDefinitions="Auto,*,Auto" Margin="16,16,8,8">
+
+      <!-- ── Header ── -->
+      <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" Margin="0,0,0,14">
+
+        <!-- List-view toggle -->
+        <Button Grid.Column="0"
+                Classes="view-toggle"
+                Classes.active="{Binding !IsGridView}"
+                Content="≡"
+                Command="{Binding SetListViewCommand}" />
+
+        <!-- Grid-view toggle -->
+        <Button Grid.Column="1"
+                Classes="view-toggle"
+                Classes.active="{Binding IsGridView}"
+                Content="⊞"
+                Command="{Binding SetGridViewCommand}"
+                Margin="4,0,0,0" />
+
+        <TextBlock Grid.Column="2"
+                   Text="CLIP POOL"
+                   Foreground="{StaticResource TextBrushDisabled}"
+                   FontSize="10" FontWeight="Bold" LetterSpacing="3"
+                   VerticalAlignment="Center" Margin="10,0,0,0" />
+
+        <TextBlock Grid.Column="4"
+                   Text="{Binding Clips.Count, StringFormat='{}{0} clips'}"
+                   Foreground="{StaticResource TextBrushDisabled}"
+                   FontSize="11" VerticalAlignment="Center" Margin="0,0,12,0" />
+
+        <Button Grid.Column="5"
+                Classes="add-clip"
+                Content="+ Add Clip"
+                Command="{Binding AddClipCommand}"
+                VerticalAlignment="Center" />
+      </Grid>
+
+      <!-- ── Content: list / grid ── -->
+      <Panel Grid.Row="1">
+
+        <!-- List view -->
+        <ScrollViewer IsVisible="{Binding !IsGridView}" VerticalScrollBarVisibility="Auto">
+          <ItemsControl x:Name="ClipList" ItemsSource="{Binding Clips}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:LiveClipItemViewModel">
+                <Panel Opacity="{Binding Opacity}">
+                  <Panel.Transitions>
+                    <Transitions>
+                      <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
+                    </Transitions>
+                  </Panel.Transitions>
+
+                  <Border Classes="active-glow" Classes.on="{Binding IsActive}" Margin="0,0,0,6" />
+
+                  <Border Classes="clip-row" Classes.active="{Binding IsActive}">
+                    <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+
+                      <!-- Thumbnail -->
+                      <Border Grid.Column="0" Width="56" Height="32"
+                              CornerRadius="4" ClipToBounds="True" Margin="0,0,12,0">
+                        <Border.Background>
+                          <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                            <GradientStop Color="#2A1A3A" Offset="0.0" />
+                            <GradientStop Color="#1A2A3A" Offset="1.0" />
+                          </LinearGradientBrush>
+                        </Border.Background>
+                        <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"
+                               IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                      </Border>
+
+                      <!-- Info -->
+                      <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                        <StackPanel Orientation="Horizontal" Spacing="5" IsVisible="{Binding IsActive}">
+                          <Ellipse Width="6" Height="6" Fill="#44DD44" VerticalAlignment="Center" />
+                          <TextBlock Text="NOW PLAYING" Foreground="#44DD44"
+                                     FontSize="9" FontWeight="Bold" LetterSpacing="1.5"
+                                     VerticalAlignment="Center" />
+                        </StackPanel>
+                        <TextBlock Classes="clip-name" Text="{Binding Name}"
+                                   FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                        <StackPanel Orientation="Horizontal" Spacing="5">
+                          <Border Background="#1E1E26" CornerRadius="4" Padding="6,2">
+                            <TextBlock Text="{Binding CollectionName}"
+                                       Foreground="White" FontSize="9" LetterSpacing="0.5" />
+                          </Border>
+                          <Border Background="{Binding StateColorBg}" CornerRadius="4" Padding="6,2">
+                            <TextBlock Text="{Binding StateName}"
+                                       Foreground="{Binding StateColorFg}"
+                                       FontSize="9" FontWeight="SemiBold" LetterSpacing="0.5" />
+                          </Border>
+                          <TextBlock Text="{Binding Duration}"
+                                     Foreground="{StaticResource TextBrushDisabled}"
+                                     FontFamily="Consolas,monospace" FontSize="9"
+                                     VerticalAlignment="Center" />
+                        </StackPanel>
+                      </StackPanel>
+
+                      <Button Grid.Column="2" Classes="remove" Content="✕"
+                              Command="{Binding RemoveCommand}"
+                              VerticalAlignment="Center" Margin="6,0,2,0" />
+                      <TextBlock Grid.Column="3" Text="≡"
+                                 Foreground="{StaticResource TextBrushDisabled}"
+                                 FontSize="14" VerticalAlignment="Center" Margin="2,0,0,0" />
+                    </Grid>
+                  </Border>
+                </Panel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+
+        <!-- Grid view -->
+        <ScrollViewer IsVisible="{Binding IsGridView}" VerticalScrollBarVisibility="Auto">
+          <ItemsControl ItemsSource="{Binding Clips}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:LiveClipItemViewModel">
+                <Border Width="150" Height="95" CornerRadius="8" ClipToBounds="True"
+                        Margin="0,0,10,10">
+                  <Border.Background>
+                    <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                      <GradientStop Color="#2A1A3A" Offset="0.0" />
+                      <GradientStop Color="#1A2A3A" Offset="1.0" />
+                    </LinearGradientBrush>
+                  </Border.Background>
+                  <Panel>
+                    <Image Source="{Binding Thumbnail}" Stretch="UniformToFill"
+                           IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                    <Border VerticalAlignment="Bottom" Background="#BB000000" Padding="8,5">
+                      <TextBlock Text="{Binding Name}"
+                                 Foreground="{StaticResource TextBrushPrimary}"
+                                 FontSize="11" FontWeight="SemiBold"
+                                 TextTrimming="CharacterEllipsis" />
+                    </Border>
+                    <Border IsVisible="{Binding IsActive}"
+                            BorderBrush="#44DD44" BorderThickness="2" CornerRadius="8" />
+                  </Panel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+
+      </Panel>
+
+      <!-- ── NOW PLAYING footer ── -->
+      <Border Grid.Row="2"
+              Background="{StaticResource PanelBackgroundBrush}"
+              CornerRadius="8" Padding="14,10" Margin="0,8,0,0">
+        <Grid ColumnDefinitions="Auto,Auto,*">
+          <Ellipse Grid.Column="0" Width="6" Height="6" Fill="#44DD44"
+                   VerticalAlignment="Center" Margin="0,0,8,0" />
+          <TextBlock Grid.Column="1"
+                     Text="NOW PLAYING"
+                     Foreground="#44DD44"
+                     FontSize="9" FontWeight="Bold" LetterSpacing="1.5"
+                     VerticalAlignment="Center" Margin="0,0,10,0" />
+          <TextBlock Grid.Column="2"
+                     Text="{Binding NowPlayingName}"
+                     Foreground="{StaticResource TextBrushPrimary}"
+                     FontSize="11" FontWeight="SemiBold"
+                     VerticalAlignment="Center"
+                     TextTrimming="CharacterEllipsis" />
+        </Grid>
+      </Border>
+
     </Grid>
 
-    <!-- ── Clip list ── -->
-    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
-      <ItemsControl x:Name="ClipList" ItemsSource="{Binding Clips}">
-        <ItemsControl.ItemTemplate>
-          <DataTemplate x:DataType="vm:LiveClipItemViewModel">
+    <!-- ── Vertical divider ── -->
+    <Border Grid.Column="1" Background="{StaticResource BoxBorderDefault}" />
 
-            <Panel Opacity="{Binding Opacity}">
-              <Panel.Transitions>
-                <Transitions>
-                  <DoubleTransition Property="Opacity" Duration="0:0:0.2" />
-                </Transitions>
-              </Panel.Transitions>
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- RIGHT PANE: Transition Pool                                             -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+      <StackPanel Margin="12,16,16,16">
 
-              <!-- Glow (behind row) -->
-              <Border Classes="active-glow"
-                      Classes.on="{Binding IsActive}"
-                      Margin="0,0,0,6" />
+        <!-- ── TRANSITIONS header ── -->
+        <TextBlock Text="TRANSITIONS"
+                   Foreground="{StaticResource TextBrushDisabled}"
+                   FontSize="10" FontWeight="Bold" LetterSpacing="3"
+                   Margin="0,0,0,10" />
 
-              <!-- Row -->
-              <Border Classes="clip-row"
-                      Classes.active="{Binding IsActive}">
-                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+        <!-- ── Transition toggle grid ── -->
+        <ItemsControl ItemsSource="{Binding TransitionOptions}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:TransitionOptionViewModel">
+              <Button Classes="transition-toggle"
+                      Classes.armed="{Binding IsArmed}"
+                      Content="{Binding Name}"
+                      Command="{Binding ToggleCommand}"
+                      Margin="0,0,6,6" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
-                  <!-- Thumbnail -->
-                  <Border Grid.Column="0"
-                          Width="56"
-                          Height="32"
-                          CornerRadius="4"
-                          ClipToBounds="True"
-                          Margin="0,0,12,0">
-                    <Border.Background>
-                      <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                        <GradientStop Color="#2A1A3A" Offset="0.0" />
-                        <GradientStop Color="#1A2A3A" Offset="1.0" />
-                      </LinearGradientBrush>
-                    </Border.Background>
-                    <Image Source="{Binding Thumbnail}"
-                           Stretch="UniformToFill"
-                           IsVisible="{Binding Thumbnail, Converter={x:Static ObjectConverters.IsNotNull}}" />
-                  </Border>
+        <!-- ── Divider ── -->
+        <Border Height="1" Background="{StaticResource BoxBorderDefault}" Margin="0,16" />
 
-                  <!-- Info column -->
-                  <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+        <!-- ── TRANSITION TIMING header ── -->
+        <TextBlock Text="TRANSITION TIMING"
+                   Foreground="{StaticResource TextBrushDisabled}"
+                   FontSize="10" FontWeight="Bold" LetterSpacing="3"
+                   Margin="0,0,0,10" />
 
-                    <!-- NOW PLAYING badge (active only) -->
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="5"
-                                IsVisible="{Binding IsActive}">
-                      <Ellipse Width="6" Height="6"
-                               Fill="#44DD44"
-                               VerticalAlignment="Center" />
-                      <TextBlock Text="NOW PLAYING"
-                                 Foreground="#44DD44"
-                                 FontSize="9"
-                                 FontWeight="Bold"
-                                 LetterSpacing="1.5"
-                                 VerticalAlignment="Center" />
-                    </StackPanel>
+        <!-- ── Fixed / Random Range mode toggle ── -->
+        <Grid ColumnDefinitions="*,4,*">
+          <Button Grid.Column="0"
+                  Classes="timing-mode"
+                  Classes.active="{Binding IsFixedDuration}"
+                  Content="Fixed"
+                  Command="{Binding SetFixedDurationCommand}" />
+          <Button Grid.Column="2"
+                  Classes="timing-mode"
+                  Classes.active="{Binding !IsFixedDuration}"
+                  Content="Random Range"
+                  Command="{Binding SetRandomDurationCommand}" />
+        </Grid>
 
-                    <!-- Clip name -->
-                    <TextBlock Classes="clip-name"
-                               Text="{Binding Name}"
-                               FontWeight="SemiBold"
-                               TextTrimming="CharacterEllipsis" />
+        <!-- ── Fixed duration ── -->
+        <StackPanel IsVisible="{Binding IsFixedDuration}" Margin="0,12,0,0" Spacing="6">
+          <Grid ColumnDefinitions="*,Auto">
+            <Slider Grid.Column="0"
+                    Value="{Binding FixedDuration}"
+                    Minimum="0.1" Maximum="5.0"
+                    VerticalAlignment="Center" />
+            <TextBlock Grid.Column="1"
+                       Text="{Binding FixedDuration, StringFormat='{}{0:F1}s'}"
+                       Foreground="{StaticResource TextBrushPrimary}"
+                       FontFamily="Consolas,monospace" FontSize="12"
+                       VerticalAlignment="Center"
+                       MinWidth="38" Margin="8,0,0,0" />
+          </Grid>
+        </StackPanel>
 
-                    <!-- Collection + State badges -->
-                    <StackPanel Orientation="Horizontal" Spacing="5">
-                      <Border Background="#1E1E26"
-                              CornerRadius="4"
-                              Padding="6,2">
-                        <TextBlock Text="{Binding CollectionName}"
-                                   Foreground="White"
-                                   FontSize="9"
-                                   LetterSpacing="0.5" />
-                      </Border>
-                      <Border Background="{Binding StateColorBg}"
-                              CornerRadius="4"
-                              Padding="6,2">
-                        <TextBlock Text="{Binding StateName}"
-                                   Foreground="{Binding StateColorFg}"
-                                   FontSize="9"
-                                   FontWeight="SemiBold"
-                                   LetterSpacing="0.5" />
-                      </Border>
-                      <TextBlock Text="{Binding Duration}"
-                                 Foreground="{StaticResource TextBrushDisabled}"
-                                 FontFamily="Consolas,monospace"
-                                 FontSize="9"
-                                 VerticalAlignment="Center" />
-                    </StackPanel>
+        <!-- ── Random range ── -->
+        <StackPanel IsVisible="{Binding !IsFixedDuration}" Margin="0,12,0,0" Spacing="4">
+          <Grid ColumnDefinitions="*,Auto,*">
+            <NumericUpDown Grid.Column="0"
+                           Value="{Binding MinDuration}"
+                           Minimum="0.1" Maximum="4.9"
+                           Increment="0.1" FormatString="F1"
+                           FontSize="12" />
+            <TextBlock Grid.Column="1"
+                       Text="–"
+                       Foreground="{StaticResource TextBrushSecondary}"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       Margin="8,0" />
+            <NumericUpDown Grid.Column="2"
+                           Value="{Binding MaxDuration}"
+                           Minimum="0.2" Maximum="5.0"
+                           Increment="0.1" FormatString="F1"
+                           FontSize="12" />
+          </Grid>
+          <Grid ColumnDefinitions="*,Auto,*">
+            <TextBlock Grid.Column="0" Text="Min"
+                       Foreground="{StaticResource TextBrushDisabled}"
+                       FontSize="10" HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="2" Text="Max"
+                       Foreground="{StaticResource TextBrushDisabled}"
+                       FontSize="10" HorizontalAlignment="Center" />
+          </Grid>
+        </StackPanel>
 
-                  </StackPanel>
+        <!-- ── Sync to Beat ── -->
+        <CheckBox IsChecked="{Binding SyncToBeat}"
+                  Foreground="{StaticResource TextBrushPrimary}"
+                  FontSize="12" Margin="0,16,0,0">
+          Sync to Beat
+        </CheckBox>
 
-                  <!-- Remove -->
-                  <Button Grid.Column="2"
-                          Classes="remove"
-                          Content="✕"
-                          Command="{Binding RemoveCommand}"
-                          VerticalAlignment="Center"
-                          Margin="6,0,2,0" />
-
-                  <!-- Drag handle -->
-                  <TextBlock Grid.Column="3"
-                             Text="≡"
-                             Foreground="{StaticResource TextBrushDisabled}"
-                             FontSize="14"
-                             VerticalAlignment="Center"
-                             Margin="2,0,0,0" />
-
-                </Grid>
-              </Border>
-            </Panel>
-
-          </DataTemplate>
-        </ItemsControl.ItemTemplate>
-      </ItemsControl>
+      </StackPanel>
     </ScrollViewer>
 
   </Grid>

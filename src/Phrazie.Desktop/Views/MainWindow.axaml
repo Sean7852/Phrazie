@@ -81,8 +81,8 @@
                     <Button Command="{Binding GoToClipQueueCommand}"
                             Classes="nav"
                             Classes.active="{Binding IsClipQueueActive}"
-                            ToolTip.Tip="View and manage the clip queue">
-                        Queue
+                            ToolTip.Tip="Manage clip pool and transitions">
+                        Pool
                     </Button>
                 </StackPanel>
 

@@ -1,23 +1,41 @@
-I need to fix the playback deferral issue in Phrazie caused by the NativeControlHost lifecycle. Currently, VLC stops rendering when the LivePerformanceView loses focus because the visual tree is destroyed.
+Please refactor the Queue page into a dual-pane Pool management system. Follow these structural and logical requirements:
 
-1. Architectural Shift (Off-screen Rendering):
+1. Layout Structure:
 
-Instead of rendering directly to a NativeControlHost, modify the VideoPlaybackService to use VLC's Callback Rendering (Memory/BitMap) mode.
+Horizontal Split: Divide the screen into a Clip Pool (Left, 70% width) and a Transition Pool (Right, 30% width).
 
-Implement a Persistent Video Buffer: Create a shared memory buffer (or WritableBitmap) that remains resident in the VideoPlaybackService regardless of which tab is active.
 
-2. Avalonia Integration:
+Sidebar Update: Rename the navigation item from 'Queue' to 'Pool' to reflect the content organization strategy.
 
-In the VideoView control, replace the NativeControlHost with a standard Avalonia Image control or a CustomControl that overrides Render.
+2. Clip Pool (Left Pane):
 
-Bind this UI element to the persistent buffer from the service. When the LivePerformanceView is loaded, it should simply start 'listening' to the buffer that is already running in the background.
+Grid/List Toggle: Add a toggle in the top-left to switch between the current list view and a Grid View featuring large, rounded-corner thumbnails.
 
-3. Performance & Synchronization:
+Accent Styling: Use the AccentYellow (#FFB800) for the + Add Clip button and ensure the 'NOW PLAYING' footer remains at the bottom of this pane.
 
-Use the Phrazie.Engine clock to ensure the buffer updates are synchronized with the CurrentPhase.
+3. Transition Pool (Right Pane - Randomization Engine):
 
-Ensure the buffer supports 1080p60 to match our recording and output requirements.
 
-4. Transition Logic:
+Multi-Select Selection: Display transition options (Fade, Cut, Strobe, Glitch, Blur, Invert) as a grid of toggles.
 
-Ensure that when I switch from the Clip Queue back to Live, the video is already at the correct frame, perfectly synced with the BPM and Phase.
+Selection Logic: Clicking an option 'arms' it for randomization. Enabled transitions must be highlighted with the BoxBorderFocused (Yellow) border; disabled ones use BoxBorderDefault.
+
+Randomization Principle: The system will randomly cycle through only the Enabled transitions during clip changes.
+
+4. Transition Timing Suite:
+
+Duration Controls: Add a section below the selection grid titled 'Transition Timing'.
+
+Mode Toggle: Include a switch between 'Fixed' and 'Random Range'.
+
+Inputs: * If Fixed, show a single numeric input/slider for duration (0.1s – 5.0s).
+
+If Random Range, show 'Min' and 'Max' duration inputs.
+
+Rhythm Sync: Add a 'Sync to Beat' checkbox. When enabled, it should snap the transition duration to the nearest musical increment (e.g., 1/2 bar, 1 bar) based on the global BPM.
+
+5. Global Styling:
+
+Use the shared color palette: SurfaceDark for panel backgrounds and TextBrushPrimary for all enabled text.
+
+All box elements must have the established CornerRadius of 8 to match the StateInstance.jpg aesthetic.
