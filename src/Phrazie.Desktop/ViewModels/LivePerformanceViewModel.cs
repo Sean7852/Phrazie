@@ -20,6 +20,13 @@ public partial class LivePerformanceViewModel : ViewModelBase
     // Tracks an out-transition that was pre-started at near-end so AdvanceToNextClip can await it
     private Task? _pendingOutTransition;
 
+    // Phrase-based clip duration tracking
+    private int    _beatClockPhrasesCounted;
+    private bool   _phraseAdvancePending;
+    private int    _clipGeneration; // increments each PlayClip/ResetPhraseClock call
+    private bool   _outTransitionArmed;      // waiting for sub-phrase phase target
+    private double _outTransitionPhaseTarget; // phase (0-1) at which to fire the out transition
+
     public VideoPlaybackService? VideoService => _playback as VideoPlaybackService;
 
     /// <summary>Awaited before the clip/state switches — plays the outgoing effect.</summary>
@@ -140,7 +147,10 @@ public partial class LivePerformanceViewModel : ViewModelBase
                 CurrentClipName = clip?.DisplayName ?? string.Empty);
 
         _playback.ClipEnded += () =>
-            Dispatcher.UIThread.Post(AdvanceToNextClip);
+        {
+            var gen = _clipGeneration;
+            Dispatcher.UIThread.Post(() => AdvanceToNextClip(gen));
+        };
 
         if (_playback is VideoPlaybackService vps)
             vps.ClipNearEnd += () =>
@@ -155,7 +165,20 @@ public partial class LivePerformanceViewModel : ViewModelBase
             Dispatcher.UIThread.Post(() =>
             {
                 if (_lastPhase > 0.9 && phase < 0.1)
+                {
                     PhraseNumber = (PhraseNumber % TotalPhrases) + 1;
+                    OnBeatClockPhraseCrossing();
+                }
+
+                // Sub-phrase out-transition trigger — fires when phase reaches the
+                // computed target so the transition ends right at the phrase boundary
+                if (_outTransitionArmed && _pendingOutTransition is null
+                    && phase >= _outTransitionPhaseTarget)
+                {
+                    _outTransitionArmed   = false;
+                    _pendingOutTransition = FireOutTransitionAsync();
+                }
+
                 _lastPhase   = phase;
                 CurrentPhase = phase;
             }, DispatcherPriority.Render);
@@ -200,7 +223,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private async Task EmergencySwitchAsync()
     {
         await _trigger.CancelAsync();
-        _pendingOutTransition = null;
+        ResetPhraseClock();
 
         var nextOpt = StateOptions.FirstOrDefault(o => o.IsNext);
         if (nextOpt is not null)
@@ -244,7 +267,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
     {
         Dispatcher.UIThread.Post(async () =>
         {
-            _pendingOutTransition = null;
+            ResetPhraseClock();
             var opt = StateOptions.FirstOrDefault(o => o.Model.Id == trigger.TargetStateId);
             if (opt is not null)
             {
@@ -313,22 +336,43 @@ public partial class LivePerformanceViewModel : ViewModelBase
         }
     }
 
-    private async void AdvanceToNextClip()
+    // Called from ClipEnded — loops if phrase mode is active and target not reached yet
+    private async void AdvanceToNextClip(int generation)
+    {
+        if (!IsPlaying || generation != _clipGeneration) return;
+
+        var phraseDuration = _transitionPool.ClipDurationPhrases;
+        if (phraseDuration > 0 && !_phraseAdvancePending)
+        {
+            // Phrase target not yet reached — seamlessly loop the same clip
+            var current = _playback.CurrentClip;
+            if (current is not null) _ = _playback.PlayAsync(current);
+            return;
+        }
+
+        if (_phraseAdvancePending) return; // AdvanceByPhraseAsync already handling this
+
+        await DoAdvanceToNextClipAsync();
+    }
+
+    // Called from the phrase boundary when phrase count target is reached
+    private async Task AdvanceByPhraseAsync()
     {
         if (!IsPlaying) return;
+        await DoAdvanceToNextClipAsync();
+    }
 
+    private async Task DoAdvanceToNextClipAsync()
+    {
         var clips = _session.Current.CurrentState?.Clips
                         .Where(c => c.IsEnabled)
                         .ToList() ?? [];
-
         if (clips.Count == 0) return;
 
         var currentIdx = clips.FindIndex(c => c.Id == _playback.CurrentClip?.Id);
         var nextIdx    = currentIdx + 1;
+        var target     = nextIdx >= clips.Count ? clips[^1] : clips[nextIdx];
 
-        var target = nextIdx >= clips.Count ? clips[^1] : clips[nextIdx];
-
-        // If near-end pre-started the out transition, await it; otherwise start it now
         if (_pendingOutTransition is not null)
         {
             await _pendingOutTransition;
@@ -343,11 +387,71 @@ public partial class LivePerformanceViewModel : ViewModelBase
         FireInTransition();
     }
 
+    private void ResetPhraseClock()
+    {
+        _beatClockPhrasesCounted  = 0;
+        _phraseAdvancePending     = false;
+        _outTransitionArmed       = false;
+        _pendingOutTransition     = null;
+        _clipGeneration++;
+    }
+
     private void PlayClip(Clip clip)
     {
+        ResetPhraseClock();
+
         if (_playback is VideoPlaybackService vps)
-            vps.NearEndLookahead = TimeSpan.FromSeconds(_transitionPool.GetMaxOutDuration() + 0.2);
+            vps.NearEndLookahead = _transitionPool.ClipDurationPhrases == 0
+                ? TimeSpan.FromSeconds(_transitionPool.GetMaxOutDuration() + 0.2)
+                : TimeSpan.Zero;
+
         _ = _playback.PlayAsync(clip);
+    }
+
+    // Fires on each IBeatClock phrase crossing (every 16 beats).
+    // Arms the sub-phrase out-transition trigger so the fade ends exactly at the phrase boundary.
+    private void OnBeatClockPhraseCrossing()
+    {
+        var phraseDuration = _transitionPool.ClipDurationPhrases;
+        if (phraseDuration <= 0 || _phraseAdvancePending) return;
+
+        _beatClockPhrasesCounted++;
+
+        // Calculate when in the last phrase(s) the out transition should start
+        var secondsPerPhrase = 60.0 / Bpm * 16.0; // IBeatClock phrase = 16 beats
+        var outDuration      = _transitionPool.GetMaxOutDuration();
+        var outRatio         = outDuration / secondsPerPhrase; // fractional phrases consumed
+        var phrasesForFull   = (int)Math.Floor(outRatio);
+        var subFraction      = outRatio - phrasesForFull; // 0 <= subFraction < 1
+        bool hasSub          = subFraction > 0.01;
+
+        // Arm crossing: the phrase at which we start watching the sub-phrase phase
+        // (always strictly before phraseDuration so arming and advancing don't collide)
+        int armCrossing = hasSub
+            ? phraseDuration - phrasesForFull - 1
+            : phraseDuration - phrasesForFull;
+        armCrossing = Math.Max(1, armCrossing);
+
+        if (!_outTransitionArmed && _pendingOutTransition is null
+            && _beatClockPhrasesCounted == armCrossing
+            && armCrossing < phraseDuration)
+        {
+            _outTransitionArmed        = true;
+            _outTransitionPhaseTarget  = hasSub ? 1.0 - subFraction : 0.0;
+
+            // If target is at the downbeat (phase 0), fire immediately rather than waiting
+            if (_outTransitionPhaseTarget <= 0.01)
+            {
+                _outTransitionArmed   = false;
+                _pendingOutTransition = FireOutTransitionAsync();
+            }
+        }
+
+        if (_beatClockPhrasesCounted >= phraseDuration)
+        {
+            _phraseAdvancePending = true;
+            _ = AdvanceByPhraseAsync();
+        }
     }
 
     private async Task FireOutTransitionAsync()

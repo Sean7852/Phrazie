@@ -175,6 +175,15 @@ public sealed class VideoPlaybackService : IPlaybackService, IDisposable
     public Task PlayAsync(Clip clip)
     {
         _nearEndFired = false;
+
+        // Wipe the ready buffer so the old clip's last frame isn't visible
+        // during the gap between PlayAsync and the first decoded frame of the new clip.
+        lock (_bufferLock)
+        {
+            if (_readyBuffer.Length > 0)
+                Array.Clear(_readyBuffer);
+        }
+
         _currentMedia?.Dispose();
         _currentMedia = new Media(_libVlc, clip.FilePath, FromType.FromPath);
         MediaPlayer.Play(_currentMedia);

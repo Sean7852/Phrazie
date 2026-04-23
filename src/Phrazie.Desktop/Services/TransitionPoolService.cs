@@ -15,6 +15,13 @@ public sealed class TransitionPoolService
     private double               _minSeconds   = 0.5;
     private double               _maxSeconds   = 2.0;
 
+    /// <summary>
+    /// How many user-phrazes each clip plays before transitioning.
+    /// 1 phraze = 8 bars = 32 beats = 2 IBeatClock phrases.
+    /// 0 means free-running (advance on clip end).
+    /// </summary>
+    public int ClipDurationPhrases { get; set; } = 4;
+
     public void SetArmedOut(IEnumerable<TransitionType> types) => _armedOut = [.. types];
     public void SetArmedIn(IEnumerable<TransitionType> types)  => _armedIn  = [.. types];
 

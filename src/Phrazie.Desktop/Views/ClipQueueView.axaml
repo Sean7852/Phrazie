@@ -492,6 +492,42 @@
           </Grid>
         </StackPanel>
 
+        <!-- ── Divider ── -->
+        <Border Height="1" Background="{StaticResource BoxBorderDefault}" Margin="0,16" />
+
+        <!-- ── CLIP DURATION header ── -->
+        <TextBlock Text="CLIP DURATION"
+                   Foreground="{StaticResource TextBrushDisabled}"
+                   FontSize="10" FontWeight="Bold" LetterSpacing="3"
+                   Margin="0,0,0,10" />
+
+        <!-- Phrase slider + value -->
+        <Grid ColumnDefinitions="*,Auto">
+          <Slider Grid.Column="0"
+                  Value="{Binding ClipDurationPhrases}"
+                  Minimum="1" Maximum="16"
+                  TickFrequency="1"
+                  IsSnapToTickEnabled="True"
+                  VerticalAlignment="Center" />
+          <StackPanel Grid.Column="1" Margin="10,0,0,0" Width="44" VerticalAlignment="Center">
+            <TextBlock Text="{Binding ClipDurationPhrases}"
+                       Foreground="{StaticResource TextBrushPrimary}"
+                       FontFamily="Consolas,monospace" FontSize="14" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" />
+            <TextBlock Text="phraze"
+                       Foreground="{StaticResource TextBrushDisabled}"
+                       FontSize="9" LetterSpacing="0.5"
+                       HorizontalAlignment="Center" />
+          </StackPanel>
+        </Grid>
+
+        <!-- bars · beats info line -->
+        <TextBlock Text="{Binding PhraseBeatsDisplay}"
+                   Foreground="{StaticResource TextBrushDisabled}"
+                   FontSize="10" FontFamily="Consolas,monospace"
+                   HorizontalAlignment="Center"
+                   Margin="0,6,0,0" />
+
       </StackPanel>
     </ScrollViewer>
 

@@ -49,16 +49,25 @@ public partial class ClipQueueViewModel : ViewModelBase,
     [ObservableProperty] private decimal? _maxDuration     = 2.0m;
     [ObservableProperty] private string   _nowPlayingName  = "—";
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PhraseBeatsDisplay))]
+    private int _clipDurationPhrases = 4;
+
+    /// <summary>e.g. "16 bars · 64 beats"</summary>
+    public string PhraseBeatsDisplay =>
+        $"{ClipDurationPhrases * 4} bars · {ClipDurationPhrases * 16} beats";
+
     [RelayCommand] private void SetListView()       => IsGridView      = false;
     [RelayCommand] private void SetGridView()       => IsGridView      = true;
     [RelayCommand] private void SetFixedDuration()  => IsFixedDuration = true;
     [RelayCommand] private void SetRandomDuration() => IsFixedDuration = false;
 
     // Push duration settings whenever any relevant property changes
-    partial void OnIsFixedDurationChanged(bool _)   => PushDurationToService();
-    partial void OnFixedDurationChanged(double _)   => PushDurationToService();
-    partial void OnMinDurationChanged(decimal? _)   => PushDurationToService();
-    partial void OnMaxDurationChanged(decimal? _)   => PushDurationToService();
+    partial void OnIsFixedDurationChanged(bool _)     => PushDurationToService();
+    partial void OnFixedDurationChanged(double _)     => PushDurationToService();
+    partial void OnMinDurationChanged(decimal? _)     => PushDurationToService();
+    partial void OnMaxDurationChanged(decimal? _)     => PushDurationToService();
+    partial void OnClipDurationPhrasesChanged(int _)  => PushClipDurationToService();
 
     public ClipQueueViewModel(
         ISessionService       session,
@@ -79,6 +88,7 @@ public partial class ClipQueueViewModel : ViewModelBase,
         PushOutArmedToService();
         PushInArmedToService();
         PushDurationToService();
+        PushClipDurationToService();
 
         WeakReferenceMessenger.Default.Register(this);
 
@@ -136,6 +146,9 @@ public partial class ClipQueueViewModel : ViewModelBase,
             FixedDuration,
             (double)(MinDuration ?? 0.5m),
             (double)(MaxDuration ?? 2.0m));
+
+    private void PushClipDurationToService() =>
+        _transitionPool.ClipDurationPhrases = ClipDurationPhrases;
 
     private void LoadClips()
     {
