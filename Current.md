@@ -1,5 +1,4 @@
-Looks nice so far, now we need to add another function in the pool right panel.
-Phraze control, add another function under the Transition duration names Clip Duration which controls how long each video plays.
-We use phraze to control the length, we provide 1-16 phrazes adjustment, this will align with the bpm on the LivePerformanceView.
-1 phraze is 8 bars, 32 beats in total, if a clip is less than the total phraze count, loop the video seemlessly.
-Apply the in & out transition effect after it finishes all phrazes. 
+I've encountered a bug where clips pause for a second when looping. I need to implement a Gapless Double Buffering system in the VideoPlaybackService.1. Implementation:Maintain two instances of the MediaPlayer.
+* Implement a 'Look-ahead' logic: When the current clip reaches 95% completion (or near the end of the 16-beat phrase ), pre-roll the second player.
+* Seamlessly swap the video source being sent to our Persistent Video Buffer exactly on the downbeat (Phase 0.0).2. VLC Optimization:Set the VLC 'network-caching' and 'file-caching' parameters to lower values (e.g., 150ms) to reduce seek latency.Use the :input-repeat=65535 option or handle the EndReached event to trigger the manual swap rather than relying on VLC's internal loop.3. Threading:
+* Ensure the 'Swap' logic happens on a dedicated high-priority background thread so it is not affected by UI activity in the Clip Queue or Sidebar.Please update VideoPlaybackService.cs to handle this gapless transition logic.

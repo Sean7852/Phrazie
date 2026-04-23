@@ -353,9 +353,16 @@ public partial class LivePerformanceViewModel : ViewModelBase
         var phraseDuration = _transitionPool.ClipDurationPhrases;
         if (phraseDuration > 0 && !_phraseAdvancePending)
         {
-            // Phrase target not yet reached — seamlessly loop the same clip
+            // Phrase target not yet reached — shouldn't normally fire because
+            // VLC native looping keeps the clip running, but handle it just in case.
             var current = _playback.CurrentClip;
-            if (current is not null) _ = _playback.PlayAsync(current);
+            if (current is not null)
+            {
+                if (_playback is VideoPlaybackService vps)
+                    _ = vps.PlayAsync(current, loop: true);
+                else
+                    _ = _playback.PlayAsync(current);
+            }
             return;
         }
 
@@ -408,12 +415,19 @@ public partial class LivePerformanceViewModel : ViewModelBase
     {
         ResetPhraseClock();
 
-        if (_playback is VideoPlaybackService vps)
-            vps.NearEndLookahead = _transitionPool.ClipDurationPhrases == 0
-                ? TimeSpan.FromSeconds(_transitionPool.GetMaxOutDuration() + 0.2)
-                : TimeSpan.Zero;
+        var phraseMode = _transitionPool.ClipDurationPhrases > 0;
 
-        _ = _playback.PlayAsync(clip);
+        if (_playback is VideoPlaybackService vps)
+        {
+            vps.NearEndLookahead = phraseMode
+                ? TimeSpan.Zero
+                : TimeSpan.FromSeconds(_transitionPool.GetMaxOutDuration() + 0.2);
+            _ = vps.PlayAsync(clip, loop: phraseMode);
+        }
+        else
+        {
+            _ = _playback.PlayAsync(clip);
+        }
     }
 
     private async Task FireOutTransitionAsync()
