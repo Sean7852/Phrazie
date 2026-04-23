@@ -60,8 +60,8 @@
 - [x] Video playback (LibVLC, Windows)
 - [x] Loop clip when it ends
 - [x] State-based clip switching (respects PlaybackMode)
-- [ ] External full-screen output (second monitor)
-- [ ] Preview window separate from output
+- [x] External full-screen output (second monitor)
+- [x] Preview window separate from output (floating 640×360 on single-screen)
 
 ### 7. Mobile Remote (Basic)
 - [ ] View current state
@@ -126,6 +126,7 @@
 - [x] Phrase-based clip duration with beat-aligned transitions
 - [x] Transition FX engine (Fade / Cut / Strobe / Blur / Glitch / Invert)
 - [x] Gapless video looping (double-buffer MediaPlayer, 150 ms VLC caching)
+- [x] External output window (PROJECT button, 4 projection modes, auto-hides title bar in fullscreen, crossfade on clip change)
 - [x] Auth service (Supabase sign-up / sign-in / sign-out)
 - [x] Auth gate UI (login screen before app)
 - [x] Local database persistence (SQLite — collections, states, clips)
@@ -184,6 +185,9 @@
 - [x] Clip manager window — "Manage" button on each state card, per-state grid view, right-click context menu (disable/enable/delete), drag-drop import
 - [x] Clip manager rubber-band multi-select with dark-themed context menu (delete selected)
 - [x] Custom dark window chrome — frameless MainWindow with min/max/close buttons, AboutDialog + ClipManagerWindow with ✕ close, no OS title bar
+- [x] PROJECT button in transport bar — amber glow when active, grid icon opens 4-mode picker popup (path-drawn icons, tooltips)
+- [x] External output window — OS native chrome, auto-hide title bar in fullscreen (hover top 50px to reveal), double-click or Escape to toggle fullscreen, killed on app exit
+- [x] Projection modes — fullscreen or windowed on external/main screen; windowed restores previous non-fullscreen size
 
 ---
 
