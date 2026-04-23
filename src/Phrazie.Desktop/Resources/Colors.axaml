@@ -50,7 +50,8 @@
     <!-- ── Accent Brushes ────────────────────────────────────────────────── -->
     <SolidColorBrush x:Key="AccentBrush"          Color="{StaticResource AccentYellow}" />
     <SolidColorBrush x:Key="AccentOrangeBrush"    Color="{StaticResource AccentOrange}" />
-    <SolidColorBrush x:Key="AccentOrangeDimBrush" Color="{StaticResource AccentOrangeDim}" />
+    <SolidColorBrush x:Key="AccentOrangeDimBrush"    Color="{StaticResource AccentOrangeDim}" />
+    <SolidColorBrush x:Key="AccentYellowDimBrush"   Color="{StaticResource AccentYellowDim}" />
     <SolidColorBrush x:Key="StatusPurpleBrush"    Color="{StaticResource StatusPurple}" />
     <SolidColorBrush x:Key="StatusPurpleBgBrush"  Color="{StaticResource StatusPurpleBg}" />
     <SolidColorBrush x:Key="LiveBrush"            Color="{StaticResource StatusGreen}" />

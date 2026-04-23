@@ -17,6 +17,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IBeatClock            _beatClock;
     private readonly ISessionStore         _sessionStore;
     private readonly IAuthService          _auth;
+    private readonly TransitionPoolService _transitionPool;
 
     [ObservableProperty] private bool           _isAuthenticated;
     [ObservableProperty] private LoginViewModel _loginPage;
@@ -44,21 +45,23 @@ public partial class MainWindowViewModel : ViewModelBase
         IHotkeyService        hotkeys,
         ISessionStore         sessionStore,
         IAuthService          auth,
-        LoginViewModel        loginPage)
+        LoginViewModel        loginPage,
+        TransitionPoolService transitionPool)
     {
-        _collections  = collections;
-        _session      = session;
-        _trigger      = trigger;
-        _playback     = playback;
-        _beatClock    = beatClock;
-        _filePicker   = filePicker;
-        _hotkeys      = hotkeys;
-        _sessionStore = sessionStore;
-        _auth         = auth;
-        _loginPage    = loginPage;
-        _currentPage  = BuildCollectionsPage();
+        _collections    = collections;
+        _session        = session;
+        _trigger        = trigger;
+        _playback       = playback;
+        _beatClock      = beatClock;
+        _filePicker     = filePicker;
+        _hotkeys        = hotkeys;
+        _sessionStore   = sessionStore;
+        _auth           = auth;
+        _loginPage      = loginPage;
+        _transitionPool = transitionPool;
+        _currentPage    = BuildCollectionsPage();
 
-        _clipQueuePage   = new ClipQueueViewModel(_session, _playback);
+        _clipQueuePage   = new ClipQueueViewModel(_session, _playback, _transitionPool);
         _isAuthenticated = sessionStore.IsAuthenticated;
 
         WeakReferenceMessenger.Default.Register<OpenClipBrowserMessage>(this, (_, msg) =>
@@ -106,7 +109,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void GoToLive()
     {
-        _livePage         ??= new LivePerformanceViewModel(_session, _trigger, _playback, _beatClock);
+        _livePage         ??= new LivePerformanceViewModel(_session, _trigger, _playback, _beatClock, _transitionPool);
         CurrentPage         = _livePage;
         IsCollectionsActive = false;
         IsLiveActive        = true;

@@ -1,23 +1,4 @@
-I need to fix the playback deferral issue in Phrazie caused by the NativeControlHost lifecycle. Currently, VLC stops rendering when the LivePerformanceView loses focus because the visual tree is destroyed.
-
-1. Architectural Shift (Off-screen Rendering):
-
-Instead of rendering directly to a NativeControlHost, modify the VideoPlaybackService to use VLC's Callback Rendering (Memory/BitMap) mode.
-
-Implement a Persistent Video Buffer: Create a shared memory buffer (or WritableBitmap) that remains resident in the VideoPlaybackService regardless of which tab is active.
-
-2. Avalonia Integration:
-
-In the VideoView control, replace the NativeControlHost with a standard Avalonia Image control or a CustomControl that overrides Render.
-
-Bind this UI element to the persistent buffer from the service. When the LivePerformanceView is loaded, it should simply start 'listening' to the buffer that is already running in the background.
-
-3. Performance & Synchronization:
-
-Use the Phrazie.Engine clock to ensure the buffer updates are synchronized with the CurrentPhase.
-
-Ensure the buffer supports 1080p60 to match our recording and output requirements.
-
-4. Transition Logic:
-
-Ensure that when I switch from the Clip Queue back to Live, the video is already at the correct frame, perfectly synced with the BPM and Phase.
+I've encountered a bug where clips pause for a second when looping. I need to implement a Gapless Double Buffering system in the VideoPlaybackService.1. Implementation:Maintain two instances of the MediaPlayer.
+* Implement a 'Look-ahead' logic: When the current clip reaches 95% completion (or near the end of the 16-beat phrase ), pre-roll the second player.
+* Seamlessly swap the video source being sent to our Persistent Video Buffer exactly on the downbeat (Phase 0.0).2. VLC Optimization:Set the VLC 'network-caching' and 'file-caching' parameters to lower values (e.g., 150ms) to reduce seek latency.Use the :input-repeat=65535 option or handle the EndReached event to trigger the manual swap rather than relying on VLC's internal loop.3. Threading:
+* Ensure the 'Swap' logic happens on a dedicated high-priority background thread so it is not affected by UI activity in the Clip Queue or Sidebar.Please update VideoPlaybackService.cs to handle this gapless transition logic.

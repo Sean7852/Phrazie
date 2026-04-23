@@ -11,12 +11,26 @@ namespace Phrazie.Desktop.ViewModels;
 
 public partial class LivePerformanceViewModel : ViewModelBase
 {
-    private readonly ISessionService  _session;
-    private readonly ITriggerService  _trigger;
-    private readonly IPlaybackService _playback;
-    private readonly IBeatClock       _beatClock;
+    private readonly ISessionService       _session;
+    private readonly ITriggerService       _trigger;
+    private readonly IPlaybackService      _playback;
+    private readonly IBeatClock            _beatClock;
+    private readonly TransitionPoolService _transitionPool;
+
+    // Tracks an out-transition that was pre-started at near-end so AdvanceToNextClip can await it
+    private Task? _pendingOutTransition;
+
+    // Phrase-based clip duration tracking
+    private int  _beatClockPhrasesCounted;
+    private bool _phraseAdvancePending;
+    private int  _clipGeneration; // increments each ResetPhraseClock call
 
     public VideoPlaybackService? VideoService => _playback as VideoPlaybackService;
+
+    /// <summary>Awaited before the clip/state switches — plays the outgoing effect.</summary>
+    public event Func<TransitionType, double, Task>? OutTransitionRequired;
+    /// <summary>Fired immediately after the clip/state switches — plays the incoming effect.</summary>
+    public event Action<TransitionType, double>? InTransitionStarted;
 
     // ── state options (the three buttons: Normal / Break / Drop) ──────────
 
@@ -64,7 +78,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
             _beatClock.Start();
             var first = _session.Current.CurrentState?.Clips.FirstOrDefault(c => c.IsEnabled);
             if (first is not null && _playback.CurrentClip is null)
-                _ = _playback.PlayAsync(first);
+                PlayClip(first);
         }
         else
         {
@@ -100,15 +114,17 @@ public partial class LivePerformanceViewModel : ViewModelBase
     // ── ctor ──────────────────────────────────────────────────────────────
 
     public LivePerformanceViewModel(
-        ISessionService  session,
-        ITriggerService  trigger,
-        IPlaybackService playback,
-        IBeatClock       beatClock)
+        ISessionService       session,
+        ITriggerService       trigger,
+        IPlaybackService      playback,
+        IBeatClock            beatClock,
+        TransitionPoolService transitionPool)
     {
-        _session   = session;
-        _trigger   = trigger;
-        _playback  = playback;
-        _beatClock = beatClock;
+        _session        = session;
+        _trigger        = trigger;
+        _playback       = playback;
+        _beatClock      = beatClock;
+        _transitionPool = transitionPool;
 
         BuildStateOptions(_session.Current);
         SyncFromSession(_session.Current);
@@ -129,14 +145,49 @@ public partial class LivePerformanceViewModel : ViewModelBase
                 CurrentClipName = clip?.DisplayName ?? string.Empty);
 
         _playback.ClipEnded += () =>
-            Dispatcher.UIThread.Post(AdvanceToNextClip);
+        {
+            var gen = _clipGeneration;
+            Dispatcher.UIThread.Post(() => AdvanceToNextClip(gen));
+        };
+
+        if (_playback is VideoPlaybackService vps)
+            vps.ClipNearEnd += () =>
+                Dispatcher.UIThread.Post(() =>
+                {
+                    if (_pendingOutTransition is null)
+                        _pendingOutTransition = FireOutTransitionAsync();
+                });
 
         _beatClock.Bpm = Bpm;
         _beatClock.PhaseChanged += phase =>
             Dispatcher.UIThread.Post(() =>
             {
                 if (_lastPhase > 0.9 && phase < 0.1)
+                {
                     PhraseNumber = (PhraseNumber % TotalPhrases) + 1;
+                    _beatClockPhrasesCounted++;
+                }
+
+                var phraseDur = _transitionPool.ClipDurationPhrases;
+                if (phraseDur > 0 && !_phraseAdvancePending)
+                {
+                    // Continuous elapsed time in IBeatClock phrases — gives sub-phrase precision
+                    var elapsed  = _beatClockPhrasesCounted + phase;
+                    var spp      = 60.0 / Bpm * 16.0; // seconds per IBeatClock phrase
+                    var outRatio = _transitionPool.GetMaxOutDuration() / spp;
+
+                    // Start the out transition early so it ends right at the phrase boundary
+                    if (_pendingOutTransition is null && elapsed >= phraseDur - outRatio)
+                        _pendingOutTransition = FireOutTransitionAsync();
+
+                    // Advance the clip once all phrases are complete
+                    if (elapsed >= phraseDur)
+                    {
+                        _phraseAdvancePending = true;
+                        _ = AdvanceByPhraseAsync();
+                    }
+                }
+
                 _lastPhase   = phase;
                 CurrentPhase = phase;
             }, DispatcherPriority.Render);
@@ -181,12 +232,15 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private async Task EmergencySwitchAsync()
     {
         await _trigger.CancelAsync();
+        ResetPhraseClock();
 
         var nextOpt = StateOptions.FirstOrDefault(o => o.IsNext);
         if (nextOpt is not null)
         {
+            await FireOutTransitionAsync();
             await _session.TransitionToStateAsync(nextOpt.Model);
             await _playback.TransitionToStateAsync(nextOpt.Model);
+            FireInTransition();
         }
 
         StatusLabel        = "Waiting";
@@ -222,11 +276,14 @@ public partial class LivePerformanceViewModel : ViewModelBase
     {
         Dispatcher.UIThread.Post(async () =>
         {
+            ResetPhraseClock();
             var opt = StateOptions.FirstOrDefault(o => o.Model.Id == trigger.TargetStateId);
             if (opt is not null)
             {
+                await FireOutTransitionAsync();
                 await _session.TransitionToStateAsync(opt.Model);
                 await _playback.TransitionToStateAsync(opt.Model);
+                FireInTransition();
             }
 
             StatusLabel        = "Triggered";
@@ -256,7 +313,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
         if (!IsPlaying || _playback.CurrentClip is not null) return;
         var first = s.CurrentState?.Clips.FirstOrDefault(c => c.IsEnabled);
         if (first is not null)
-            _ = _playback.PlayAsync(first);
+            PlayClip(first);
     }
 
     private void BuildStateOptions(Session s)
@@ -288,27 +345,102 @@ public partial class LivePerformanceViewModel : ViewModelBase
         }
     }
 
-    private void AdvanceToNextClip()
+    // Called from ClipEnded — loops if phrase mode is active and target not reached yet
+    private async void AdvanceToNextClip(int generation)
+    {
+        if (!IsPlaying || generation != _clipGeneration) return;
+
+        var phraseDuration = _transitionPool.ClipDurationPhrases;
+        if (phraseDuration > 0 && !_phraseAdvancePending)
+        {
+            // Phrase target not yet reached — shouldn't normally fire because
+            // VLC native looping keeps the clip running, but handle it just in case.
+            var current = _playback.CurrentClip;
+            if (current is not null)
+            {
+                if (_playback is VideoPlaybackService vps)
+                    _ = vps.PlayAsync(current, loop: true);
+                else
+                    _ = _playback.PlayAsync(current);
+            }
+            return;
+        }
+
+        if (_phraseAdvancePending) return; // AdvanceByPhraseAsync already handling this
+
+        await DoAdvanceToNextClipAsync();
+    }
+
+    // Called from the phrase boundary when phrase count target is reached
+    private async Task AdvanceByPhraseAsync()
     {
         if (!IsPlaying) return;
+        await DoAdvanceToNextClipAsync();
+    }
 
+    private async Task DoAdvanceToNextClipAsync()
+    {
         var clips = _session.Current.CurrentState?.Clips
                         .Where(c => c.IsEnabled)
                         .ToList() ?? [];
-
         if (clips.Count == 0) return;
 
         var currentIdx = clips.FindIndex(c => c.Id == _playback.CurrentClip?.Id);
         var nextIdx    = currentIdx + 1;
+        var target     = nextIdx >= clips.Count ? clips[0] : clips[nextIdx];
 
-        // Past the end — loop the last clip
-        if (nextIdx >= clips.Count)
+        if (_pendingOutTransition is not null)
         {
-            _ = _playback.PlayAsync(clips[^1]);
-            return;
+            await _pendingOutTransition;
+            _pendingOutTransition = null;
+        }
+        else
+        {
+            await FireOutTransitionAsync();
         }
 
-        _ = _playback.PlayAsync(clips[nextIdx]);
+        PlayClip(target);
+        FireInTransition();
+    }
+
+    private void ResetPhraseClock()
+    {
+        _beatClockPhrasesCounted = 0;
+        _phraseAdvancePending    = false;
+        _pendingOutTransition    = null;
+        _clipGeneration++;
+    }
+
+    private void PlayClip(Clip clip)
+    {
+        ResetPhraseClock();
+
+        var phraseMode = _transitionPool.ClipDurationPhrases > 0;
+
+        if (_playback is VideoPlaybackService vps)
+        {
+            vps.NearEndLookahead = phraseMode
+                ? TimeSpan.Zero
+                : TimeSpan.FromSeconds(_transitionPool.GetMaxOutDuration() + 0.2);
+            _ = vps.PlayAsync(clip, loop: phraseMode);
+        }
+        else
+        {
+            _ = _playback.PlayAsync(clip);
+        }
+    }
+
+    private async Task FireOutTransitionAsync()
+    {
+        var (type, duration) = _transitionPool.PickOut();
+        if (OutTransitionRequired is not null)
+            await OutTransitionRequired(type, duration);
+    }
+
+    private void FireInTransition()
+    {
+        var (type, duration) = _transitionPool.PickIn();
+        InTransitionStarted?.Invoke(type, duration);
     }
 
     private string BuildTriggerDescription(string stateName) => DelayType switch

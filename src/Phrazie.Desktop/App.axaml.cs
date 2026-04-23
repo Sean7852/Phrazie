@@ -65,7 +65,8 @@ public partial class App : Application
         services.AddSingleton<IHotkeyService,          MockHotkeyService>();
 
         // ── Desktop services ───────────────────────────────────────────────────
-        services.AddSingleton<IFilePickerService, AvaloniaFilePickerService>();
+        services.AddSingleton<IFilePickerService,    AvaloniaFilePickerService>();
+        services.AddSingleton<TransitionPoolService>();
 
         // ── ViewModels ─────────────────────────────────────────────────────────
         services.AddSingleton<LoginViewModel>();
