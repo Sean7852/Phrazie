@@ -92,6 +92,23 @@
       <Setter Property="Foreground"  Value="{StaticResource DangerBrush}" />
     </Style>
 
+    <!-- ── PROJECT button ── -->
+    <Style Selector="Button.transport.project">
+      <Setter Property="Foreground"   Value="{StaticResource TextBrushSecondary}" />
+      <Setter Property="BorderBrush"  Value="{StaticResource BoxBorderDefault}" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding"      Value="12,6" />
+      <Setter Property="FontSize"     Value="12" />
+      <Setter Property="FontWeight"   Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.transport.project.active /template/ ContentPresenter">
+      <Setter Property="Background"             Value="#1AF59E0B" />
+    </Style>
+    <Style Selector="Button.transport.project.active">
+      <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+      <Setter Property="Foreground"  Value="{StaticResource AccentBrush}" />
+    </Style>
+
   </UserControl.Styles>
 
   <Grid Height="100" VerticalAlignment="Bottom" Background="Transparent">
@@ -208,6 +225,21 @@
             <StackPanel Orientation="Horizontal" Spacing="6">
               <Ellipse Width="8" Height="8" Fill="{StaticResource DangerBrush}" />
               <TextBlock Text="REC" FontWeight="Bold" />
+            </StackPanel>
+          </Button>
+        </Panel>
+
+        <Panel VerticalAlignment="Center">
+          <Border CornerRadius="5"
+                  Margin="-4"
+                  IsVisible="{Binding IsProjecting}"
+                  BoxShadow="0 0 14 4 #80F59E0B" />
+          <Button Classes="transport project"
+                  Classes.active="{Binding IsProjecting}"
+                  Command="{Binding ToggleProjectionCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="⬛" FontSize="9" VerticalAlignment="Center" />
+              <TextBlock Text="PROJECT" FontWeight="Bold" />
             </StackPanel>
           </Button>
         </Panel>

@@ -18,6 +18,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ISessionStore         _sessionStore;
     private readonly IAuthService          _auth;
     private readonly TransitionPoolService _transitionPool;
+    private readonly ProjectionService     _projection;
 
     [ObservableProperty] private bool           _isAuthenticated;
     [ObservableProperty] private LoginViewModel _loginPage;
@@ -46,7 +47,8 @@ public partial class MainWindowViewModel : ViewModelBase
         ISessionStore         sessionStore,
         IAuthService          auth,
         LoginViewModel        loginPage,
-        TransitionPoolService transitionPool)
+        TransitionPoolService transitionPool,
+        ProjectionService     projection)
     {
         _collections    = collections;
         _session        = session;
@@ -59,6 +61,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _auth           = auth;
         _loginPage      = loginPage;
         _transitionPool = transitionPool;
+        _projection     = projection;
         _currentPage    = BuildCollectionsPage();
 
         _clipQueuePage   = new ClipQueueViewModel(_session, _playback, _transitionPool);
@@ -109,7 +112,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void GoToLive()
     {
-        _livePage         ??= new LivePerformanceViewModel(_session, _trigger, _playback, _beatClock, _transitionPool);
+        _livePage         ??= new LivePerformanceViewModel(_session, _trigger, _playback, _beatClock, _transitionPool, _projection);
         CurrentPage         = _livePage;
         IsCollectionsActive = false;
         IsLiveActive        = true;

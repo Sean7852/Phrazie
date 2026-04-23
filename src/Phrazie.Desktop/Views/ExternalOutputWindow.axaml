@@ -1,0 +1,77 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Phrazie.Desktop.Controls"
+        x:Class="Phrazie.Desktop.Views.ExternalOutputWindow"
+        Title="Phrazie Output"
+        Background="Black"
+        WindowDecorations="None"
+        ShowInTaskbar="False"
+        CanResize="True"
+        MinWidth="320" MinHeight="180">
+
+  <Window.Styles>
+    <Style Selector="Button.chrome">
+      <Setter Property="Background"                    Value="Transparent" />
+      <Setter Property="Foreground"                    Value="#8E8E93" />
+      <Setter Property="BorderThickness"               Value="0" />
+      <Setter Property="Width"                         Value="36" />
+      <Setter Property="Height"                        Value="28" />
+      <Setter Property="Padding"                       Value="0" />
+      <Setter Property="FontSize"                      Value="13" />
+      <Setter Property="HorizontalContentAlignment"    Value="Center" />
+      <Setter Property="VerticalContentAlignment"      Value="Center" />
+      <Setter Property="CornerRadius"                  Value="0" />
+    </Style>
+    <Style Selector="Button.chrome:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#26262E" />
+      <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.chrome.close:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#C42B1C" />
+      <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="28,*">
+
+    <!-- ── Floating chrome bar (hidden when fullscreen) ─────────────────── -->
+    <Grid x:Name="ChromeBar"
+          Grid.Row="0"
+          Background="#CC111114">
+
+      <!-- Drag area (fills bar minus buttons) -->
+      <Border x:Name="DragArea"
+              HorizontalAlignment="Stretch"
+              Margin="0,0,76,0"
+              Cursor="SizeAll" />
+
+      <!-- Label -->
+      <TextBlock Text="PHRAZIE OUTPUT"
+                 Foreground="#48484A"
+                 FontSize="10"
+                 FontWeight="Bold"
+                 LetterSpacing="2"
+                 VerticalAlignment="Center"
+                 Margin="12,0" />
+
+      <!-- Buttons -->
+      <StackPanel Orientation="Horizontal"
+                  HorizontalAlignment="Right">
+        <Button x:Name="FullscreenBtn"
+                Classes="chrome"
+                ToolTip.Tip="Toggle fullscreen"
+                Content="⛶" />
+        <Button x:Name="CloseBtn"
+                Classes="chrome close"
+                Content="✕" />
+      </StackPanel>
+
+    </Grid>
+
+    <!-- ── Video output ──────────────────────────────────────────────────── -->
+    <controls:VideoView x:Name="VideoOutput"
+                        Grid.Row="1" />
+
+  </Grid>
+
+</Window>
