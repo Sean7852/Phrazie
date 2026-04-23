@@ -30,7 +30,8 @@
       "Bash(tasklist)",
       "Bash(echo \"exit: $?\")",
       "Bash(xargs grep *)",
-      "Bash(dotnet-decompiler LibVLCSharp.dll)"
+      "Bash(dotnet-decompiler LibVLCSharp.dll)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }

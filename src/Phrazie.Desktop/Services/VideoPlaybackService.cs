@@ -116,17 +116,10 @@ public sealed class VideoPlaybackService : IPlaybackService, IDisposable
             if (currentMs > 200 && (length - currentMs) <= threshold)
             {
                 _near95Fired = true;
-                var clip = CurrentClip;
+                var clip        = CurrentClip;
+                var standbyIdx  = 1 - _activeSlot; // capture before any swap
                 if (clip is not null)
-                {
-                    var thread = new Thread(() => _slots[1 - _activeSlot].Play(clip))
-                    {
-                        IsBackground = true,
-                        Priority     = ThreadPriority.Highest,
-                        Name         = "VJStudio-Preroll"
-                    };
-                    thread.Start();
-                }
+                    _ = Task.Run(() => _slots[standbyIdx].Play(clip));
             }
         }
     }
@@ -152,15 +145,9 @@ public sealed class VideoPlaybackService : IPlaybackService, IDisposable
         // Atomic flip — from this point DisplayCallbacks from the new slot drive FrameReady
         Interlocked.Exchange(ref _activeSlot, incomingIdx);
 
-        // Stop the outgoing player on a high-priority background thread
+        // Stop the outgoing player on a thread-pool thread
         var outSlot = _slots[outgoingIdx];
-        var thread  = new Thread(() => outSlot.Stop())
-        {
-            IsBackground = true,
-            Priority     = ThreadPriority.Highest,
-            Name         = "VJStudio-SlotStop"
-        };
-        thread.Start();
+        _ = Task.Run(() => outSlot.Stop());
     }
 
     // ── IPlaybackService ───────────────────────────────────────────────────

@@ -31,6 +31,9 @@ public partial class App : Application
             {
                 DataContext = Services.GetRequiredService<MainWindowViewModel>()
             };
+
+            desktop.MainWindow.Closed += (_, _) =>
+                Services.GetRequiredService<ProjectionService>().Close();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -58,7 +61,8 @@ public partial class App : Application
         // ── Core interfaces → SQLite implementations ───────────────────────────
         services.AddSingleton<ICollectionRepository, SqliteCollectionRepository>();
         services.AddSingleton<IClipRepository,        SqliteClipRepository>();
-        services.AddSingleton<IPlaybackService,       VideoPlaybackService>();
+        services.AddSingleton<VideoPlaybackService>();
+        services.AddSingleton<IPlaybackService>(sp => sp.GetRequiredService<VideoPlaybackService>());
         services.AddSingleton<IBeatClock,             BeatClock>();
         services.AddSingleton<ITriggerService,         MockTriggerService>();
         services.AddSingleton<ISessionService,         MockSessionService>();
@@ -67,6 +71,7 @@ public partial class App : Application
         // ── Desktop services ───────────────────────────────────────────────────
         services.AddSingleton<IFilePickerService,    AvaloniaFilePickerService>();
         services.AddSingleton<TransitionPoolService>();
+        services.AddSingleton<ProjectionService>();
 
         // ── ViewModels ─────────────────────────────────────────────────────────
         services.AddSingleton<LoginViewModel>();

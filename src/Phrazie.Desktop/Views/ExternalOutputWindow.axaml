@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Phrazie.Desktop.Controls"
+        x:Class="Phrazie.Desktop.Views.ExternalOutputWindow"
+        Title="Phrazie Output"
+        Background="Black"
+        WindowDecorations="None"
+        ShowInTaskbar="True"
+        CanResize="True"
+        MinWidth="320" MinHeight="180">
+
+  <Window.Styles>
+
+    <Style Selector="Button.winchr">
+      <Setter Property="Background"                 Value="Transparent" />
+      <Setter Property="Foreground"                 Value="#8E8E93" />
+      <Setter Property="BorderThickness"            Value="0" />
+      <Setter Property="Width"                      Value="46" />
+      <Setter Property="Height"                     Value="32" />
+      <Setter Property="Padding"                    Value="0" />
+      <Setter Property="FontSize"                   Value="11" />
+      <Setter Property="CornerRadius"               Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment"   Value="Center" />
+    </Style>
+    <Style Selector="Button.winchr:pointerover /template/ ContentPresenter">
+      <Setter Property="Background"             Value="#26262E" />
+      <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+    <Style Selector="Button.winchr.close:pointerover /template/ ContentPresenter">
+      <Setter Property="Background"             Value="#C42B1C" />
+      <Setter Property="TextElement.Foreground" Value="White" />
+    </Style>
+
+  </Window.Styles>
+
+  <Panel>
+
+    <!-- ── Video output (fills entire window) ───────────────────────────── -->
+    <controls:VideoView x:Name="VideoOutput" />
+
+    <!-- ── Title bar overlay ─────────────────────────────────────────────── -->
+    <!-- Visible always when windowed; auto-hides in fullscreen, hover to reveal -->
+    <Border x:Name="TitleBar"
+            Height="32"
+            VerticalAlignment="Top"
+            Background="#111114"
+            BorderBrush="#26262E"
+            BorderThickness="0,0,0,1"
+            ZIndex="10">
+      <Grid ColumnDefinitions="*,Auto">
+
+        <!-- Drag + label -->
+        <Border x:Name="DragArea" Grid.Column="0" Background="Transparent" Cursor="SizeAll">
+          <TextBlock Text="PHRAZIE OUTPUT"
+                     Foreground="#48484A"
+                     FontSize="10"
+                     FontWeight="Bold"
+                     LetterSpacing="2"
+                     VerticalAlignment="Center"
+                     Margin="14,0" />
+        </Border>
+
+        <!-- Window buttons -->
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+          <Button x:Name="MinBtn"   Classes="winchr" Content="&#x2014;" />
+          <Button x:Name="MaxBtn"   Classes="winchr" Content="&#x2610;" />
+          <Button x:Name="CloseBtn" Classes="winchr close" Content="&#x2715;" />
+        </StackPanel>
+
+      </Grid>
+    </Border>
+
+  </Panel>
+
+</Window>

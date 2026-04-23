@@ -16,6 +16,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private readonly IPlaybackService      _playback;
     private readonly IBeatClock            _beatClock;
     private readonly TransitionPoolService _transitionPool;
+    private readonly ProjectionService     _projection;
 
     // Tracks an out-transition that was pre-started at near-end so AdvanceToNextClip can await it
     private Task? _pendingOutTransition;
@@ -65,8 +66,10 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     // ── Transport ─────────────────────────────────────────────────────────
 
-    [ObservableProperty] private bool _isPlaying   = true;
-    [ObservableProperty] private bool _isRecording = false;
+    [ObservableProperty] private bool _isPlaying              = true;
+    [ObservableProperty] private bool _isRecording            = false;
+    [ObservableProperty] private bool _isProjecting           = false;
+    [ObservableProperty] private bool _isProjectionPickerOpen = false;
 
     public string PlayPauseIcon => IsPlaying ? "⏸" : "▶";
 
@@ -87,8 +90,21 @@ public partial class LivePerformanceViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand] private void TogglePlay()   => IsPlaying   = !IsPlaying;
-    [RelayCommand] private void ToggleRecord() => IsRecording = !IsRecording;
+    [RelayCommand] private void TogglePlay()                => IsPlaying               = !IsPlaying;
+    [RelayCommand] private void ToggleRecord()              => IsRecording              = !IsRecording;
+    [RelayCommand] private void ToggleProjection()          => _projection.Toggle();
+    [RelayCommand] private void ToggleProjectionPicker()    => IsProjectionPickerOpen  = !IsProjectionPickerOpen;
+
+    [RelayCommand] private void ProjectExtFullscreen()  => OpenProjectionMode(Services.ProjectionMode.FullscreenExternal);
+    [RelayCommand] private void ProjectExtWindowed()    => OpenProjectionMode(Services.ProjectionMode.WindowedExternal);
+    [RelayCommand] private void ProjectMainFullscreen() => OpenProjectionMode(Services.ProjectionMode.FullscreenMain);
+    [RelayCommand] private void ProjectMainWindowed()   => OpenProjectionMode(Services.ProjectionMode.WindowedMain);
+
+    private void OpenProjectionMode(Services.ProjectionMode mode)
+    {
+        IsProjectionPickerOpen = false;
+        _projection.OpenWithMode(mode);
+    }
 
     // ── BPM ───────────────────────────────────────────────────────────────
 
@@ -118,13 +134,18 @@ public partial class LivePerformanceViewModel : ViewModelBase
         ITriggerService       trigger,
         IPlaybackService      playback,
         IBeatClock            beatClock,
-        TransitionPoolService transitionPool)
+        TransitionPoolService transitionPool,
+        ProjectionService     projection)
     {
         _session        = session;
         _trigger        = trigger;
         _playback       = playback;
         _beatClock      = beatClock;
         _transitionPool = transitionPool;
+        _projection     = projection;
+
+        _projection.IsProjectingChanged += v =>
+            Dispatcher.UIThread.Post(() => IsProjecting = v);
 
         BuildStateOptions(_session.Current);
         SyncFromSession(_session.Current);

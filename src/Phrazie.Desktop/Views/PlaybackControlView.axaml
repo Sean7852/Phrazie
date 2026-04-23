@@ -92,6 +92,57 @@
       <Setter Property="Foreground"  Value="{StaticResource DangerBrush}" />
     </Style>
 
+    <!-- ── PROJECT button ── -->
+    <Style Selector="Button.transport.project">
+      <Setter Property="Foreground"   Value="{StaticResource TextBrushSecondary}" />
+      <Setter Property="BorderBrush"  Value="{StaticResource BoxBorderDefault}" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="Padding"      Value="12,6" />
+      <Setter Property="FontSize"     Value="12" />
+      <Setter Property="FontWeight"   Value="SemiBold" />
+    </Style>
+    <Style Selector="Button.transport.project.active /template/ ContentPresenter">
+      <Setter Property="Background"             Value="#1AF59E0B" />
+    </Style>
+    <Style Selector="Button.transport.project.active">
+      <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}" />
+      <Setter Property="Foreground"  Value="{StaticResource AccentBrush}" />
+    </Style>
+
+    <!-- ── Mode picker trigger button ── -->
+    <Style Selector="Button.modepicker">
+      <Setter Property="Background"     Value="Transparent" />
+      <Setter Property="Foreground"     Value="{StaticResource TextBrushSecondary}" />
+      <Setter Property="BorderBrush"    Value="{StaticResource BoxBorderDefault}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius"   Value="4" />
+      <Setter Property="Width"          Value="26" />
+      <Setter Property="Height"         Value="26" />
+      <Setter Property="Padding"        Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment"   Value="Center" />
+      <Setter Property="VerticalAlignment"          Value="Center" />
+    </Style>
+    <Style Selector="Button.modepicker:pointerover /template/ ContentPresenter">
+      <Setter Property="Background"             Value="{StaticResource ControlBackgroundBrush}" />
+      <Setter Property="TextElement.Foreground" Value="{StaticResource TextBrushPrimary}" />
+    </Style>
+
+    <!-- ── Mode picker popup icon buttons ── -->
+    <Style Selector="Button.modeicon">
+      <Setter Property="Background"     Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Width"          Value="48" />
+      <Setter Property="Height"         Value="48" />
+      <Setter Property="Padding"        Value="0" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment"   Value="Center" />
+      <Setter Property="CornerRadius"   Value="6" />
+    </Style>
+    <Style Selector="Button.modeicon:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
+    </Style>
+
   </UserControl.Styles>
 
   <Grid Height="100" VerticalAlignment="Bottom" Background="Transparent">
@@ -196,6 +247,113 @@
                   VerticalAlignment="Bottom"
                   Height="64"
                   Spacing="12">
+
+        <!-- ── Mode picker trigger + popup ── -->
+        <Panel x:Name="ModePickerAnchor" VerticalAlignment="Center">
+          <Button Classes="modepicker"
+                  Command="{Binding ToggleProjectionPickerCommand}"
+                  ToolTip.Tip="Output mode">
+            <!-- 2×2 grid icon -->
+            <Viewbox Width="12" Height="12">
+              <Canvas Width="12" Height="12">
+                <Path Data="M 0,0 H 5 V 5 H 0 Z M 7,0 H 12 V 5 H 7 Z M 0,7 H 5 V 12 H 0 Z M 7,7 H 12 V 12 H 7 Z"
+                      Stroke="#8E8E93" StrokeThickness="1" Fill="Transparent" />
+              </Canvas>
+            </Viewbox>
+          </Button>
+
+          <Popup IsOpen="{Binding IsProjectionPickerOpen, Mode=TwoWay}"
+                 Placement="TopEdgeAlignedLeft"
+                 IsLightDismissEnabled="True"
+                 VerticalOffset="-8">
+            <Border Background="{StaticResource PanelBackgroundBrush}"
+                    BorderBrush="{StaticResource BoxBorderDefault}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="6">
+              <StackPanel Orientation="Horizontal" Spacing="2">
+
+                <!-- External fullscreen: two rects, right one has expand corners -->
+                <Button Classes="modeicon"
+                        Command="{Binding ProjectExtFullscreenCommand}"
+                        ToolTip.Tip="Fullscreen — external screen">
+                  <Viewbox Width="26" Height="18">
+                    <Canvas Width="22" Height="13">
+                      <Path Data="M 0,1.5 H 6.5 V 11 H 0 Z
+                                  M 8.5,0 H 21.5 V 12.5 H 8.5 Z
+                                  M 9.5,1 V 2.5 M 9.5,1 H 11
+                                  M 20.5,1 H 19 M 20.5,1 V 2.5
+                                  M 9.5,11.5 V 10 M 9.5,11.5 H 11
+                                  M 20.5,11.5 H 19 M 20.5,11.5 V 10"
+                            Stroke="#8E8E93" StrokeThickness="1" Fill="Transparent" />
+                    </Canvas>
+                  </Viewbox>
+                </Button>
+
+                <!-- External windowed: two rects, small inner window in right -->
+                <Button Classes="modeicon"
+                        Command="{Binding ProjectExtWindowedCommand}"
+                        ToolTip.Tip="Windowed — external screen">
+                  <Viewbox Width="26" Height="18">
+                    <Canvas Width="22" Height="13">
+                      <Path Data="M 0,1.5 H 6.5 V 11 H 0 Z
+                                  M 8.5,0 H 21.5 V 12.5 H 8.5 Z
+                                  M 11,3 H 19 V 9.5 H 11 Z"
+                            Stroke="#8E8E93" StrokeThickness="1" Fill="Transparent" />
+                    </Canvas>
+                  </Viewbox>
+                </Button>
+
+                <Border Width="1" Background="{StaticResource BoxBorderDefault}" Margin="2,6" />
+
+                <!-- Main fullscreen: single large rect with expand corners -->
+                <Button Classes="modeicon"
+                        Command="{Binding ProjectMainFullscreenCommand}"
+                        ToolTip.Tip="Fullscreen — main screen">
+                  <Viewbox Width="26" Height="18">
+                    <Canvas Width="22" Height="13">
+                      <Path Data="M 0,0 H 21.5 V 12.5 H 0 Z
+                                  M 1,1 V 3 M 1,1 H 3
+                                  M 20.5,1 H 18.5 M 20.5,1 V 3
+                                  M 1,11.5 V 9.5 M 1,11.5 H 3
+                                  M 20.5,11.5 H 18.5 M 20.5,11.5 V 9.5"
+                            Stroke="#8E8E93" StrokeThickness="1" Fill="Transparent" />
+                    </Canvas>
+                  </Viewbox>
+                </Button>
+
+                <!-- Main windowed: single rect with smaller inner rect -->
+                <Button Classes="modeicon"
+                        Command="{Binding ProjectMainWindowedCommand}"
+                        ToolTip.Tip="Windowed — main screen">
+                  <Viewbox Width="26" Height="18">
+                    <Canvas Width="22" Height="13">
+                      <Path Data="M 0,0 H 21.5 V 12.5 H 0 Z
+                                  M 4,3 H 17.5 V 9.5 H 4 Z"
+                            Stroke="#8E8E93" StrokeThickness="1" Fill="Transparent" />
+                    </Canvas>
+                  </Viewbox>
+                </Button>
+
+              </StackPanel>
+            </Border>
+          </Popup>
+        </Panel>
+
+        <Panel VerticalAlignment="Center">
+          <Border CornerRadius="5"
+                  Margin="-4"
+                  IsVisible="{Binding IsProjecting}"
+                  BoxShadow="0 0 14 4 #80F59E0B" />
+          <Button Classes="transport project"
+                  Classes.active="{Binding IsProjecting}"
+                  Command="{Binding ToggleProjectionCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+              <TextBlock Text="⬛" FontSize="9" VerticalAlignment="Center" />
+              <TextBlock Text="PROJECT" FontWeight="Bold" />
+            </StackPanel>
+          </Button>
+        </Panel>
 
         <Panel VerticalAlignment="Center">
           <Border CornerRadius="5"
