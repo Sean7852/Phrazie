@@ -42,8 +42,12 @@
 - [x] Video output area (LibVLC via custom NativeControlHost)
 - [x] Clip name overlay on video
 - [x] Play / pause controls
-- [x] Auto-advance to next clip on clip end (loops last clip)
+- [x] Auto-advance to next clip on clip end (wraps to first clip)
 - [x] Auto-play first clip on unpause
+- [x] Phrase-based clip duration (1–16 phrazes slider; 1 phraze = 16 beats / 4 bars)
+- [x] Transition FX engine — Fade, Cut, Strobe, Blur, Glitch, Invert (in & out banks, independent timing)
+- [x] Out-transition fires before phrase boundary so it lands exactly on the downbeat
+- [x] Gapless looping — double-buffer MediaPlayer (A/B), pre-rolls at 95%, atomic slot swap on EndReached
 - [ ] Manual clip advance
 
 ### 5. Trigger System
@@ -118,7 +122,10 @@
 - [x] Video thumbnail extraction (Windows Shell)
 - [x] Video playback (LibVLC)
 - [x] State-based clip switching
-- [x] Auto-advance queue (next clip on end, loop last)
+- [x] Auto-advance queue (next clip on end, wraps to first)
+- [x] Phrase-based clip duration with beat-aligned transitions
+- [x] Transition FX engine (Fade / Cut / Strobe / Blur / Glitch / Invert)
+- [x] Gapless video looping (double-buffer MediaPlayer, 150 ms VLC caching)
 - [x] Auth service (Supabase sign-up / sign-in / sign-out)
 - [x] Auth gate UI (login screen before app)
 - [x] Local database persistence (SQLite — collections, states, clips)
@@ -156,6 +163,9 @@
 ## UI / UX Improvements (Done)
 
 - [x] Queue page — live clip list with active clip highlight (green glow + NOW PLAYING badge), per-item collection/state color badges, video thumbnails, add/remove clips
+- [x] Clip Queue — separate In / Out transition banks (toggle armed types, fixed/random duration)
+- [x] Clip Queue — Clip Duration slider (1–16 phrazes) with bar/beat readout
+- [x] Live page — transition FX applied to video output (animated Fade, Blur, Glitch, Invert, Strobe)
 - [x] Remove gear icon from collection cards — settings moved to management page
 - [x] Single-click collection card opens management page
 - [x] Collection detail rich header — cover image, name, description inline editing
