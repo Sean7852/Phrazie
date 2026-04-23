@@ -141,7 +141,6 @@ public sealed class VideoView : Control
                                        outgoing ? 0.0 : 20.0,
                                        outgoing ? 20.0 : 0.0,
                                        durationSeconds, ct);
-                    Effect = null;
                     break;
 
                 case TransitionType.Glitch:
@@ -156,11 +155,18 @@ public sealed class VideoView : Control
         catch (OperationCanceledException) { }
         finally
         {
-            // For a completed Out transition, preserve opacity so the screen
-            // stays in its end-state until the In transition brings it back.
-            // Always reset on cancellation or when an In transition finishes.
             if (ct.IsCancellationRequested || !outgoing)
+            {
                 Opacity = 1.0;
+            }
+            else
+            {
+                // Out transition completed normally — hide the control and drop the
+                // bitmap so nothing shows during the clip-swap gap regardless of
+                // which transition type was used.
+                Opacity = 0.0;
+                _bitmap = null;
+            }
 
             Effect          = null;
             RenderTransform = null;
