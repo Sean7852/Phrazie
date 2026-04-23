@@ -380,7 +380,7 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
         var currentIdx = clips.FindIndex(c => c.Id == _playback.CurrentClip?.Id);
         var nextIdx    = currentIdx + 1;
-        var target     = nextIdx >= clips.Count ? clips[^1] : clips[nextIdx];
+        var target     = nextIdx >= clips.Count ? clips[0] : clips[nextIdx];
 
         if (_pendingOutTransition is not null)
         {
