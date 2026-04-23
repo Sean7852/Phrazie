@@ -21,11 +21,9 @@ public partial class LivePerformanceViewModel : ViewModelBase
     private Task? _pendingOutTransition;
 
     // Phrase-based clip duration tracking
-    private int    _beatClockPhrasesCounted;
-    private bool   _phraseAdvancePending;
-    private int    _clipGeneration; // increments each PlayClip/ResetPhraseClock call
-    private bool   _outTransitionArmed;      // waiting for sub-phrase phase target
-    private double _outTransitionPhaseTarget; // phase (0-1) at which to fire the out transition
+    private int  _beatClockPhrasesCounted;
+    private bool _phraseAdvancePending;
+    private int  _clipGeneration; // increments each ResetPhraseClock call
 
     public VideoPlaybackService? VideoService => _playback as VideoPlaybackService;
 
@@ -167,16 +165,27 @@ public partial class LivePerformanceViewModel : ViewModelBase
                 if (_lastPhase > 0.9 && phase < 0.1)
                 {
                     PhraseNumber = (PhraseNumber % TotalPhrases) + 1;
-                    OnBeatClockPhraseCrossing();
+                    _beatClockPhrasesCounted++;
                 }
 
-                // Sub-phrase out-transition trigger — fires when phase reaches the
-                // computed target so the transition ends right at the phrase boundary
-                if (_outTransitionArmed && _pendingOutTransition is null
-                    && phase >= _outTransitionPhaseTarget)
+                var phraseDur = _transitionPool.ClipDurationPhrases;
+                if (phraseDur > 0 && !_phraseAdvancePending)
                 {
-                    _outTransitionArmed   = false;
-                    _pendingOutTransition = FireOutTransitionAsync();
+                    // Continuous elapsed time in IBeatClock phrases — gives sub-phrase precision
+                    var elapsed  = _beatClockPhrasesCounted + phase;
+                    var spp      = 60.0 / Bpm * 16.0; // seconds per IBeatClock phrase
+                    var outRatio = _transitionPool.GetMaxOutDuration() / spp;
+
+                    // Start the out transition early so it ends right at the phrase boundary
+                    if (_pendingOutTransition is null && elapsed >= phraseDur - outRatio)
+                        _pendingOutTransition = FireOutTransitionAsync();
+
+                    // Advance the clip once all phrases are complete
+                    if (elapsed >= phraseDur)
+                    {
+                        _phraseAdvancePending = true;
+                        _ = AdvanceByPhraseAsync();
+                    }
                 }
 
                 _lastPhase   = phase;
@@ -389,10 +398,9 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     private void ResetPhraseClock()
     {
-        _beatClockPhrasesCounted  = 0;
-        _phraseAdvancePending     = false;
-        _outTransitionArmed       = false;
-        _pendingOutTransition     = null;
+        _beatClockPhrasesCounted = 0;
+        _phraseAdvancePending    = false;
+        _pendingOutTransition    = null;
         _clipGeneration++;
     }
 
@@ -406,52 +414,6 @@ public partial class LivePerformanceViewModel : ViewModelBase
                 : TimeSpan.Zero;
 
         _ = _playback.PlayAsync(clip);
-    }
-
-    // Fires on each IBeatClock phrase crossing (every 16 beats).
-    // Arms the sub-phrase out-transition trigger so the fade ends exactly at the phrase boundary.
-    private void OnBeatClockPhraseCrossing()
-    {
-        var phraseDuration = _transitionPool.ClipDurationPhrases;
-        if (phraseDuration <= 0 || _phraseAdvancePending) return;
-
-        _beatClockPhrasesCounted++;
-
-        // Calculate when in the last phrase(s) the out transition should start
-        var secondsPerPhrase = 60.0 / Bpm * 16.0; // IBeatClock phrase = 16 beats
-        var outDuration      = _transitionPool.GetMaxOutDuration();
-        var outRatio         = outDuration / secondsPerPhrase; // fractional phrases consumed
-        var phrasesForFull   = (int)Math.Floor(outRatio);
-        var subFraction      = outRatio - phrasesForFull; // 0 <= subFraction < 1
-        bool hasSub          = subFraction > 0.01;
-
-        // Arm crossing: the phrase at which we start watching the sub-phrase phase
-        // (always strictly before phraseDuration so arming and advancing don't collide)
-        int armCrossing = hasSub
-            ? phraseDuration - phrasesForFull - 1
-            : phraseDuration - phrasesForFull;
-        armCrossing = Math.Max(1, armCrossing);
-
-        if (!_outTransitionArmed && _pendingOutTransition is null
-            && _beatClockPhrasesCounted == armCrossing
-            && armCrossing < phraseDuration)
-        {
-            _outTransitionArmed        = true;
-            _outTransitionPhaseTarget  = hasSub ? 1.0 - subFraction : 0.0;
-
-            // If target is at the downbeat (phase 0), fire immediately rather than waiting
-            if (_outTransitionPhaseTarget <= 0.01)
-            {
-                _outTransitionArmed   = false;
-                _pendingOutTransition = FireOutTransitionAsync();
-            }
-        }
-
-        if (_beatClockPhrasesCounted >= phraseDuration)
-        {
-            _phraseAdvancePending = true;
-            _ = AdvanceByPhraseAsync();
-        }
     }
 
     private async Task FireOutTransitionAsync()
