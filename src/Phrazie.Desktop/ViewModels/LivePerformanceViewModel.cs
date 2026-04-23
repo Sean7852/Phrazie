@@ -66,9 +66,10 @@ public partial class LivePerformanceViewModel : ViewModelBase
 
     // ── Transport ─────────────────────────────────────────────────────────
 
-    [ObservableProperty] private bool _isPlaying    = true;
-    [ObservableProperty] private bool _isRecording  = false;
-    [ObservableProperty] private bool _isProjecting = false;
+    [ObservableProperty] private bool _isPlaying              = true;
+    [ObservableProperty] private bool _isRecording            = false;
+    [ObservableProperty] private bool _isProjecting           = false;
+    [ObservableProperty] private bool _isProjectionPickerOpen = false;
 
     public string PlayPauseIcon => IsPlaying ? "⏸" : "▶";
 
@@ -89,9 +90,21 @@ public partial class LivePerformanceViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand] private void TogglePlay()       => IsPlaying   = !IsPlaying;
-    [RelayCommand] private void ToggleRecord()     => IsRecording = !IsRecording;
-    [RelayCommand] private void ToggleProjection() => _projection.Toggle();
+    [RelayCommand] private void TogglePlay()                => IsPlaying               = !IsPlaying;
+    [RelayCommand] private void ToggleRecord()              => IsRecording              = !IsRecording;
+    [RelayCommand] private void ToggleProjection()          => _projection.Toggle();
+    [RelayCommand] private void ToggleProjectionPicker()    => IsProjectionPickerOpen  = !IsProjectionPickerOpen;
+
+    [RelayCommand] private void ProjectExtFullscreen()  => OpenProjectionMode(Services.ProjectionMode.FullscreenExternal);
+    [RelayCommand] private void ProjectExtWindowed()    => OpenProjectionMode(Services.ProjectionMode.WindowedExternal);
+    [RelayCommand] private void ProjectMainFullscreen() => OpenProjectionMode(Services.ProjectionMode.FullscreenMain);
+    [RelayCommand] private void ProjectMainWindowed()   => OpenProjectionMode(Services.ProjectionMode.WindowedMain);
+
+    private void OpenProjectionMode(Services.ProjectionMode mode)
+    {
+        IsProjectionPickerOpen = false;
+        _projection.OpenWithMode(mode);
+    }
 
     // ── BPM ───────────────────────────────────────────────────────────────
 

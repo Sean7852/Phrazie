@@ -31,6 +31,9 @@ public partial class App : Application
             {
                 DataContext = Services.GetRequiredService<MainWindowViewModel>()
             };
+
+            desktop.MainWindow.Closed += (_, _) =>
+                Services.GetRequiredService<ProjectionService>().Close();
         }
 
         base.OnFrameworkInitializationCompleted();

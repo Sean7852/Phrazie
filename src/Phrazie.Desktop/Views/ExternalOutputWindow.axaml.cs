@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
@@ -12,6 +11,7 @@ public partial class ExternalOutputWindow : Window
 {
     private readonly VideoPlaybackService _vps;
     private Action<Clip?>?               _clipChangedHandler;
+    private readonly DispatcherTimer      _hideBarTimer;
 
     public ExternalOutputWindow(VideoPlaybackService vps)
     {
@@ -20,24 +20,54 @@ public partial class ExternalOutputWindow : Window
 
         VideoOutput.Attach(vps);
 
-        // Show clip crossfade on the external window independently of the main UI
-        _clipChangedHandler = _clip =>
-            Dispatcher.UIThread.Post(() => _ = PlayCrossfadeAsync());
-        _vps.ClipChanged += _clipChangedHandler;
-
-        // Wire chrome bar controls
-        DragArea.PointerPressed      += (_, e) => BeginMoveDrag(e);
-        FullscreenBtn.Click          += (_, _) => ToggleFullscreen();
-        CloseBtn.Click               += (_, _) => Close();
-
-        // Hide chrome bar when fullscreen, show when floating
-        PropertyChanged += (_, e) =>
+        // Auto-hide title bar after 2 s of inactivity when fullscreen
+        _hideBarTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+        _hideBarTimer.Tick += (_, _) =>
         {
-            if (e.Property == WindowStateProperty)
-                ChromeBar.IsVisible = WindowState != WindowState.FullScreen;
+            _hideBarTimer.Stop();
+            if (WindowState == WindowState.FullScreen)
+                TitleBar.IsVisible = false;
         };
 
-        // Double-click on the video also toggles fullscreen
+        // Show/hide title bar based on window state
+        PropertyChanged += (_, e) =>
+        {
+            if (e.Property != WindowStateProperty) return;
+            if (WindowState == WindowState.FullScreen)
+            {
+                TitleBar.IsVisible = false;
+                _hideBarTimer.Stop();
+            }
+            else
+            {
+                TitleBar.IsVisible = true;
+                _hideBarTimer.Stop();
+            }
+        };
+
+        // Reveal title bar when pointer enters the top of the screen in fullscreen
+        PointerMoved += (_, e) =>
+        {
+            if (WindowState != WindowState.FullScreen) return;
+            var y = e.GetPosition(this).Y;
+            if (y < 50)
+            {
+                TitleBar.IsVisible = true;
+                _hideBarTimer.Stop();
+                _hideBarTimer.Start();
+            }
+        };
+
+        // Wire title bar controls
+        DragArea.PointerPressed += (_, e) => BeginMoveDrag(e);
+
+        MinBtn.Click += (_, _) => WindowState = WindowState.Minimized;
+
+        MaxBtn.Click += (_, _) => ToggleFullscreen();
+
+        CloseBtn.Click += (_, _) => Close();
+
+        // Double-click video to toggle fullscreen
         VideoOutput.DoubleTapped += (_, _) => ToggleFullscreen();
 
         // Escape exits fullscreen
@@ -47,8 +77,14 @@ public partial class ExternalOutputWindow : Window
                 ToggleFullscreen();
         };
 
+        // Crossfade on clip change
+        _clipChangedHandler = _clip =>
+            Dispatcher.UIThread.Post(() => _ = PlayCrossfadeAsync());
+        _vps.ClipChanged += _clipChangedHandler;
+
         Closed += (_, _) =>
         {
+            _hideBarTimer.Stop();
             _vps.ClipChanged -= _clipChangedHandler;
             _clipChangedHandler = null;
         };
@@ -63,8 +99,6 @@ public partial class ExternalOutputWindow : Window
 
     private async Task PlayCrossfadeAsync()
     {
-        // New clip just started — buffer is cleared so the view is already black.
-        // Fade in from black over 0.5 s for a smooth club-screen crossfade.
         VideoOutput.Opacity = 0.0;
         await VideoOutput.PlayTransitionAsync(TransitionType.Fade, 0.5, outgoing: false);
     }
