@@ -47,6 +47,18 @@
     <SolidColorBrush x:Key="TextBrushDisabled"  Color="{StaticResource TextDisabled}" />
     <SolidColorBrush x:Key="TextBrushAccent"    Color="{StaticResource AccentYellow}" />
 
+    <!-- ── Card / Surface Brushes ──────────────────────────────────────────── -->
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="{StaticResource SurfaceLight}" />
+    <SolidColorBrush x:Key="BorderBrushDefault"  Color="{StaticResource BorderMuted}" />
+
+    <!-- ── Play Button States ───────────────────────────────────────────── -->
+    <SolidColorBrush x:Key="PlayBtnFgBrush"       Color="{StaticResource AccentYellow}" />
+    <SolidColorBrush x:Key="PlayBtnBgBrush"       Color="#12F59E0B" />
+    <SolidColorBrush x:Key="PlayBtnBgHoverBrush"  Color="#22F59E0B" />
+    <SolidColorBrush x:Key="PlayBtnBgActiveBrush" Color="{StaticResource AccentYellowDim}" />
+    <SolidColorBrush x:Key="PlayBtnBorderBrush"   Color="{StaticResource AccentYellowDim}" />
+    <SolidColorBrush x:Key="PlayBtnActiveBorderBrush" Color="{StaticResource AccentYellow}" />
+
     <!-- ── Accent Brushes ────────────────────────────────────────────────── -->
     <SolidColorBrush x:Key="AccentBrush"          Color="{StaticResource AccentYellow}" />
     <SolidColorBrush x:Key="AccentOrangeBrush"    Color="{StaticResource AccentOrange}" />

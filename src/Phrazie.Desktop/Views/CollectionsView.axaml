@@ -6,124 +6,350 @@
              Background="Transparent">
 
     <UserControl.Styles>
-        <Style Selector="Button.select-btn">
-            <Setter Property="Width"            Value="34" />
-            <Setter Property="Height"           Value="34" />
-            <Setter Property="Padding"          Value="0" />
-            <Setter Property="CornerRadius"     Value="17" />
-            <Setter Property="BorderThickness"  Value="0" />
-            <Setter Property="Background"       Value="{StaticResource BoxBorderDefault}" />
+
+        <!-- ── New Collection pill button ─────────────────────────────────── -->
+        <Style Selector="Button.new-btn">
+            <Setter Property="Height"          Value="34" />
+            <Setter Property="Padding"         Value="14,0" />
+            <Setter Property="Background"      Value="{StaticResource ControlBackgroundBrush}" />
+            <Setter Property="Foreground"      Value="{StaticResource TextBrushPrimary}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderBrushDefault}" />
+            <Setter Property="CornerRadius"    Value="17" />
+            <Setter Property="FontSize"        Value="12" />
+            <Setter Property="FontWeight"      Value="Medium" />
         </Style>
-        <Style Selector="Button.select-btn:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+        <Style Selector="Button.new-btn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource SurfaceLight}" />
         </Style>
-        <!-- Active collection: filled amber -->
-        <Style Selector="Button.select-btn.active">
-            <Setter Property="Background" Value="{StaticResource AccentBrush}" />
+
+        <!-- ── Segmented sort buttons ──────────────────────────────────────── -->
+        <Style Selector="Button.sort-btn">
+            <Setter Property="Height"          Value="32" />
+            <Setter Property="Padding"         Value="12,0" />
+            <Setter Property="FontSize"        Value="12" />
+            <Setter Property="FontWeight"      Value="Medium" />
+            <Setter Property="Background"      Value="Transparent" />
+            <Setter Property="Foreground"      Value="{StaticResource TextBrushSecondary}" />
+            <Setter Property="BorderThickness" Value="1,1,0,1" />
+            <Setter Property="BorderBrush"     Value="{StaticResource BorderBrushDefault}" />
+            <Setter Property="CornerRadius"    Value="0" />
         </Style>
-        <Style Selector="Button.select-btn.active:pointerover /template/ ContentPresenter">
-            <Setter Property="Background" Value="#FFBB44" />
+        <Style Selector="Button.sort-btn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
         </Style>
+        <Style Selector="Button.sort-btn.active /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
+        </Style>
+        <Style Selector="Button.sort-btn.active">
+            <Setter Property="Foreground" Value="{StaticResource TextBrushPrimary}" />
+        </Style>
+        <Style Selector="Button.sort-btn.sort-first">
+            <Setter Property="CornerRadius"    Value="4,0,0,4" />
+        </Style>
+        <Style Selector="Button.sort-btn.sort-last">
+            <Setter Property="CornerRadius"    Value="0,4,4,0" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <!-- ── Card hover glow ────────────────────────────────────────────── -->
+        <Style Selector="Border.card">
+            <Setter Property="Transitions">
+                <Transitions>
+                    <BrushTransition Property="BorderBrush" Duration="0:0:0.15" />
+                </Transitions>
+            </Setter>
+        </Style>
+        <Style Selector="Border.card:pointerover">
+            <Setter Property="BorderBrush" Value="{StaticResource AccentYellowDimBrush}" />
+            <Setter Property="BoxShadow"   Value="0 0 12 0 #30F59E0B" />
+        </Style>
+
+        <!-- ── Card action buttons ─────────────────────────────────────────── -->
+        <Style Selector="Button.card-btn">
+            <Setter Property="Height"          Value="30" />
+            <Setter Property="Background"      Value="{StaticResource SurfaceDark}" />
+            <Setter Property="Foreground"      Value="{StaticResource TextBrushSecondary}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize"        Value="12" />
+            <Setter Property="Padding"         Value="10,0" />
+            <Setter Property="CornerRadius"    Value="4" />
+        </Style>
+        <Style Selector="Button.card-btn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
+        </Style>
+
+        <!-- Play — amber in all states -->
+        <Style Selector="Button.card-btn.play">
+            <Setter Property="Foreground"      Value="{StaticResource PlayBtnFgBrush}" />
+            <Setter Property="Background"      Value="{StaticResource PlayBtnBgBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush"     Value="{StaticResource PlayBtnBorderBrush}" />
+        </Style>
+        <Style Selector="Button.card-btn.play:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource PlayBtnBgHoverBrush}" />
+        </Style>
+        <Style Selector="Button.card-btn.play:focus-visible /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource PlayBtnBgHoverBrush}" />
+        </Style>
+        <!-- Active = this collection is live -->
+        <Style Selector="Button.card-btn.play.active">
+            <Setter Property="Background"  Value="{StaticResource PlayBtnBgActiveBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource PlayBtnActiveBorderBrush}" />
+        </Style>
+        <Style Selector="Button.card-btn.play.active:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#60F59E0B" />
+        </Style>
+
+        <Style Selector="Button.card-btn.danger:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="#3FEF4444" />
+        </Style>
+
+        <!-- ── Three-dot menu button ──────────────────────────────────────── -->
+        <Style Selector="Button.dots-btn">
+            <Setter Property="Width"           Value="26" />
+            <Setter Property="Height"          Value="26" />
+            <Setter Property="Padding"         Value="0" />
+            <Setter Property="Background"      Value="Transparent" />
+            <Setter Property="Foreground"      Value="{StaticResource TextBrushSecondary}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius"    Value="4" />
+            <Setter Property="FontSize"        Value="15" />
+        </Style>
+        <Style Selector="Button.dots-btn:pointerover /template/ ContentPresenter">
+            <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}" />
+        </Style>
+
     </UserControl.Styles>
 
-    <Grid RowDefinitions="Auto,*" Margin="32">
+    <Grid RowDefinitions="Auto,*" Margin="32,28,32,32">
 
-        <StackPanel Grid.Row="0" Margin="0,0,0,28">
-            <TextBlock Text="Collections"
-                       Foreground="{StaticResource TextBrushPrimary}"
-                       FontSize="28"
-                       FontWeight="Light"
-                       Margin="0,0,0,16" />
+        <!-- ═══ Header ══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,24">
 
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <TextBox Text="{Binding NewCollectionName}"
-                         PlaceholderText="New collection name…"
-                         Width="280"
-                         Background="{StaticResource ControlBackgroundBrush}"
-                         BorderBrush="{StaticResource BoxBorderDefault}"
-                         CornerRadius="4"
-                         ToolTip.Tip="Enter a name for your new collection" />
-                <Button Command="{Binding CreateCollectionCommand}"
-                        Content="Create"
-                        Background="{StaticResource TextBrushPrimary}"
-                        Foreground="{StaticResource MainBackgroundBrush}"
-                        BorderThickness="0"
-                        Padding="18,8"
-                        CornerRadius="4"
-                        FontWeight="Medium"
-                        ToolTip.Tip="Create a new collection with Normal, Break, and Drop states" />
+            <!-- Left column: title + stats + new-collection button -->
+            <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Bottom">
+
+                <TextBlock Text="Collections"
+                           Foreground="{StaticResource TextBrushPrimary}"
+                           FontSize="26"
+                           FontWeight="Bold" />
+
+                <TextBlock Text="{Binding StatsDisplay}"
+                           Foreground="{StaticResource TextBrushSecondary}"
+                           FontSize="12"
+                           Margin="0,0,0,12" />
+
+                <Button Classes="new-btn">
+                    <Button.Flyout>
+                        <Flyout Placement="Bottom">
+                            <Border Background="{StaticResource PanelBackgroundBrush}"
+                                    BorderBrush="{StaticResource BorderBrushDefault}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="16">
+                                <StackPanel Spacing="10" Width="240">
+                                    <TextBlock Text="New Collection"
+                                               Foreground="{StaticResource TextBrushPrimary}"
+                                               FontWeight="SemiBold"
+                                               FontSize="13" />
+                                    <TextBox Text="{Binding NewCollectionName}"
+                                             PlaceholderText="Collection name…"
+                                             Background="{StaticResource ControlBackgroundBrush}"
+                                             BorderBrush="{StaticResource BoxBorderDefault}"
+                                             CornerRadius="6" />
+                                    <Button Command="{Binding CreateCollectionCommand}"
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Center"
+                                            Background="{StaticResource AccentBrush}"
+                                            Foreground="{StaticResource SurfaceBlack}"
+                                            BorderThickness="0"
+                                            CornerRadius="6"
+                                            FontWeight="SemiBold"
+                                            Content="Create" />
+                                </StackPanel>
+                            </Border>
+                        </Flyout>
+                    </Button.Flyout>
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <TextBlock Text="+"
+                                   Foreground="{StaticResource AccentBrush}"
+                                   FontSize="15"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="New Collection"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
             </StackPanel>
-        </StackPanel>
 
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding Collections}">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
+            <!-- Right column: search + sort segment -->
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="10"
+                        VerticalAlignment="Bottom">
 
-            <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="vm:CollectionCardViewModel">
-                    <Border Width="185"
-                            Background="{StaticResource ControlBackgroundBrush}"
-                            BorderBrush="{StaticResource BoxBorderDefault}"
-                            BorderThickness="1"
-                            CornerRadius="8"
-                            Margin="0,0,14,14"
-                            ClipToBounds="True"
-                            Cursor="Hand">
-                        <StackPanel>
+                <TextBox Text="{Binding SearchText}"
+                         PlaceholderText="Search collections..."
+                         Width="200"
+                         Height="32"
+                         Background="{StaticResource ControlBackgroundBrush}"
+                         BorderBrush="{StaticResource BorderBrushDefault}"
+                         BorderThickness="1"
+                         CornerRadius="6"
+                         FontSize="12"
+                         VerticalContentAlignment="Center" />
 
-                            <Panel Height="115">
-                                <Border>
-                                    <Border.Background>
-                                        <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
-                                            <GradientStop Color="{StaticResource SurfaceBlack}" Offset="0" />
-                                            <GradientStop Color="{StaticResource SurfaceDark}" Offset="1" />
-                                        </LinearGradientBrush>
-                                    </Border.Background>
-                                </Border>
-                                <Image Source="{Binding CoverImage}"
-                                       Stretch="UniformToFill"
-                                       IsVisible="{Binding CoverImage, Converter={x:Static ObjectConverters.IsNotNull}}" />
-                            </Panel>
+                <!-- Segmented sort buttons -->
+                <StackPanel Orientation="Horizontal" Spacing="0">
+                    <Button Classes="sort-btn sort-first"
+                            Classes.active="{Binding IsSortRecent}"
+                            Command="{Binding SortByRecentCommand}"
+                            Content="Recent" />
+                    <Button Classes="sort-btn"
+                            Classes.active="{Binding IsSortAz}"
+                            Command="{Binding SortByNameCommand}"
+                            Content="A-Z" />
+                    <Button Classes="sort-btn sort-last"
+                            Classes.active="{Binding IsSortSize}"
+                            Command="{Binding SortBySizeCommand}"
+                            Content="Size" />
+                </StackPanel>
 
-                            <StackPanel Margin="14,12,14,14" Spacing="10">
-                                <TextBlock Text="{Binding Name}"
-                                           Foreground="{StaticResource TextBrushPrimary}"
-                                           FontSize="14"
-                                           FontWeight="Medium" />
+            </StackPanel>
+        </Grid>
 
-                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                                    <Button Classes="select-btn"
+        <!-- ═══ Card grid ═══════════════════════════════════════════════════ -->
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+            <ItemsControl ItemsSource="{Binding FilteredCollections}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:CollectionCardViewModel">
+
+                        <Border Classes="card"
+                                Width="240"
+                                Background="{StaticResource CardBackgroundBrush}"
+                                BorderBrush="{StaticResource BorderBrushDefault}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Margin="0,0,20,20"
+                                ClipToBounds="True"
+                                Cursor="Hand">
+                            <StackPanel>
+
+                                <!-- 16:9 thumbnail -->
+                                <Panel Height="135" ClipToBounds="True">
+                                    <Border>
+                                        <Border.Background>
+                                            <LinearGradientBrush StartPoint="0%,0%" EndPoint="100%,100%">
+                                                <GradientStop Color="{StaticResource SurfaceBlack}" Offset="0" />
+                                                <GradientStop Color="{StaticResource SurfaceDark}"  Offset="1" />
+                                            </LinearGradientBrush>
+                                        </Border.Background>
+                                    </Border>
+                                    <Image Source="{Binding CoverImage}"
+                                           Stretch="UniformToFill"
+                                           IsVisible="{Binding CoverImage, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                </Panel>
+
+                                <!-- Name + clip count + ⋮ button -->
+                                <Grid ColumnDefinitions="*,Auto" Margin="12,10,8,0" VerticalAlignment="Center">
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{Binding Name}"
+                                                   Foreground="{StaticResource TextBrushPrimary}"
+                                                   FontSize="13"
+                                                   FontWeight="SemiBold"
+                                                   TextTrimming="CharacterEllipsis" />
+                                        <TextBlock Text="{Binding ClipCountDisplay}"
+                                                   Foreground="{StaticResource TextBrushSecondary}"
+                                                   FontSize="11"
+                                                   Margin="0,3,0,0" />
+                                    </StackPanel>
+                                    <Button Grid.Column="1"
+                                            Classes="dots-btn"
+                                            VerticalAlignment="Top"
+                                            ToolTip.Tip="More options">
+                                        <Button.Flyout>
+                                            <MenuFlyout>
+                                                <MenuItem Header="Manage"
+                                                          Command="{Binding ManageCommand}" />
+                                                <MenuItem Header="Delete"
+                                                          Command="{Binding DeleteCommand}" />
+                                            </MenuFlyout>
+                                        </Button.Flyout>
+                                        <TextBlock Text="⋮"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                    </Button>
+                                </Grid>
+
+                                <!-- Play + Delete footer -->
+                                <Grid ColumnDefinitions="*,Auto" Margin="12,8,12,12">
+                                    <Button Grid.Column="0"
+                                            Classes="card-btn play"
                                             Classes.active="{Binding IsActive}"
                                             Command="{Binding SelectCommand}"
-                                            ToolTip.Tip="Set as the active collection for live performance">
-                                        <TextBlock Text="▶"
-                                                   FontFamily="Segoe UI Symbol"
-                                                   FontSize="13"
-                                                   Foreground="{StaticResource TextBrushPrimary}"
-                                                   HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   Margin="3,0,0,0" />
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Center"
+                                            ToolTip.Tip="Set as active collection">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <TextBlock Text="▶"
+                                                       FontFamily="Segoe UI Symbol"
+                                                       FontSize="11"
+                                                       VerticalAlignment="Center" />
+                                            <TextBlock Text="Play"
+                                                       VerticalAlignment="Center" />
+                                        </StackPanel>
                                     </Button>
-                                    <Button Command="{Binding ManageCommand}"
-                                            Content="Manage"
-                                            Background="Transparent"
-                                            Foreground="{StaticResource TextBrushSecondary}"
-                                            BorderThickness="0"
-                                            Padding="8,5"
-                                            FontSize="12"
-                                            ToolTip.Tip="Open collection management" />
-                                </StackPanel>
-                            </StackPanel>
+                                    <Button Grid.Column="1"
+                                            Classes="card-btn danger"
+                                            Width="32"
+                                            Padding="0"
+                                            Margin="6,0,0,0"
+                                            Command="{Binding DeleteCommand}"
+                                            ToolTip.Tip="Delete collection">
+                                        <Viewbox Width="13" Height="13" Stretch="Uniform">
+                                            <Canvas Width="16" Height="16">
+                                                <!-- lid bar -->
+                                                <Path Data="M1,5 H15"
+                                                      Stroke="{StaticResource TextBrushSecondary}"
+                                                      StrokeThickness="1.5"
+                                                      StrokeLineCap="Round" />
+                                                <!-- handle -->
+                                                <Path Data="M6,5 V3 Q6,2 7,2 H9 Q10,2 10,3 V5"
+                                                      Stroke="{StaticResource TextBrushSecondary}"
+                                                      StrokeThickness="1.5"
+                                                      StrokeLineCap="Round"
+                                                      Fill="Transparent" />
+                                                <!-- body -->
+                                                <Path Data="M3,5 L3.5,14 Q3.5,15 4.5,15 H11.5 Q12.5,15 12.5,14 L13,5"
+                                                      Stroke="{StaticResource TextBrushSecondary}"
+                                                      StrokeThickness="1.5"
+                                                      StrokeLineCap="Round"
+                                                      Fill="Transparent" />
+                                                <!-- inner lines -->
+                                                <Path Data="M6,7 V13 M8,7 V13 M10,7 V13"
+                                                      Stroke="{StaticResource TextBrushSecondary}"
+                                                      StrokeThickness="1.2"
+                                                      StrokeLineCap="Round" />
+                                            </Canvas>
+                                        </Viewbox>
+                                    </Button>
+                                </Grid>
 
-                        </StackPanel>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                            </StackPanel>
+                        </Border>
+
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
 
     </Grid>
-
 </UserControl>

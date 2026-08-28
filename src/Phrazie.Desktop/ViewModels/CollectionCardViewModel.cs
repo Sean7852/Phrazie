@@ -9,23 +9,29 @@ namespace Phrazie.Desktop.ViewModels;
 
 public partial class CollectionCardViewModel : ViewModelBase
 {
-    private readonly ISessionService        _session;
-    private readonly Action<Collection>     _onManage;
+    private readonly ISessionService                      _session;
+    private readonly Action<Collection>                   _onManage;
+    private readonly Action<CollectionCardViewModel>      _onDelete;
 
     public Collection Model { get; }
     public string     Name  => Model.Name;
+
+    public int    ClipCount        => Model.States.Sum(s => s.Clips.Count);
+    public string ClipCountDisplay => $"{ClipCount} clips";
 
     [ObservableProperty] private Bitmap? _coverImage;
     [ObservableProperty] private bool    _isActive;
 
     public CollectionCardViewModel(
-        Collection           model,
-        ISessionService      session,
-        Action<Collection>   onManage)
+        Collection                          model,
+        ISessionService                     session,
+        Action<Collection>                  onManage,
+        Action<CollectionCardViewModel>     onDelete)
     {
         Model     = model;
         _session  = session;
         _onManage = onManage;
+        _onDelete = onDelete;
 
         _isActive = _session.Current.ActiveCollection?.Id == model.Id;
 
@@ -43,4 +49,7 @@ public partial class CollectionCardViewModel : ViewModelBase
 
     [RelayCommand]
     private void Manage() => _onManage(Model);
+
+    [RelayCommand]
+    private void Delete() => _onDelete(this);
 }
